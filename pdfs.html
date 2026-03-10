@@ -17,16 +17,7 @@
       color: var(--text-light);
     }
     .no-data-msg .nd-icon { font-size: 2.8rem; display: block; margin-bottom: 12px; }
-    .no-data-msg p { margin-bottom: 18px; font-size: 0.95rem; }
-    .no-data-msg .nd-btn {
-      display: inline-block; background: var(--green); color: white;
-      padding: 10px 26px; border-radius: 50px; font-weight: 700;
-      font-size: 0.88rem; cursor: pointer; transition: background 0.2s; margin-bottom: 14px;
-    }
-    .no-data-msg .nd-btn:hover { background: var(--green-dark); }
-    .no-data-msg .nd-sub { font-size: 0.82rem; color: var(--text-light); margin-top: 6px; }
-    .no-data-msg .nd-sub a { color: var(--green); font-weight: 600; text-decoration: none; }
-    .no-data-msg .nd-sub a:hover { text-decoration: underline; }
+    .no-data-msg p { font-size: 0.95rem; }
 
     .pdf-search {
       max-width: 480px; margin: 0 auto 20px;
@@ -95,9 +86,6 @@
 <!-- ===== PDFs ===== -->
 <section>
   <div class="container">
-
-    <!-- Hidden file input for direct Excel loading -->
-    <input type="file" id="excelFileInput" accept=".xlsx,.xls" style="display:none;" />
 
     <!-- Search -->
     <div class="pdf-search" id="pdfSearchBox" style="display:none;">
@@ -182,12 +170,7 @@ $(function () {
      PDFs — Infinite Scroll
   ══════════════════════════════════════════════════════════ */
   function noDataMsg() {
-    return '<div class="no-data-msg">' +
-      '<span class="nd-icon">📚</span>' +
-      '<p>No PDFs found. Select your <strong>content-manager.xlsx</strong> to display PDF downloads.</p>' +
-      '<label class="nd-btn" for="excelFileInput">📂 Load Excel File</label>' +
-      '<div class="nd-sub">Need to add or edit entries? <a href="tools/excel-manager.html">⚙ Open Excel Manager</a></div>' +
-    '</div>';
+    return '<div class="no-data-msg"><span class="nd-icon">📚</span><p>No PDFs found.</p></div>';
   }
 
   function clearPdfs() {
@@ -297,18 +280,6 @@ $(function () {
     if (e.key === 'Escape') $(this).val(''); applyFilter();
   });
   $(document).on('click', '#pdfSearchBtn', function () { applyFilter(); });
-
-  /* ── Direct Excel load from PDF page ── */
-  $('#excelFileInput').on('change', function (e) {
-    var file = e.target.files[0];
-    if (!file) return;
-    SITE_DATA.loadFromFile(file, function () {
-      buildAndRender();
-    }, function (err) {
-      alert('Error loading Excel file: ' + err.message);
-    });
-    $(this).val('');
-  });
 
   /* ── Init ── */
   if (SITE_DATA.loaded && SITE_DATA.pdfs.length) {
