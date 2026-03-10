@@ -122,7 +122,22 @@
     }
   };
 
-  /* Auto-restore on script load */
-  window.SITE_DATA.loadFromStorage();
+  /* Auto-restore on script load:
+     1. Try localStorage first (from Excel Manager)
+     2. Fall back to static data JS files (photos.js / videos.js / pdfs.js) */
+  if (!window.SITE_DATA.loadFromStorage()) {
+    if (typeof PHOTOS_DATA !== 'undefined' && PHOTOS_DATA.length) {
+      window.SITE_DATA.photos = PHOTOS_DATA;
+    }
+    if (typeof VIDEOS_DATA !== 'undefined' && VIDEOS_DATA.length) {
+      window.SITE_DATA.videos = VIDEOS_DATA;
+    }
+    if (typeof PDFS_DATA !== 'undefined' && PDFS_DATA.length) {
+      window.SITE_DATA.pdfs = PDFS_DATA;
+    }
+    if (window.SITE_DATA.photos.length || window.SITE_DATA.videos.length || window.SITE_DATA.pdfs.length) {
+      window.SITE_DATA.loaded = true;
+    }
+  }
 
 })();

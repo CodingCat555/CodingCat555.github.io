@@ -9,7 +9,11 @@
   <!-- SheetJS (reads Excel) + jQuery -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <!-- Central data loader (reads content-manager.xlsx, caches in localStorage) -->
+  <!-- Static data files -->
+  <script src="data/photos.js"></script>
+  <script src="data/videos.js"></script>
+  <script src="data/pdfs.js"></script>
+  <!-- Central data loader (localStorage › falls back to data JS files) -->
   <script src="data/data-loader.js"></script>
   <style>
     .no-data-msg {
