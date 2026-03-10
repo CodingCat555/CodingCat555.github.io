@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Content Manager — Yogi Ramsuratkumar Website</title>
+
+  <!-- jQuery + SheetJS -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <!-- Data files -->
+  <script src="../data/photos.js"></script>
+  <script src="../data/videos.js"></script>
+  <script src="../data/pdfs.js"></script>
+
+  <style>
+    :root {
+      --green: #1A6B2E; --green-dark: #0F4520; --green-light: #2D9148;
+      --gold: #FFD700; --cream: #F0FFF4; --light: #D8F3DC;
+      --text: #1B4332; --text-light: #3D7A57; --border: rgba(26,107,46,0.22);
+      --card: #F5FFFA; --radius: 10px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: var(--cream); color: var(--text); }
+
+    /* ---- Header ---- */
+    .header {
+      background: linear-gradient(135deg, var(--green-dark), var(--green));
+      color: white; padding: 16px 28px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 3px 14px rgba(0,0,0,0.25);
+    }
+    .header h1 { font-size: 1.25rem; }
+    .header p  { font-size: 0.78rem; opacity: 0.8; margin-top: 2px; }
+    .header-back { color: var(--gold); font-size: 0.85rem; text-decoration: none; }
+    .header-back:hover { text-decoration: underline; }
+
+    /* ---- Workflow strip ---- */
+    .workflow {
+      background: var(--light); border-bottom: 1px solid var(--border);
+      padding: 10px 28px; display: flex; align-items: center; gap: 14px;
+      flex-wrap: wrap;
+    }
+    .workflow span { font-size: 0.78rem; color: var(--text-light); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+    .step { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--text); }
+    .step-num { width: 22px; height: 22px; background: var(--green); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; flex-shrink: 0; }
+    .step-arrow { color: var(--text-light); font-size: 0.9rem; }
+
+    /* ---- Toolbar ---- */
+    .toolbar {
+      padding: 12px 28px; background: white;
+      border-bottom: 1px solid var(--border);
+      display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+    }
+    .btn { padding: 9px 18px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; }
+    .btn-green  { background: var(--green); color: white; }
+    .btn-green:hover  { background: var(--green-dark); }
+    .btn-gold   { background: var(--gold); color: var(--green-dark); }
+    .btn-gold:hover   { background: #e6c200; }
+    .btn-outline{ background: white; color: var(--green); border: 2px solid var(--green); }
+    .btn-outline:hover{ background: var(--light); }
+    .btn-red    { background: #c62828; color: white; }
+    .btn-red:hover    { background: #a31515; }
+    .toolbar-sep { width: 1px; height: 32px; background: var(--border); margin: 0 4px; }
+    #uploadInput { display: none; }
+
+    /* ---- Tabs ---- */
+    .tabs { display: flex; background: var(--light); border-bottom: 2px solid var(--border); padding: 0 28px; }
+    .tab-btn {
+      padding: 12px 24px; cursor: pointer; font-size: 0.9rem; font-weight: 700;
+      color: var(--text-light); border: none; background: none;
+      border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s;
+    }
+    .tab-btn.active { color: var(--green); border-bottom-color: var(--green); }
+    .tab-btn:hover:not(.active) { color: var(--green); background: rgba(26,107,46,0.05); }
+    .tab-count { background: var(--green); color: white; font-size: 0.68rem; padding: 1px 7px; border-radius: 50px; margin-left: 6px; }
+
+    /* ---- Content ---- */
+    .content { padding: 20px 28px; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ---- Table ---- */
+    .table-wrap { overflow-x: auto; border-radius: var(--radius); box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+    table { width: 100%; border-collapse: collapse; background: white; min-width: 900px; }
+    thead th {
+      background: var(--green); color: white; padding: 11px 14px;
+      font-size: 0.82rem; text-align: left; white-space: nowrap;
+      border-right: 1px solid rgba(255,255,255,0.15);
+    }
+    thead th:first-child { border-radius: var(--radius) 0 0 0; }
+    thead th:last-child  { border-radius: 0 var(--radius) 0 0; }
+    .serial-th { width: 70px; text-align: center !important; }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+    tbody tr:nth-child(even) { background: #F5FFFA; }
+    tbody tr:hover { background: #E8F5E9; }
+    tbody td { padding: 8px 10px; vertical-align: top; }
+    .serial-td { text-align: center; font-weight: 700; color: var(--green); font-size: 0.9rem; width: 60px; }
+
+    /* Editable cell */
+    .editable {
+      width: 100%; min-height: 32px; padding: 4px 8px;
+      border: 1px solid transparent; border-radius: 5px;
+      font-family: Arial; font-size: 0.83rem; resize: vertical;
+      background: transparent; color: var(--text); transition: border 0.2s;
+    }
+    .editable:focus { outline: none; border-color: var(--green); background: white; box-shadow: 0 0 0 3px rgba(26,107,46,0.1); }
+    .desc-cell .editable { min-height: 54px; }
+    select.editable { cursor: pointer; }
+
+    /* Row actions */
+    .del-row { background: none; border: none; color: #c62828; cursor: pointer; font-size: 1rem; padding: 4px 6px; border-radius: 4px; }
+    .del-row:hover { background: #fde8e8; }
+
+    /* ---- Status bar ---- */
+    .status-bar {
+      margin-top: 14px; padding: 10px 16px;
+      background: white; border: 1px solid var(--border);
+      border-radius: var(--radius); font-size: 0.82rem;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .status-bar.success { border-color: #2e7d32; background: #e8f5e9; color: #2e7d32; }
+    .status-bar.error   { border-color: #c62828; background: #fde8e8; color: #c62828; }
+    .status-bar.info    { border-color: var(--green); background: var(--cream); color: var(--green); }
+
+    /* ---- Generated JS preview ---- */
+    .js-preview { display: none; margin-top: 18px; }
+    .js-preview h3 { font-size: 0.9rem; color: var(--green-dark); margin-bottom: 8px; }
+    .js-tabs { display: flex; gap: 6px; margin-bottom: 6px; }
+    .js-tab { padding: 5px 14px; border: 1.5px solid var(--border); border-radius: 5px; background: white; cursor: pointer; font-size: 0.8rem; color: var(--text); }
+    .js-tab.active { background: var(--green); color: white; border-color: var(--green); }
+    pre.code-box {
+      background: #0d1117; color: #58a6ff; padding: 16px; border-radius: var(--radius);
+      font-size: 0.78rem; overflow-x: auto; max-height: 340px; overflow-y: auto;
+      line-height: 1.6; white-space: pre-wrap;
+    }
+    .copy-btn { margin-top: 8px; }
+
+    /* ---- Tip box ---- */
+    .tip { background: rgba(26,107,46,0.06); border-left: 4px solid var(--green); padding: 10px 14px; border-radius: 0 var(--radius) var(--radius) 0; font-size: 0.82rem; color: var(--text-light); margin-bottom: 14px; line-height: 1.6; }
+    .tip strong { color: var(--green-dark); }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div>
+    <h1>🪔 Content Manager — Yogi Ramsuratkumar Website</h1>
+    <p>Manage Photos · Videos · PDFs via Excel or direct table editing</p>
+  </div>
+  <a href="../index.html" class="header-back">← Back to Website</a>
+</div>
+
+<!-- Workflow -->
+<div class="workflow">
+  <span>Workflow:</span>
+  <div class="step"><span class="step-num">1</span> Edit rows in the table below</div>
+  <span class="step-arrow">→</span>
+  <div class="step"><span class="step-num">2</span> Click <b>Generate JS Files</b></div>
+  <span class="step-arrow">→</span>
+  <div class="step"><span class="step-num">3</span> Copy JS code into <b>data/photos.js</b>, <b>data/videos.js</b>, <b>data/pdfs.js</b></div>
+  <span class="step-arrow">→</span>
+  <div class="step"><span class="step-num">4</span> Refresh gallery pages — done! ✓</div>
+</div>
+
+<!-- Toolbar -->
+<div class="toolbar">
+  <button class="btn btn-gold" id="btnDownloadExcel">⬇ Download Excel</button>
+  <label class="btn btn-outline" style="cursor:pointer;">
+    📂 Upload Excel <input type="file" id="uploadInput" accept=".xlsx,.xls" />
+  </label>
+  <div class="toolbar-sep"></div>
+  <button class="btn btn-green" id="btnGenJS">⚙ Generate JS Files</button>
+  <div class="toolbar-sep"></div>
+  <button class="btn btn-outline" id="btnAddRow">➕ Add Row</button>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <button class="tab-btn active" data-tab="photos">🖼 Photos <span class="tab-count" id="photosCount">0</span></button>
+  <button class="tab-btn" data-tab="videos">🎬 Videos <span class="tab-count" id="videosCount">0</span></button>
+  <button class="tab-btn" data-tab="pdfs">📚 PDFs <span class="tab-count" id="pdfsCount">0</span></button>
+</div>
+
+<!-- Content -->
+<div class="content">
+  <div id="statusBar" class="status-bar info" style="display:none;"></div>
+
+  <!-- PHOTOS TAB -->
+  <div class="tab-panel active" id="tab-photos">
+    <div class="tip">
+      <strong>Photos:</strong> Add photo files to <code>images/gallery/</code> folder, then set the Image File path here.
+      Serial No controls the display order on the gallery page.
+    </div>
+    <div class="table-wrap">
+      <table id="photosTable">
+        <thead>
+          <tr>
+            <th class="serial-th">S.No</th>
+            <th style="min-width:200px">Name</th>
+            <th style="min-width:300px">Description</th>
+            <th style="min-width:120px">Category</th>
+            <th style="min-width:220px">Image File</th>
+            <th style="width:44px"></th>
+          </tr>
+        </thead>
+        <tbody id="photosBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- VIDEOS TAB -->
+  <div class="tab-panel" id="tab-videos">
+    <div class="tip">
+      <strong>Videos:</strong> Paste the full YouTube embed URL (e.g. <code>https://www.youtube.com/embed/ABC123xyz</code>).
+      Get it from YouTube → Share → Embed → copy the src value.
+    </div>
+    <div class="table-wrap">
+      <table id="videosTable">
+        <thead>
+          <tr>
+            <th class="serial-th">S.No</th>
+            <th style="min-width:200px">Name</th>
+            <th style="min-width:280px">Description</th>
+            <th style="min-width:120px">Category</th>
+            <th style="min-width:300px">YouTube URL</th>
+            <th style="min-width:90px">Duration</th>
+            <th style="width:44px"></th>
+          </tr>
+        </thead>
+        <tbody id="videosBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PDFs TAB -->
+  <div class="tab-panel" id="tab-pdfs">
+    <div class="tip">
+      <strong>PDFs:</strong> Place PDF files in the <code>pdfs/</code> folder, then set the PDF File path here (e.g. <code>pdfs/my-book.pdf</code>).
+    </div>
+    <div class="table-wrap">
+      <table id="pdfsTable">
+        <thead>
+          <tr>
+            <th class="serial-th">S.No</th>
+            <th style="min-width:200px">Name</th>
+            <th style="min-width:280px">Description</th>
+            <th style="min-width:120px">Category</th>
+            <th style="min-width:220px">PDF File</th>
+            <th style="min-width:90px">Pages</th>
+            <th style="width:44px"></th>
+          </tr>
+        </thead>
+        <tbody id="pdfsBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Generated JS Preview -->
+  <div class="js-preview" id="jsPreview">
+    <h3>⚙ Generated JS Data Files — Copy each tab into the corresponding data/ file:</h3>
+    <div class="js-tabs">
+      <button class="js-tab active" data-jstab="photos">data/photos.js</button>
+      <button class="js-tab" data-jstab="videos">data/videos.js</button>
+      <button class="js-tab" data-jstab="pdfs">data/pdfs.js</button>
+    </div>
+    <pre class="code-box" id="codeBox"></pre>
+    <button class="btn btn-green copy-btn" id="btnCopyCode">📋 Copy to Clipboard</button>
+    <button class="btn btn-gold copy-btn" id="btnDownloadJS" style="margin-left:8px;">⬇ Download JS File</button>
+  </div>
+</div>
+
+<script>
+$(function () {
+
+  /* ─── Category options ─────────────────────────────────────── */
+  var CAT = {
+    photos: ['darshan','ashram','festival','early','devotees'],
+    videos: ['discourse','bhajan','documentary','rare'],
+    pdfs  : ['book','talk','song','magazine','photo']
+  };
+
+  var generatedJS = { photos: '', videos: '', pdfs: '' };
+  var activeJsTab = 'photos';
+
+  /* ─── Tab switching ─────────────────────────────────────────── */
+  $('.tab-btn').on('click', function () {
+    $('.tab-btn').removeClass('active');
+    $('.tab-panel').removeClass('active');
+    $(this).addClass('active');
+    $('#tab-' + $(this).data('tab')).addClass('active');
+  });
+
+  /* ─── Render helpers ────────────────────────────────────────── */
+  function catSelect(cats, val) {
+    var html = '<select class="editable">';
+    cats.forEach(function (c) {
+      html += '<option value="' + c + '"' + (c === val ? ' selected' : '') + '>' + c + '</option>';
+    });
+    html += '</select>';
+    return html;
+  }
+  function cell(val, cls, tag) {
+    cls = cls || ''; tag = tag || 'input';
+    if (tag === 'textarea') return '<textarea class="editable ' + cls + '">' + $('<div>').text(val).html() + '</textarea>';
+    return '<input type="text" class="editable ' + cls + '" value="' + $('<div>').text(val).html() + '" />';
+  }
+  function delBtn() { return '<button class="del-row" title="Delete row">✕</button>'; }
+
+  /* ─── Render Photos ─────────────────────────────────────────── */
+  function renderPhotos(data) {
+    var $body = $('#photosBody').empty();
+    $.each(data, function (i, r) {
+      var $tr = $('<tr>').append(
+        $('<td class="serial-td">').text(r.serial),
+        $('<td>').html(cell(r.name)),
+        $('<td class="desc-cell">').html(cell(r.description, '', 'textarea')),
+        $('<td>').html(catSelect(CAT.photos, r.category)),
+        $('<td>').html(cell(r.image)),
+        $('<td>').html(delBtn())
+      );
+      $body.append($tr);
+    });
+    $('#photosCount').text(data.length);
+  }
+
+  /* ─── Render Videos ─────────────────────────────────────────── */
+  function renderVideos(data) {
+    var $body = $('#videosBody').empty();
+    $.each(data, function (i, r) {
+      var $tr = $('<tr>').append(
+        $('<td class="serial-td">').text(r.serial),
+        $('<td>').html(cell(r.name)),
+        $('<td class="desc-cell">').html(cell(r.description, '', 'textarea')),
+        $('<td>').html(catSelect(CAT.videos, r.category)),
+        $('<td>').html(cell(r.youtubeUrl)),
+        $('<td>').html(cell(r.duration)),
+        $('<td>').html(delBtn())
+      );
+      $body.append($tr);
+    });
+    $('#videosCount').text(data.length);
+  }
+
+  /* ─── Render PDFs ───────────────────────────────────────────── */
+  function renderPdfs(data) {
+    var $body = $('#pdfsBody').empty();
+    $.each(data, function (i, r) {
+      var $tr = $('<tr>').append(
+        $('<td class="serial-td">').text(r.serial),
+        $('<td>').html(cell(r.name)),
+        $('<td class="desc-cell">').html(cell(r.description, '', 'textarea')),
+        $('<td>').html(catSelect(CAT.pdfs, r.category)),
+        $('<td>').html(cell(r.file)),
+        $('<td>').html(cell(r.pages)),
+        $('<td>').html(delBtn())
+      );
+      $body.append($tr);
+    });
+    $('#pdfsCount').text(data.length);
+  }
+
+  /* ─── Initial render from data files ──────────────────────── */
+  var sortBySerial = function (a, b) { return a.serial - b.serial; };
+  renderPhotos(PHOTOS_DATA.slice().sort(sortBySerial));
+  renderVideos(VIDEOS_DATA.slice().sort(sortBySerial));
+  renderPdfs(PDFS_DATA.slice().sort(sortBySerial));
+
+  /* ─── Delete row ────────────────────────────────────────────── */
+  $(document).on('click', '.del-row', function () {
+    if (confirm('Delete this row?')) {
+      $(this).closest('tr').remove();
+      updateCounts();
+    }
+  });
+
+  /* ─── Add row ──────────────────────────────────────────────── */
+  $('#btnAddRow').on('click', function () {
+    var tab = $('.tab-btn.active').data('tab');
+    var nextSerial = 1;
+    if (tab === 'photos') {
+      nextSerial = $('#photosBody tr').length + 1;
+      var $tr = $('<tr>').append(
+        $('<td class="serial-td">').text(nextSerial),
+        $('<td>').html(cell('')), $('<td class="desc-cell">').html(cell('', '', 'textarea')),
+        $('<td>').html(catSelect(CAT.photos, 'darshan')),
+        $('<td>').html(cell('images/gallery/new-photo.jpg')),
+        $('<td>').html(delBtn())
+      );
+      $('#photosBody').append($tr);
+    } else if (tab === 'videos') {
+      nextSerial = $('#videosBody tr').length + 1;
+      var $tr = $('<tr>').append(
+        $('<td class="serial-td">').text(nextSerial),
+        $('<td>').html(cell('')), $('<td class="desc-cell">').html(cell('', '', 'textarea')),
+        $('<td>').html(catSelect(CAT.videos, 'discourse')),
+        $('<td>').html(cell('https://www.youtube.com/embed/VIDEO_ID')),
+        $('<td>').html(cell('')), $('<td>').html(delBtn())
+      );
+      $('#videosBody').append($tr);
+    } else if (tab === 'pdfs') {
+      nextSerial = $('#pdfsBody tr').length + 1;
+      var $tr = $('<tr>').append(
+        $('<td class="serial-td">').text(nextSerial),
+        $('<td>').html(cell('')), $('<td class="desc-cell">').html(cell('', '', 'textarea')),
+        $('<td>').html(catSelect(CAT.pdfs, 'book')),
+        $('<td>').html(cell('pdfs/new-file.pdf')),
+        $('<td>').html(cell('')), $('<td>').html(delBtn())
+      );
+      $('#pdfsBody').append($tr);
+    }
+    updateCounts();
+  });
+
+  function updateCounts() {
+    $('#photosCount').text($('#photosBody tr').length);
+    $('#videosCount').text($('#videosBody tr').length);
+    $('#pdfsCount').text($('#pdfsBody tr').length);
+  }
+
+  /* ─── Read table data ───────────────────────────────────────── */
+  function readPhotos() {
+    return $('#photosBody tr').map(function (i) {
+      var $tds = $(this).find('td');
+      return {
+        serial     : i + 1,
+        name       : $tds.eq(1).find('.editable').val().trim(),
+        description: $tds.eq(2).find('.editable').val().trim(),
+        category   : $tds.eq(3).find('.editable').val(),
+        image      : $tds.eq(4).find('.editable').val().trim()
+      };
+    }).get();
+  }
+  function readVideos() {
+    return $('#videosBody tr').map(function (i) {
+      var $tds = $(this).find('td');
+      return {
+        serial     : i + 1,
+        name       : $tds.eq(1).find('.editable').val().trim(),
+        description: $tds.eq(2).find('.editable').val().trim(),
+        category   : $tds.eq(3).find('.editable').val(),
+        youtubeUrl : $tds.eq(4).find('.editable').val().trim(),
+        duration   : $tds.eq(5).find('.editable').val().trim()
+      };
+    }).get();
+  }
+  function readPdfs() {
+    return $('#pdfsBody tr').map(function (i) {
+      var $tds = $(this).find('td');
+      return {
+        serial     : i + 1,
+        name       : $tds.eq(1).find('.editable').val().trim(),
+        description: $tds.eq(2).find('.editable').val().trim(),
+        category   : $tds.eq(3).find('.editable').val(),
+        file       : $tds.eq(4).find('.editable').val().trim(),
+        pages      : $tds.eq(5).find('.editable').val().trim()
+      };
+    }).get();
+  }
+
+  /* ─── Generate JS ───────────────────────────────────────────── */
+  function toJsFile(varName, arr, fields) {
+    var lines = ['/* Auto-generated by Content Manager — ' + new Date().toLocaleDateString() + ' */\n'];
+    lines.push('var ' + varName + ' = [\n');
+    arr.forEach(function (item, idx) {
+      lines.push('  {\n');
+      fields.forEach(function (f) {
+        var v = (item[f] !== undefined) ? item[f] : '';
+        lines.push('    ' + f.padEnd(12) + ': ' + JSON.stringify(String(v)) + (f === fields[fields.length-1] ? '' : ',') + '\n');
+      });
+      lines.push('  }' + (idx < arr.length - 1 ? ',' : '') + '\n');
+    });
+    lines.push('];\n');
+    return lines.join('');
+  }
+
+  $('#btnGenJS').on('click', function () {
+    generatedJS.photos = toJsFile('PHOTOS_DATA', readPhotos(), ['serial','name','description','category','image']);
+    generatedJS.videos = toJsFile('VIDEOS_DATA', readVideos(), ['serial','name','description','category','youtubeUrl','duration']);
+    generatedJS.pdfs   = toJsFile('PDFS_DATA',   readPdfs(),   ['serial','name','description','category','file','pages']);
+
+    $('#jsPreview').show();
+    activeJsTab = 'photos';
+    $('.js-tab').removeClass('active');
+    $('[data-jstab="photos"]').addClass('active');
+    $('#codeBox').text(generatedJS.photos);
+    showStatus('JS files generated! Copy each tab into the matching data/ file, then refresh gallery pages.', 'success');
+    $('#jsPreview')[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  /* JS tab switching */
+  $(document).on('click', '.js-tab', function () {
+    activeJsTab = $(this).data('jstab');
+    $('.js-tab').removeClass('active');
+    $(this).addClass('active');
+    $('#codeBox').text(generatedJS[activeJsTab] || '');
+  });
+
+  /* Copy code */
+  $('#btnCopyCode').on('click', function () {
+    var text = $('#codeBox').text();
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(function () { showStatus('Copied to clipboard!', 'success'); });
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+      showStatus('Copied!', 'success');
+    }
+  });
+
+  /* Download JS file */
+  $('#btnDownloadJS').on('click', function () {
+    var fname = 'data/' + activeJsTab + '.js';
+    downloadText(generatedJS[activeJsTab] || '', activeJsTab + '.js', 'text/javascript');
+    showStatus('Downloaded ' + activeJsTab + '.js — replace your data/' + activeJsTab + '.js with this file.', 'success');
+  });
+
+  /* ─── Download Excel ─────────────────────────────────────────── */
+  $('#btnDownloadExcel').on('click', function () {
+    var wb = XLSX.utils.book_new();
+
+    // Photos sheet
+    var pData = [['Serial No','Name','Description','Category','Image File']];
+    readPhotos().forEach(function (r) { pData.push([r.serial, r.name, r.description, r.category, r.image]); });
+    var pWs = XLSX.utils.aoa_to_sheet(pData);
+    pWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:32}];
+    XLSX.utils.book_append_sheet(wb, pWs, 'Photos');
+
+    // Videos sheet
+    var vData = [['Serial No','Name','Description','Category','YouTube URL','Duration']];
+    readVideos().forEach(function (r) { vData.push([r.serial, r.name, r.description, r.category, r.youtubeUrl, r.duration]); });
+    var vWs = XLSX.utils.aoa_to_sheet(vData);
+    vWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:46},{wch:12}];
+    XLSX.utils.book_append_sheet(wb, vWs, 'Videos');
+
+    // PDFs sheet
+    var dData = [['Serial No','Name','Description','Category','PDF File','Pages']];
+    readPdfs().forEach(function (r) { dData.push([r.serial, r.name, r.description, r.category, r.file, r.pages]); });
+    var dWs = XLSX.utils.aoa_to_sheet(dData);
+    dWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:32},{wch:12}];
+    XLSX.utils.book_append_sheet(wb, dWs, 'PDFs');
+
+    XLSX.writeFile(wb, 'content-manager.xlsx');
+    showStatus('Excel file downloaded: content-manager.xlsx', 'success');
+  });
+
+  /* ─── Upload Excel ───────────────────────────────────────────── */
+  $('#uploadInput').on('change', function (e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function (ev) {
+      try {
+        var wb = XLSX.read(ev.target.result, { type: 'binary' });
+
+        // Photos
+        if (wb.Sheets['Photos']) {
+          var rows = XLSX.utils.sheet_to_json(wb.Sheets['Photos'], { defval: '' });
+          var pData = rows.map(function (r, i) {
+            return {
+              serial     : Number(r['Serial No']) || (i + 1),
+              name       : String(r['Name'] || ''),
+              description: String(r['Description'] || ''),
+              category   : String(r['Category'] || 'darshan'),
+              image      : String(r['Image File'] || '')
+            };
+          });
+          renderPhotos(pData.sort(sortBySerial));
+        }
+
+        // Videos
+        if (wb.Sheets['Videos']) {
+          var rows = XLSX.utils.sheet_to_json(wb.Sheets['Videos'], { defval: '' });
+          var vData = rows.map(function (r, i) {
+            return {
+              serial     : Number(r['Serial No']) || (i + 1),
+              name       : String(r['Name'] || ''),
+              description: String(r['Description'] || ''),
+              category   : String(r['Category'] || 'discourse'),
+              youtubeUrl : String(r['YouTube URL'] || ''),
+              duration   : String(r['Duration'] || '')
+            };
+          });
+          renderVideos(vData.sort(sortBySerial));
+        }
+
+        // PDFs
+        if (wb.Sheets['PDFs']) {
+          var rows = XLSX.utils.sheet_to_json(wb.Sheets['PDFs'], { defval: '' });
+          var dData = rows.map(function (r, i) {
+            return {
+              serial     : Number(r['Serial No']) || (i + 1),
+              name       : String(r['Name'] || ''),
+              description: String(r['Description'] || ''),
+              category   : String(r['Category'] || 'book'),
+              file       : String(r['PDF File'] || ''),
+              pages      : String(r['Pages'] || '')
+            };
+          });
+          renderPdfs(dData.sort(sortBySerial));
+        }
+
+        showStatus('Excel imported successfully! Review data below, then click Generate JS Files.', 'success');
+      } catch (err) {
+        showStatus('Error reading Excel: ' + err.message, 'error');
+      }
+      $(this).val(''); // reset file input
+    };
+    reader.readAsBinaryString(file);
+  });
+
+  /* ─── Helpers ────────────────────────────────────────────────── */
+  function showStatus(msg, type) {
+    var $s = $('#statusBar');
+    $s.removeClass('success error info').addClass(type || 'info')
+      .html((type === 'success' ? '✅ ' : type === 'error' ? '❌ ' : 'ℹ ') + msg)
+      .show();
+    setTimeout(function () { $s.fadeOut(); }, 6000);
+  }
+
+  function downloadText(content, filename, mime) {
+    var blob = new Blob([content], { type: mime || 'text/plain' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename; a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+});
+</script>
+</body>
+</html>
