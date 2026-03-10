@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Sample Excel — Yogi Ramsuratkumar</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #f0f7f0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .card {
+      background: white; border-radius: 16px; box-shadow: 0 8px 40px rgba(26,107,46,0.15);
+      padding: 44px 48px; max-width: 560px; width: 95%; text-align: center;
+    }
+    .icon { font-size: 3.2rem; margin-bottom: 16px; }
+    h1 { color: #1A6B2E; font-size: 1.55rem; margin-bottom: 10px; }
+    .sub { color: #555; font-size: 0.93rem; line-height: 1.7; margin-bottom: 28px; }
+    .sheets {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+      margin-bottom: 30px;
+    }
+    .sheet-info {
+      background: #e8f5e9; border-radius: 10px; padding: 14px 10px;
+      border: 1.5px solid #c8e6c9;
+    }
+    .sheet-info .s-icon { font-size: 1.6rem; display: block; margin-bottom: 6px; }
+    .sheet-info .s-name { font-weight: 700; color: #1A6B2E; font-size: 0.85rem; }
+    .sheet-info .s-count { color: #666; font-size: 0.76rem; margin-top: 2px; }
+    .btn-download {
+      display: inline-block; background: #1A6B2E; color: white;
+      font-size: 1.05rem; font-weight: 700; padding: 14px 36px;
+      border-radius: 50px; border: none; cursor: pointer;
+      box-shadow: 0 4px 16px rgba(26,107,46,0.35);
+      transition: all 0.2s; text-decoration: none; margin-bottom: 14px;
+    }
+    .btn-download:hover { background: #0F4520; transform: translateY(-2px); box-shadow: 0 6px 22px rgba(26,107,46,0.45); }
+    .note { font-size: 0.8rem; color: #888; line-height: 1.6; }
+    .note strong { color: #1A6B2E; }
+    .success {
+      display: none; margin-top: 20px; background: #e8f5e9; border: 1.5px solid #a5d6a7;
+      border-radius: 10px; padding: 14px 18px; color: #1A6B2E; font-size: 0.9rem; font-weight: 600;
+    }
+    .back-link { display: inline-block; margin-top: 22px; color: #1A6B2E; font-size: 0.85rem; text-decoration: none; }
+    .back-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="icon">📊</div>
+  <h1>Create Sample Excel File</h1>
+  <p class="sub">
+    Click the button below to download <strong>content-manager.xlsx</strong> with sample data
+    pre-filled for Photos, Videos, and PDFs sheets. Place the file in your website root folder
+    and load it from any gallery page.
+  </p>
+
+  <div class="sheets">
+    <div class="sheet-info">
+      <span class="s-icon">🖼</span>
+      <div class="s-name">Photos</div>
+      <div class="s-count">8 sample rows</div>
+    </div>
+    <div class="sheet-info">
+      <span class="s-icon">🎬</span>
+      <div class="s-name">Videos</div>
+      <div class="s-count">6 sample rows</div>
+    </div>
+    <div class="sheet-info">
+      <span class="s-icon">📚</span>
+      <div class="s-name">PDFs</div>
+      <div class="s-count">8 sample rows</div>
+    </div>
+  </div>
+
+  <button class="btn-download" onclick="generateAndDownload()">⬇ Download content-manager.xlsx</button>
+
+  <div class="note">
+    After downloading, move the file to:<br/>
+    <strong>C:\Manimaran\Claude\yogiramsurathkumar\content-manager.xlsx</strong><br/><br/>
+    Then open any gallery page and click <strong>📂 Load Excel File</strong> to load it.
+  </div>
+
+  <div class="success" id="successMsg">
+    ✅ content-manager.xlsx downloaded! Move it to the website root folder and load it from any gallery page.
+  </div>
+
+  <br/>
+  <a href="../gallery.html" class="back-link">← Back to Photo Gallery</a>
+  &nbsp;|&nbsp;
+  <a href="excel-manager.html" class="back-link">⚙ Open Excel Manager</a>
+</div>
+
+<script>
+function generateAndDownload() {
+
+  var wb = XLSX.utils.book_new();
+
+  /* ════════════════════════════════════════
+     PHOTOS SHEET
+  ════════════════════════════════════════ */
+  var photosData = [
+    ['Serial No', 'Name', 'Description', 'Category', 'Image File'],
+    [1,  'Yogi at Tiruvannamalai Ashram',    'Beloved Yogi Ramsuratkumar seated at his ashram in Tiruvannamalai, radiating divine peace.',        'ashram',   'images/photos/yogi-ashram.jpg'],
+    [2,  'Young Yogi Ramsuratkumar',          'A rare photograph of the Yogi in his early years of wandering and sadhana across India.',           'life',     'images/photos/yogi-young.jpg'],
+    [3,  'Blessing Devotees',                 'The compassionate Yogi blessing a gathering of devotees with his characteristic raised hand.',       'blessings','images/photos/yogi-blessing.jpg'],
+    [4,  'Singing Bhajans',                   'Yogi Ramsuratkumar singing devotional songs in praise of his father, Ramana Maharshi.',             'bhajan',   'images/photos/yogi-bhajan.jpg'],
+    [5,  'At Arunachala Hill',                'The Yogi meditating near the sacred Arunachala hill, the spiritual heart of Tiruvannamalai.',       'ashram',   'images/photos/yogi-arunachala.jpg'],
+    [6,  'With Disciples',                    'A serene gathering of close disciples around the master, sharing in his divine presence.',           'devotees', 'images/photos/yogi-disciples.jpg'],
+    [7,  'Walking in the Ashram Garden',      'The Yogi taking his daily walk amidst the lush greenery of the ashram grounds.',                    'ashram',   'images/photos/yogi-garden.jpg'],
+    [8,  'Mahasamadhi Day Remembrance',       'Devotees gathered at the Ashram on the anniversary of the Yogi\'s Mahasamadhi in 2001.',            'events',   'images/photos/yogi-mahasamadhi.jpg']
+  ];
+  var photosWS = XLSX.utils.aoa_to_sheet(photosData);
+  photosWS['!cols'] = [
+    { wch: 10 }, { wch: 36 }, { wch: 60 }, { wch: 14 }, { wch: 36 }
+  ];
+  XLSX.utils.book_append_sheet(wb, photosWS, 'Photos');
+
+  /* ════════════════════════════════════════
+     VIDEOS SHEET
+  ════════════════════════════════════════ */
+  var videosData = [
+    ['Serial No', 'Name', 'Description', 'Category', 'YouTube URL', 'Duration'],
+    [1, 'Divine Discourse at the Ashram',       'A rare recording of Yogi Ramsuratkumar giving a discourse to devotees at his Tiruvannamalai ashram.', 'discourse', 'https://www.youtube.com/watch?v=REPLACE_VIDEO_ID_1', '28:14'],
+    [2, 'Bhajan — Yogi Ramsuratkumar Naam',     'Devotional songs sung in praise of the Yogi, recorded at the annual Jayanti celebration.',             'bhajan',    'https://www.youtube.com/watch?v=REPLACE_VIDEO_ID_2', '15:42'],
+    [3, 'Documentary — The Godchild of Ramana', 'A short documentary exploring the life and teachings of the beloved beggar saint of Tiruvannamalai.',   'documentary','https://www.youtube.com/watch?v=REPLACE_VIDEO_ID_3', '42:00'],
+    [4, 'Chanting — Ramnam Japa',               'Collective chanting of the divine name, led by senior disciples of the Yogi, at the ashram hall.',     'bhajan',    'https://www.youtube.com/watch?v=REPLACE_VIDEO_ID_4', '60:00'],
+    [5, 'Interview with Devotees',              'Long-time devotees share personal experiences of grace and miracles received from Yogi Ramsuratkumar.', 'interview', 'https://www.youtube.com/watch?v=REPLACE_VIDEO_ID_5', '18:30'],
+    [6, 'Arunachala Pradakshina',               'The annual Girivalam (circumambulation of Arunachala) walk dedicated to Yogi Ramsuratkumar.',           'events',    'https://www.youtube.com/watch?v=REPLACE_VIDEO_ID_6', '12:05']
+  ];
+  var videosWS = XLSX.utils.aoa_to_sheet(videosData);
+  videosWS['!cols'] = [
+    { wch: 10 }, { wch: 36 }, { wch: 66 }, { wch: 14 }, { wch: 44 }, { wch: 10 }
+  ];
+  XLSX.utils.book_append_sheet(wb, videosWS, 'Videos');
+
+  /* ════════════════════════════════════════
+     PDFs SHEET
+  ════════════════════════════════════════ */
+  var pdfsData = [
+    ['Serial No', 'Name', 'Description', 'Category', 'PDF File', 'Pages'],
+    [1,  'Ammachi — The Life of Yogi Ramsuratkumar', 'A comprehensive biography of the Yogi written by his close devotee, covering his life and teachings.', 'book',     'pdfs/ammachi-biography.pdf',        320],
+    [2,  'Ramnam — The Power of the Divine Name',    'A compilation of the Yogi\'s teachings on the power of chanting the divine name of Rama.',           'book',     'pdfs/ramnam-divine-name.pdf',        96],
+    [3,  'Talks with the Godchild',                  'Transcripts of intimate conversations between the Yogi and visiting seekers from around the world.',   'talk',     'pdfs/talks-with-godchild.pdf',       148],
+    [4,  'Songs in Praise of Yogi Ramsuratkumar',    'A collection of devotional songs (bhajans) composed by disciples in Tamil, Telugu, and English.',     'song',     'pdfs/songs-praise-yogi.pdf',          64],
+    [5,  'Vision — Annual Ashram Magazine 2023',     'The yearly publication from Yogi Ramsuratkumar Ashram with articles, poems, and remembrances.',       'magazine', 'pdfs/vision-magazine-2023.pdf',      128],
+    [6,  'Grace and Guidance',                       'Personal accounts of miraculous experiences and divine grace bestowed by Yogi Ramsuratkumar.',        'talk',     'pdfs/grace-and-guidance.pdf',        112],
+    [7,  'Sudarshanam — Rare Photographs',           'A photo-book collection of rare and unpublished photographs of the Yogi across different decades.',   'book',     'pdfs/sudarshanam-photographs.pdf',   88],
+    [8,  'Jaya Guru Raya — Chant Book',             'The complete chant book with lyrics and transliterations for all ashram kirtans and bhajans.',        'song',     'pdfs/jaya-guru-raya-chants.pdf',      48]
+  ];
+  var pdfsWS = XLSX.utils.aoa_to_sheet(pdfsData);
+  pdfsWS['!cols'] = [
+    { wch: 10 }, { wch: 44 }, { wch: 70 }, { wch: 12 }, { wch: 38 }, { wch: 8 }
+  ];
+  XLSX.utils.book_append_sheet(wb, pdfsWS, 'PDFs');
+
+  /* ════════════════════════════════════════
+     Style header rows green + bold
+  ════════════════════════════════════════ */
+  ['Photos', 'Videos', 'PDFs'].forEach(function (sheetName) {
+    var ws  = wb.Sheets[sheetName];
+    var ref = XLSX.utils.decode_range(ws['!ref']);
+    for (var col = ref.s.c; col <= ref.e.c; col++) {
+      var cellAddr = XLSX.utils.encode_cell({ r: 0, c: col });
+      if (!ws[cellAddr]) continue;
+      ws[cellAddr].s = {
+        font  : { bold: true, color: { rgb: 'FFFFFF' }, name: 'Arial', sz: 11 },
+        fill  : { patternType: 'solid', fgColor: { rgb: '1A6B2E' } },
+        alignment: { horizontal: 'center', vertical: 'center' }
+      };
+    }
+  });
+
+  /* Download */
+  XLSX.writeFile(wb, 'content-manager.xlsx');
+
+  document.getElementById('successMsg').style.display = 'block';
+}
+</script>
+</body>
+</html>

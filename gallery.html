@@ -11,34 +11,32 @@
   <!-- Central data loader (reads content-manager.xlsx, caches in localStorage) -->
   <script src="data/data-loader.js"></script>
   <style>
-    /* ── Excel status bar ── */
-    .excel-bar {
-      background: #e8f5e9; border: 1.5px solid rgba(26,107,46,0.3);
-      border-radius: 10px; padding: 12px 18px; margin-bottom: 24px;
-      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-      font-size: 0.85rem;
+    .no-data-msg {
+      text-align: center; padding: 48px 20px; grid-column: 1/-1;
+      color: var(--text-light);
     }
-    .excel-bar.no-data { background: #fff8e1; border-color: #f9a825; }
-    .excel-bar-icon { font-size: 1.4rem; flex-shrink: 0; }
-    .excel-bar-msg  { flex: 1; color: var(--text-body); line-height: 1.5; }
-    .excel-bar-msg strong { color: var(--green-dark); }
-    .excel-bar-msg small  { color: var(--text-light); display: block; margin-top: 2px; font-size: 0.78rem; }
-    .eb-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 7px 16px; border-radius: 6px; font-size: 0.82rem;
-      font-weight: 700; cursor: pointer; border: none; white-space: nowrap;
-      transition: all 0.2s;
+    .no-data-msg .nd-icon { font-size: 2.8rem; display: block; margin-bottom: 12px; }
+    .no-data-msg p { margin-bottom: 18px; font-size: 0.95rem; }
+    .no-data-msg .nd-btn {
+      display: inline-block; background: var(--green); color: white;
+      padding: 10px 26px; border-radius: 50px; font-weight: 700;
+      font-size: 0.88rem; cursor: pointer; transition: background 0.2s; margin-bottom: 14px;
     }
-    .eb-load  { background: var(--green); color: white; }
-    .eb-load:hover  { background: var(--green-dark); }
-    .eb-reload { background: white; color: var(--green); border: 1.5px solid var(--green); }
-    .eb-reload:hover { background: var(--light-bg); }
-    .eb-clear  { background: none; color: #c62828; border: 1.5px solid #c62828; }
-    .eb-clear:hover  { background: #fde8e8; }
-    .eb-file-input { display: none; }
+    .no-data-msg .nd-btn:hover { background: var(--green-dark); }
+    .no-data-msg .nd-sub { font-size: 0.82rem; color: var(--text-light); margin-top: 6px; }
+    .no-data-msg .nd-sub a { color: var(--green); font-weight: 600; text-decoration: none; }
+    .no-data-msg .nd-sub a:hover { text-decoration: underline; }
     .gallery-loading { text-align:center; color:var(--text-light); padding:48px; font-size:1rem; grid-column:1/-1; }
     .gallery-counter { text-align:center; font-size:0.82rem; color:var(--text-light); margin-bottom:18px; }
     .gallery-desc { display:block; font-size:0.75rem; color:rgba(255,255,255,0.72); margin-top:3px; line-height:1.4; }
+    .gallery-search {
+      max-width: 480px; margin: 0 auto 20px;
+      display: flex; border: 2px solid var(--border); border-radius: 50px;
+      overflow: hidden; background: white; box-shadow: var(--shadow);
+    }
+    .gallery-search input { flex:1; padding:11px 20px; border:none; outline:none; font-size:0.92rem; font-family:inherit; background:transparent; color:var(--text-dark); }
+    .gallery-search button { padding:11px 18px; background:var(--green); color:white; border:none; cursor:pointer; font-size:1rem; transition:var(--transition); }
+    .gallery-search button:hover { background:var(--green-dark); }
   </style>
 </head>
 <body>
@@ -96,18 +94,13 @@
 <section class="gallery-section">
   <div class="container">
 
-    <!-- ── Excel Status Bar ── -->
-    <div class="excel-bar no-data" id="excelBar">
-      <span class="excel-bar-icon" id="ebIcon">📊</span>
-      <div class="excel-bar-msg" id="ebMsg">
-        <strong>No Excel data loaded.</strong>
-        <small>Load <em>content-manager.xlsx</em> to display the gallery. Data saves in your browser for all pages.</small>
-      </div>
-      <label class="eb-btn eb-load" id="ebLoadBtn">
-        📂 Load Excel File
-        <input type="file" class="eb-file-input" id="excelFileInput" accept=".xlsx,.xls" />
-      </label>
-      <a href="tools/excel-manager.html" class="eb-btn eb-reload" style="text-decoration:none;">⚙ Open Manager</a>
+    <!-- Hidden file input for direct Excel loading -->
+    <input type="file" id="excelFileInput" accept=".xlsx,.xls" style="display:none;" />
+
+    <!-- ── Search ── -->
+    <div class="gallery-search" id="gallerySearchBox" style="display:none;">
+      <input type="text" id="gallerySearch" placeholder="Search photos by name or description…" aria-label="Search photos" />
+      <button id="gallerySearchBtn">🔍</button>
     </div>
 
     <!-- ── Category Filters ── -->
@@ -123,6 +116,9 @@
         📊 Load <strong>content-manager.xlsx</strong> using the bar above to display photos.
       </div>
     </div>
+    <!-- Infinite scroll sentinel -->
+    <div id="sentinel" style="height:2px;display:none;"></div>
+    <div id="loadingMore" style="display:none;text-align:center;padding:18px 0;color:var(--text-light);font-size:0.9rem;grid-column:1/-1;">⏳ Loading more photos…</div>
 
   </div>
 </section>
@@ -177,82 +173,35 @@
 <script>
 $(function () {
 
-  var allSorted = [];
+  var BATCH           = 12;   /* 3 cols × 4 rows on desktop */
+  var allSorted       = [];
+  var currentFiltered = [];
+  var loadedCount     = 0;
+  var scrollObserver  = null;
 
   /* ══════════════════════════════════════════════════════════
-     Excel Status Bar
+     Gallery — Infinite Scroll
   ══════════════════════════════════════════════════════════ */
-  function updateBar(loaded, at) {
-    var $bar = $('#excelBar');
-    if (loaded) {
-      $bar.removeClass('no-data');
-      $('#ebIcon').text('✅');
-      $('#ebMsg').html(
-        '<strong>Photos sheet loaded from content-manager.xlsx</strong>' +
-        '<small>Loaded: ' + (at || '') + ' &nbsp;|&nbsp; ' + SITE_DATA.photos.length + ' photos</small>'
-      );
-      $('#ebLoadBtn').html(
-        '🔄 Reload Excel <input type="file" class="eb-file-input" id="excelFileInput" accept=".xlsx,.xls" />'
-      ).removeClass('eb-load').addClass('eb-reload');
-
-      /* Add clear button if not present */
-      if (!$('#ebClear').length) {
-        $bar.append('<button class="eb-btn eb-clear" id="ebClear">✕ Clear</button>');
-      }
-    } else {
-      $bar.addClass('no-data');
-      $('#ebIcon').text('📊');
-      $('#ebMsg').html(
-        '<strong>No Excel data loaded.</strong>' +
-        '<small>Load <em>content-manager.xlsx</em> to display the gallery.</small>'
-      );
-      $('#ebLoadBtn').html(
-        '📂 Load Excel File <input type="file" class="eb-file-input" id="excelFileInput" accept=".xlsx,.xls" />'
-      ).removeClass('eb-reload').addClass('eb-load');
-      $('#ebClear').remove();
-    }
+  function noDataMsg() {
+    return '<div class="no-data-msg">' +
+      '<span class="nd-icon">🖼</span>' +
+      '<p>No photos found. Select your <strong>content-manager.xlsx</strong> to display the gallery.</p>' +
+      '<label class="nd-btn" for="excelFileInput">📂 Load Excel File</label>' +
+      '<div class="nd-sub">Need to add or edit entries? <a href="tools/excel-manager.html">⚙ Open Excel Manager</a></div>' +
+    '</div>';
   }
 
-  /* ── File input handler (delegated — re-attached after reload) ── */
-  $(document).on('change', '#excelFileInput', function (e) {
-    var file = e.target.files[0];
-    if (!file) return;
-    $('#ebMsg').html('<strong>⏳ Loading Excel…</strong>');
-    SITE_DATA.loadFromFile(file,
-      function () {                             /* success */
-        updateBar(true, SITE_DATA.loadedAt);
-        buildAndRender();
-      },
-      function (err) {                          /* error */
-        alert('Error reading Excel: ' + err.message);
-        updateBar(false);
-      }
-    );
-    $(this).val('');
-  });
-
-  /* ── Clear button ── */
-  $(document).on('click', '#ebClear', function () {
-    if (!confirm('Clear all cached Excel data from browser?')) return;
-    SITE_DATA.clear();
-    updateBar(false);
-    clearGallery();
-  });
-
-  /* ══════════════════════════════════════════════════════════
-     Gallery Rendering
-  ══════════════════════════════════════════════════════════ */
   function clearGallery() {
-    $('#galleryFilters').hide();
-    $('#galleryContainer').html('<div class="gallery-loading">📊 Load <strong>content-manager.xlsx</strong> to display photos.</div>');
+    if (scrollObserver) { scrollObserver.disconnect(); scrollObserver = null; }
+    $('#gallerySearchBox, #galleryFilters, #sentinel, #loadingMore').hide();
+    $('#galleryContainer').html(noDataMsg());
     $('#galleryCounter').text('');
-    allSorted = [];
+    allSorted = []; currentFiltered = []; loadedCount = 0;
   }
 
   function buildAndRender() {
     allSorted = SITE_DATA.sorted(SITE_DATA.photos);
 
-    /* Build category filter buttons */
     var cats = [];
     allSorted.forEach(function (p) {
       if (p.category && $.inArray(p.category, cats) === -1) cats.push(p.category);
@@ -264,62 +213,116 @@ $(function () {
         c.charAt(0).toUpperCase() + c.slice(1) + '</button>');
     });
 
-    renderGallery(allSorted);
+    $('#gallerySearchBox').show();
+    currentFiltered = allSorted;
+    loadedCount = 0;
+    $('#galleryContainer').empty();
+    appendBatch();
   }
 
-  function renderGallery(data) {
-    var $container = $('#galleryContainer').empty();
-    if (!data.length) {
-      $container.html('<p class="gallery-loading">No photos found in this category.</p>');
-      $('#galleryCounter').text('');
-      return;
+  function makeItem(item) {
+    var sn = '#' + String(item.serial).padStart(2, '0');
+    return $('<div>', {
+      'class': 'gallery-item fade-in',
+      'data-category': item.category,
+      'data-img'     : item.image,
+      'data-caption' : item.name
+    }).append(
+      '<span class="serial-badge">' + sn + '</span>',
+      $('<img>', { src: item.image, alt: item.name }).on('error', function () {
+        $(this).replaceWith(
+          '<div class="gallery-placeholder">' +
+            '<span class="ph-icon">🪔</span>' +
+            '<span class="ph-text">' + sn + ' ' + item.name + '</span>' +
+          '</div>'
+        );
+      }),
+      '<div class="gallery-overlay">' +
+        '<span class="gallery-caption">' + item.name + '</span>' +
+        '<span class="gallery-desc">' + item.description + '</span>' +
+      '</div>',
+      '<div class="gallery-zoom">🔍</div>'
+    );
+  }
+
+  function appendBatch() {
+    var batch = currentFiltered.slice(loadedCount, loadedCount + BATCH);
+    if (!batch.length && loadedCount === 0) {
+      $('#galleryContainer').html('<p class="gallery-loading">No photos found.</p>');
+      $('#galleryCounter').text(''); $('#sentinel').hide(); return;
     }
-    $.each(data, function (i, item) {
-      var sn = '#' + String(item.serial).padStart(2, '0');
-      var $item = $('<div>', {
-        'class'        : 'gallery-item fade-in',
-        'data-category': item.category,
-        'data-img'     : item.image,
-        'data-caption' : item.name
-      }).append(
-        '<span class="serial-badge">' + sn + '</span>',
-        $('<img>', { src: item.image, alt: item.name }).on('error', function () {
-          $(this).replaceWith(
-            '<div class="gallery-placeholder">' +
-              '<span class="ph-icon">🪔</span>' +
-              '<span class="ph-text">' + sn + ' ' + item.name + '</span>' +
-            '</div>'
-          );
-        }),
-        '<div class="gallery-overlay">' +
-          '<span class="gallery-caption">' + item.name + '</span>' +
-          '<span class="gallery-desc">' + item.description + '</span>' +
-        '</div>',
-        '<div class="gallery-zoom">🔍</div>'
-      );
-      $container.append($item);
-    });
-    $('#galleryCounter').text('Showing ' + data.length + ' photo' + (data.length !== 1 ? 's' : '') +
-      ' — sorted by Serial No from Photos sheet');
+    var $container = $('#galleryContainer');
+    $.each(batch, function (i, item) { $container.append(makeItem(item)); });
+    loadedCount += batch.length;
+    updateCounter();
+
+    if (loadedCount < currentFiltered.length) {
+      $('#sentinel').show(); setupObserver();
+    } else {
+      $('#sentinel').hide();
+      if (scrollObserver) { scrollObserver.disconnect(); scrollObserver = null; }
+    }
     if (typeof window.initGallery === 'function') window.initGallery();
   }
 
-  /* ── Filter ── */
+  function updateCounter() {
+    var total = currentFiltered.length;
+    $('#galleryCounter').text(
+      'Showing ' + Math.min(loadedCount, total) + ' of ' + total +
+      ' photo' + (total !== 1 ? 's' : '')
+    );
+  }
+
+  function setupObserver() {
+    if (scrollObserver) scrollObserver.disconnect();
+    scrollObserver = new IntersectionObserver(function (entries) {
+      if (!entries[0].isIntersecting) return;
+      $('#loadingMore').show();
+      setTimeout(function () { appendBatch(); $('#loadingMore').hide(); }, 250);
+    }, { rootMargin: '300px' });
+    scrollObserver.observe(document.getElementById('sentinel'));
+  }
+
+  /* ── Combined filter + search ── */
+  function applyFilter() {
+    var f = $('.filter-btn.active').data('filter') || 'all';
+    var q = $('#gallerySearch').val().toLowerCase().trim();
+    currentFiltered = allSorted.filter(function (p) {
+      return (f === 'all' || p.category === f) &&
+        (!q || (p.name || '').toLowerCase().indexOf(q) !== -1 ||
+               (p.description || '').toLowerCase().indexOf(q) !== -1);
+    });
+    loadedCount = 0;
+    $('#galleryContainer').empty();
+    if (scrollObserver) { scrollObserver.disconnect(); scrollObserver = null; }
+    appendBatch();
+  }
+
   $(document).on('click', '.filter-btn', function () {
-    var f = $(this).data('filter');
-    $('.filter-btn').removeClass('active');
-    $(this).addClass('active');
-    renderGallery(f === 'all' ? allSorted : allSorted.filter(function (p) { return p.category === f; }));
+    $('.filter-btn').removeClass('active'); $(this).addClass('active'); applyFilter();
+  });
+  $(document).on('input keyup', '#gallerySearch', function (e) {
+    if (e.key === 'Escape') $(this).val(''); applyFilter();
+  });
+  $(document).on('click', '#gallerySearchBtn', function () { applyFilter(); });
+
+  /* ── Direct Excel load from gallery page ── */
+  $('#excelFileInput').on('change', function (e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    SITE_DATA.loadFromFile(file, function () {
+      buildAndRender();
+    }, function (err) {
+      alert('Error loading Excel file: ' + err.message);
+    });
+    $(this).val('');
   });
 
-  /* ══════════════════════════════════════════════════════════
-     Init
-  ══════════════════════════════════════════════════════════ */
+  /* ── Init ── */
   if (SITE_DATA.loaded && SITE_DATA.photos.length) {
-    updateBar(true, SITE_DATA.loadedAt);
     buildAndRender();
   } else {
-    updateBar(false);
+    $('#galleryContainer').html(noDataMsg());
   }
 
 });

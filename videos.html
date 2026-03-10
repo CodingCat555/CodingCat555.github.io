@@ -12,31 +12,21 @@
   <!-- Central data loader (reads content-manager.xlsx, caches in localStorage) -->
   <script src="data/data-loader.js"></script>
   <style>
-    /* ── Excel status bar ── */
-    .excel-bar {
-      background: #e8f5e9; border: 1.5px solid rgba(26,107,46,0.3);
-      border-radius: 10px; padding: 12px 18px; margin-bottom: 24px;
-      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-      font-size: 0.85rem;
+    .no-data-msg {
+      text-align: center; padding: 48px 20px;
+      color: var(--text-light);
     }
-    .excel-bar.no-data { background: #fff8e1; border-color: #f9a825; }
-    .excel-bar-icon { font-size: 1.4rem; flex-shrink: 0; }
-    .excel-bar-msg  { flex: 1; color: var(--text-body); line-height: 1.5; }
-    .excel-bar-msg strong { color: var(--green-dark); }
-    .excel-bar-msg small  { color: var(--text-light); display: block; margin-top: 2px; font-size: 0.78rem; }
-    .eb-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 7px 16px; border-radius: 6px; font-size: 0.82rem;
-      font-weight: 700; cursor: pointer; border: none; white-space: nowrap;
-      transition: all 0.2s;
+    .no-data-msg .nd-icon { font-size: 2.8rem; display: block; margin-bottom: 12px; }
+    .no-data-msg p { margin-bottom: 18px; font-size: 0.95rem; }
+    .no-data-msg .nd-btn {
+      display: inline-block; background: var(--green); color: white;
+      padding: 10px 26px; border-radius: 50px; font-weight: 700;
+      font-size: 0.88rem; cursor: pointer; transition: background 0.2s; margin-bottom: 14px;
     }
-    .eb-load  { background: var(--green); color: white; }
-    .eb-load:hover  { background: var(--green-dark); }
-    .eb-reload { background: white; color: var(--green); border: 1.5px solid var(--green); }
-    .eb-reload:hover { background: var(--light-bg); }
-    .eb-clear  { background: none; color: #c62828; border: 1.5px solid #c62828; }
-    .eb-clear:hover  { background: #fde8e8; }
-    .eb-file-input { display: none; }
+    .no-data-msg .nd-btn:hover { background: var(--green-dark); }
+    .no-data-msg .nd-sub { font-size: 0.82rem; color: var(--text-light); margin-top: 6px; }
+    .no-data-msg .nd-sub a { color: var(--green); font-weight: 600; text-decoration: none; }
+    .no-data-msg .nd-sub a:hover { text-decoration: underline; }
 
     .video-thumb { position: relative; aspect-ratio: 16/9; background: linear-gradient(135deg,#061A0E,#1A6B2E); overflow: hidden; cursor: pointer; }
     .video-thumb iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
@@ -50,6 +40,14 @@
     .video-thumb-placeholder .vt-text { font-size:0.8rem; color:rgba(255,215,0,0.4); text-align:center; padding:0 14px; line-height:1.5; }
     .gallery-counter { text-align:center; font-size:0.82rem; color:var(--text-light); margin-bottom:20px; }
     .gallery-loading { text-align:center; color:var(--text-light); padding:40px; font-size:1rem; }
+    .gallery-search {
+      max-width: 480px; margin: 0 auto 20px;
+      display: flex; border: 2px solid var(--border); border-radius: 50px;
+      overflow: hidden; background: white; box-shadow: var(--shadow);
+    }
+    .gallery-search input { flex:1; padding:11px 20px; border:none; outline:none; font-size:0.92rem; font-family:inherit; background:transparent; color:var(--text-dark); }
+    .gallery-search button { padding:11px 18px; background:var(--green); color:white; border:none; cursor:pointer; font-size:1rem; transition:var(--transition); }
+    .gallery-search button:hover { background:var(--green-dark); }
   </style>
 </head>
 <body>
@@ -108,18 +106,13 @@
 <section>
   <div class="container">
 
-    <!-- ── Excel Status Bar ── -->
-    <div class="excel-bar no-data" id="excelBar">
-      <span class="excel-bar-icon" id="ebIcon">📊</span>
-      <div class="excel-bar-msg" id="ebMsg">
-        <strong>No Excel data loaded.</strong>
-        <small>Load <em>content-manager.xlsx</em> to display the video gallery. Data saves in your browser for all pages.</small>
-      </div>
-      <label class="eb-btn eb-load" id="ebLoadBtn">
-        📂 Load Excel File
-        <input type="file" class="eb-file-input" id="excelFileInput" accept=".xlsx,.xls" />
-      </label>
-      <a href="tools/excel-manager.html" class="eb-btn eb-reload" style="text-decoration:none;">⚙ Open Manager</a>
+    <!-- Hidden file input for direct Excel loading -->
+    <input type="file" id="excelFileInput" accept=".xlsx,.xls" style="display:none;" />
+
+    <!-- ── Search ── -->
+    <div class="gallery-search" id="videoSearchBox" style="display:none;">
+      <input type="text" id="videoSearch" placeholder="Search videos by name or description…" aria-label="Search videos" />
+      <button id="videoSearchBtn">🔍</button>
     </div>
 
     <!-- ── Category Filters ── -->
@@ -135,6 +128,9 @@
         📊 Load <strong>content-manager.xlsx</strong> using the bar above to display videos.
       </div>
     </div>
+    <!-- Infinite scroll sentinel -->
+    <div id="sentinel" style="height:2px;display:none;"></div>
+    <div id="loadingMore" style="display:none;text-align:center;padding:18px 0;color:var(--text-light);font-size:0.9rem;">⏳ Loading more videos…</div>
 
   </div>
 </section>
@@ -185,81 +181,35 @@
 <script>
 $(function () {
 
-  var allSorted = [];
+  var BATCH           = 8;    /* 2 cols × 4 rows on desktop */
+  var allSorted       = [];
+  var currentFiltered = [];
+  var loadedCount     = 0;
+  var scrollObserver  = null;
 
   /* ══════════════════════════════════════════════════════════
-     Excel Status Bar
+     Videos — Infinite Scroll
   ══════════════════════════════════════════════════════════ */
-  function updateBar(loaded, at) {
-    var $bar = $('#excelBar');
-    if (loaded) {
-      $bar.removeClass('no-data');
-      $('#ebIcon').text('✅');
-      $('#ebMsg').html(
-        '<strong>Videos sheet loaded from content-manager.xlsx</strong>' +
-        '<small>Loaded: ' + (at || '') + ' &nbsp;|&nbsp; ' + SITE_DATA.videos.length + ' videos</small>'
-      );
-      $('#ebLoadBtn').html(
-        '🔄 Reload Excel <input type="file" class="eb-file-input" id="excelFileInput" accept=".xlsx,.xls" />'
-      ).removeClass('eb-load').addClass('eb-reload');
-
-      if (!$('#ebClear').length) {
-        $bar.append('<button class="eb-btn eb-clear" id="ebClear">✕ Clear</button>');
-      }
-    } else {
-      $bar.addClass('no-data');
-      $('#ebIcon').text('📊');
-      $('#ebMsg').html(
-        '<strong>No Excel data loaded.</strong>' +
-        '<small>Load <em>content-manager.xlsx</em> to display the video gallery.</small>'
-      );
-      $('#ebLoadBtn').html(
-        '📂 Load Excel File <input type="file" class="eb-file-input" id="excelFileInput" accept=".xlsx,.xls" />'
-      ).removeClass('eb-reload').addClass('eb-load');
-      $('#ebClear').remove();
-    }
+  function noDataMsg() {
+    return '<div class="no-data-msg">' +
+      '<span class="nd-icon">🎬</span>' +
+      '<p>No videos found. Select your <strong>content-manager.xlsx</strong> to display the video gallery.</p>' +
+      '<label class="nd-btn" for="excelFileInput">📂 Load Excel File</label>' +
+      '<div class="nd-sub">Need to add or edit entries? <a href="tools/excel-manager.html">⚙ Open Excel Manager</a></div>' +
+    '</div>';
   }
 
-  /* ── File input handler (delegated) ── */
-  $(document).on('change', '#excelFileInput', function (e) {
-    var file = e.target.files[0];
-    if (!file) return;
-    $('#ebMsg').html('<strong>⏳ Loading Excel…</strong>');
-    SITE_DATA.loadFromFile(file,
-      function () {
-        updateBar(true, SITE_DATA.loadedAt);
-        buildAndRender();
-      },
-      function (err) {
-        alert('Error reading Excel: ' + err.message);
-        updateBar(false);
-      }
-    );
-    $(this).val('');
-  });
-
-  /* ── Clear button ── */
-  $(document).on('click', '#ebClear', function () {
-    if (!confirm('Clear all cached Excel data from browser?')) return;
-    SITE_DATA.clear();
-    updateBar(false);
-    clearVideos();
-  });
-
-  /* ══════════════════════════════════════════════════════════
-     Video Rendering
-  ══════════════════════════════════════════════════════════ */
   function clearVideos() {
-    $('#videoFilters').hide();
-    $('#videoContainer').html('<div class="gallery-loading">📊 Load <strong>content-manager.xlsx</strong> to display videos.</div>');
+    if (scrollObserver) { scrollObserver.disconnect(); scrollObserver = null; }
+    $('#videoSearchBox, #videoFilters, #sentinel, #loadingMore').hide();
+    $('#videoContainer').html(noDataMsg());
     $('#videoCounter').text('');
-    allSorted = [];
+    allSorted = []; currentFiltered = []; loadedCount = 0;
   }
 
   function buildAndRender() {
     allSorted = SITE_DATA.sorted(SITE_DATA.videos);
 
-    /* Build category filter buttons */
     var cats = [];
     allSorted.forEach(function (v) {
       if (v.category && $.inArray(v.category, cats) === -1) cats.push(v.category);
@@ -271,53 +221,104 @@ $(function () {
         c.charAt(0).toUpperCase() + c.slice(1) + '</button>');
     });
 
-    renderVideos(allSorted);
+    $('#videoSearchBox').show();
+    currentFiltered = allSorted;
+    loadedCount = 0;
+    $('#videoContainer').empty();
+    appendBatch();
   }
 
-  function renderVideos(data) {
-    var $container = $('#videoContainer').empty();
-    if (!data.length) {
-      $container.html('<p class="gallery-loading">No videos found in this category.</p>');
-      $('#videoCounter').text('');
-      return;
-    }
-    $.each(data, function (i, v) {
-      var serial = '#' + String(v.serial).padStart(2, '0');
-      var dur    = v.duration ? '<span>⏱ ' + v.duration + '</span>' : '';
-      var $card  = $('<div>', { 'class': 'video-card fade-in', 'data-category': v.category }).append(
-        /* Thumbnail */
-        $('<div>', { 'class': 'video-thumb', 'data-src': v.youtubeUrl }).append(
-          '<div class="video-thumb-placeholder">' +
-            '<span class="vt-icon">▶</span>' +
-            '<span class="vt-text">' + v.name + '</span>' +
-          '</div>',
-          '<div class="video-play-btn">▶</div>',
-          '<span class="serial-badge video-serial">' + serial + '</span>'
-        ),
-        /* Info */
-        $('<div class="video-info">').append(
-          '<h3 class="video-title">' + v.name + '</h3>',
-          '<p class="video-desc">' + v.description + '</p>',
-          '<div class="video-meta">' +
-            '<span>📂 ' + v.category + '</span>' +
-            dur +
-          '</div>'
-        )
-      );
-      $container.append($card);
-    });
-    $('#videoCounter').text('Showing ' + data.length + ' video' + (data.length !== 1 ? 's' : '') +
-      ' — sorted by Serial No from Videos sheet');
+  function makeCard(v) {
+    var serial = '#' + String(v.serial).padStart(2, '0');
+    var dur    = v.duration ? '<span>⏱ ' + v.duration + '</span>' : '';
+    return $('<div>', { 'class': 'video-card fade-in', 'data-category': v.category }).append(
+      $('<div>', { 'class': 'video-thumb', 'data-src': v.youtubeUrl }).append(
+        '<div class="video-thumb-placeholder">' +
+          '<span class="vt-icon">▶</span>' +
+          '<span class="vt-text">' + v.name + '</span>' +
+        '</div>',
+        '<div class="video-play-btn">▶</div>',
+        '<span class="serial-badge video-serial">' + serial + '</span>'
+      ),
+      $('<div class="video-info">').append(
+        '<h3 class="video-title">' + v.name + '</h3>',
+        '<p class="video-desc">' + v.description + '</p>',
+        '<div class="video-meta"><span>📂 ' + v.category + '</span>' + dur + '</div>'
+      )
+    );
+  }
 
+  function appendBatch() {
+    var batch = currentFiltered.slice(loadedCount, loadedCount + BATCH);
+    if (!batch.length && loadedCount === 0) {
+      $('#videoContainer').html('<p class="gallery-loading">No videos found.</p>');
+      $('#videoCounter').text(''); $('#sentinel').hide(); return;
+    }
+    var $container = $('#videoContainer');
+    $.each(batch, function (i, v) { $container.append(makeCard(v)); });
+    loadedCount += batch.length;
+    updateCounter();
+
+    if (loadedCount < currentFiltered.length) {
+      $('#sentinel').show(); setupObserver();
+    } else {
+      $('#sentinel').hide();
+      if (scrollObserver) { scrollObserver.disconnect(); scrollObserver = null; }
+    }
     if (typeof window.initFade === 'function') window.initFade();
   }
 
-  /* ── Category Filter ── */
+  function updateCounter() {
+    var total = currentFiltered.length;
+    $('#videoCounter').text(
+      'Showing ' + Math.min(loadedCount, total) + ' of ' + total +
+      ' video' + (total !== 1 ? 's' : '')
+    );
+  }
+
+  function setupObserver() {
+    if (scrollObserver) scrollObserver.disconnect();
+    scrollObserver = new IntersectionObserver(function (entries) {
+      if (!entries[0].isIntersecting) return;
+      $('#loadingMore').show();
+      setTimeout(function () { appendBatch(); $('#loadingMore').hide(); }, 250);
+    }, { rootMargin: '300px' });
+    scrollObserver.observe(document.getElementById('sentinel'));
+  }
+
+  /* ── Combined filter + search ── */
+  function applyFilter() {
+    var f = $('.filter-btn.active').data('filter') || 'all';
+    var q = $('#videoSearch').val().toLowerCase().trim();
+    currentFiltered = allSorted.filter(function (v) {
+      return (f === 'all' || v.category === f) &&
+        (!q || (v.name || '').toLowerCase().indexOf(q) !== -1 ||
+               (v.description || '').toLowerCase().indexOf(q) !== -1);
+    });
+    loadedCount = 0;
+    $('#videoContainer').empty();
+    if (scrollObserver) { scrollObserver.disconnect(); scrollObserver = null; }
+    appendBatch();
+  }
+
   $(document).on('click', '.filter-btn', function () {
-    var f = $(this).data('filter');
-    $('.filter-btn').removeClass('active');
-    $(this).addClass('active');
-    renderVideos(f === 'all' ? allSorted : allSorted.filter(function (v) { return v.category === f; }));
+    $('.filter-btn').removeClass('active'); $(this).addClass('active'); applyFilter();
+  });
+  $(document).on('input keyup', '#videoSearch', function (e) {
+    if (e.key === 'Escape') $(this).val(''); applyFilter();
+  });
+  $(document).on('click', '#videoSearchBtn', function () { applyFilter(); });
+
+  /* ── Direct Excel load from video page ── */
+  $('#excelFileInput').on('change', function (e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    SITE_DATA.loadFromFile(file, function () {
+      buildAndRender();
+    }, function (err) {
+      alert('Error loading Excel file: ' + err.message);
+    });
+    $(this).val('');
   });
 
   /* ── Play video on click (lazy iframe load) ── */
@@ -332,14 +333,11 @@ $(function () {
     $thumb.empty().append('<iframe src="' + autoSrc + '" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>');
   });
 
-  /* ══════════════════════════════════════════════════════════
-     Init
-  ══════════════════════════════════════════════════════════ */
+  /* ── Init ── */
   if (SITE_DATA.loaded && SITE_DATA.videos.length) {
-    updateBar(true, SITE_DATA.loadedAt);
     buildAndRender();
   } else {
-    updateBar(false);
+    $('#videoContainer').html(noDataMsg());
   }
 
 });

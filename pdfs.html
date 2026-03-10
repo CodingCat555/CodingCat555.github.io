@@ -12,31 +12,21 @@
   <!-- Central data loader (reads content-manager.xlsx, caches in localStorage) -->
   <script src="data/data-loader.js"></script>
   <style>
-    /* ── Excel status bar ── */
-    .excel-bar {
-      background: #e8f5e9; border: 1.5px solid rgba(26,107,46,0.3);
-      border-radius: 10px; padding: 12px 18px; margin-bottom: 24px;
-      display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-      font-size: 0.85rem;
+    .no-data-msg {
+      text-align: center; padding: 48px 20px; grid-column: 1/-1;
+      color: var(--text-light);
     }
-    .excel-bar.no-data { background: #fff8e1; border-color: #f9a825; }
-    .excel-bar-icon { font-size: 1.4rem; flex-shrink: 0; }
-    .excel-bar-msg  { flex: 1; color: var(--text-body); line-height: 1.5; }
-    .excel-bar-msg strong { color: var(--green-dark); }
-    .excel-bar-msg small  { color: var(--text-light); display: block; margin-top: 2px; font-size: 0.78rem; }
-    .eb-btn {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 7px 16px; border-radius: 6px; font-size: 0.82rem;
-      font-weight: 700; cursor: pointer; border: none; white-space: nowrap;
-      transition: all 0.2s;
+    .no-data-msg .nd-icon { font-size: 2.8rem; display: block; margin-bottom: 12px; }
+    .no-data-msg p { margin-bottom: 18px; font-size: 0.95rem; }
+    .no-data-msg .nd-btn {
+      display: inline-block; background: var(--green); color: white;
+      padding: 10px 26px; border-radius: 50px; font-weight: 700;
+      font-size: 0.88rem; cursor: pointer; transition: background 0.2s; margin-bottom: 14px;
     }
-    .eb-load  { background: var(--green); color: white; }
-    .eb-load:hover  { background: var(--green-dark); }
-    .eb-reload { background: white; color: var(--green); border: 1.5px solid var(--green); }
-    .eb-reload:hover { background: var(--light-bg); }
-    .eb-clear  { background: none; color: #c62828; border: 1.5px solid #c62828; }
-    .eb-clear:hover  { background: #fde8e8; }
-    .eb-file-input { display: none; }
+    .no-data-msg .nd-btn:hover { background: var(--green-dark); }
+    .no-data-msg .nd-sub { font-size: 0.82rem; color: var(--text-light); margin-top: 6px; }
+    .no-data-msg .nd-sub a { color: var(--green); font-weight: 600; text-decoration: none; }
+    .no-data-msg .nd-sub a:hover { text-decoration: underline; }
 
     .pdf-search {
       max-width: 480px; margin: 0 auto 20px;
@@ -106,19 +96,8 @@
 <section>
   <div class="container">
 
-    <!-- ── Excel Status Bar ── -->
-    <div class="excel-bar no-data" id="excelBar">
-      <span class="excel-bar-icon" id="ebIcon">📊</span>
-      <div class="excel-bar-msg" id="ebMsg">
-        <strong>No Excel data loaded.</strong>
-        <small>Load <em>content-manager.xlsx</em> to display PDF downloads. Data saves in your browser for all pages.</small>
-      </div>
-      <label class="eb-btn eb-load" id="ebLoadBtn">
-        📂 Load Excel File
-        <input type="file" class="eb-file-input" id="excelFileInput" accept=".xlsx,.xls" />
-      </label>
-      <a href="tools/excel-manager.html" class="eb-btn eb-reload" style="text-decoration:none;">⚙ Open Manager</a>
-    </div>
+    <!-- Hidden file input for direct Excel loading -->
+    <input type="file" id="excelFileInput" accept=".xlsx,.xls" style="display:none;" />
 
     <!-- Search -->
     <div class="pdf-search" id="pdfSearchBox" style="display:none;">
@@ -139,6 +118,9 @@
         📊 Load <strong>content-manager.xlsx</strong> using the bar above to display PDF downloads.
       </div>
     </div>
+    <!-- Infinite scroll sentinel -->
+    <div id="sentinel" style="height:2px;display:none;"></div>
+    <div id="loadingMore" style="display:none;text-align:center;padding:18px 0;color:var(--text-light);font-size:0.9rem;">⏳ Loading more publications…</div>
 
   </div>
 </section>
@@ -189,83 +171,36 @@
 <script>
 $(function () {
 
-  var allSorted = [];
-  var catIcons  = { book:'📕', talk:'📜', song:'🎵', magazine:'📰', photo:'🖼' };
+  var BATCH           = 8;    /* 2 cols × 4 rows on desktop */
+  var allSorted       = [];
+  var currentFiltered = [];
+  var loadedCount     = 0;
+  var scrollObserver  = null;
+  var catIcons        = { book:'📕', talk:'📜', song:'🎵', magazine:'📰', photo:'🖼' };
 
   /* ══════════════════════════════════════════════════════════
-     Excel Status Bar
+     PDFs — Infinite Scroll
   ══════════════════════════════════════════════════════════ */
-  function updateBar(loaded, at) {
-    var $bar = $('#excelBar');
-    if (loaded) {
-      $bar.removeClass('no-data');
-      $('#ebIcon').text('✅');
-      $('#ebMsg').html(
-        '<strong>PDFs sheet loaded from content-manager.xlsx</strong>' +
-        '<small>Loaded: ' + (at || '') + ' &nbsp;|&nbsp; ' + SITE_DATA.pdfs.length + ' publications</small>'
-      );
-      $('#ebLoadBtn').html(
-        '🔄 Reload Excel <input type="file" class="eb-file-input" id="excelFileInput" accept=".xlsx,.xls" />'
-      ).removeClass('eb-load').addClass('eb-reload');
-
-      if (!$('#ebClear').length) {
-        $bar.append('<button class="eb-btn eb-clear" id="ebClear">✕ Clear</button>');
-      }
-    } else {
-      $bar.addClass('no-data');
-      $('#ebIcon').text('📊');
-      $('#ebMsg').html(
-        '<strong>No Excel data loaded.</strong>' +
-        '<small>Load <em>content-manager.xlsx</em> to display PDF downloads.</small>'
-      );
-      $('#ebLoadBtn').html(
-        '📂 Load Excel File <input type="file" class="eb-file-input" id="excelFileInput" accept=".xlsx,.xls" />'
-      ).removeClass('eb-reload').addClass('eb-load');
-      $('#ebClear').remove();
-    }
+  function noDataMsg() {
+    return '<div class="no-data-msg">' +
+      '<span class="nd-icon">📚</span>' +
+      '<p>No PDFs found. Select your <strong>content-manager.xlsx</strong> to display PDF downloads.</p>' +
+      '<label class="nd-btn" for="excelFileInput">📂 Load Excel File</label>' +
+      '<div class="nd-sub">Need to add or edit entries? <a href="tools/excel-manager.html">⚙ Open Excel Manager</a></div>' +
+    '</div>';
   }
 
-  /* ── File input handler (delegated) ── */
-  $(document).on('change', '#excelFileInput', function (e) {
-    var file = e.target.files[0];
-    if (!file) return;
-    $('#ebMsg').html('<strong>⏳ Loading Excel…</strong>');
-    SITE_DATA.loadFromFile(file,
-      function () {
-        updateBar(true, SITE_DATA.loadedAt);
-        buildAndRender();
-      },
-      function (err) {
-        alert('Error reading Excel: ' + err.message);
-        updateBar(false);
-      }
-    );
-    $(this).val('');
-  });
-
-  /* ── Clear button ── */
-  $(document).on('click', '#ebClear', function () {
-    if (!confirm('Clear all cached Excel data from browser?')) return;
-    SITE_DATA.clear();
-    updateBar(false);
-    clearPdfs();
-  });
-
-  /* ══════════════════════════════════════════════════════════
-     PDF Rendering
-  ══════════════════════════════════════════════════════════ */
   function clearPdfs() {
-    $('#pdfFilters').hide();
-    $('#pdfSearchBox').hide();
-    $('#pdfContainer').html('<div class="gallery-loading">📊 Load <strong>content-manager.xlsx</strong> to display PDF downloads.</div>');
+    if (scrollObserver) { scrollObserver.disconnect(); scrollObserver = null; }
+    $('#pdfSearchBox, #pdfFilters, #sentinel, #loadingMore').hide();
+    $('#pdfContainer').html(noDataMsg());
     $('#pdfCounter').text('');
-    allSorted = [];
+    allSorted = []; currentFiltered = []; loadedCount = 0;
   }
 
   function buildAndRender() {
     allSorted = SITE_DATA.sorted(SITE_DATA.pdfs);
 
-    /* Build category filter buttons */
     var cats = [];
     allSorted.forEach(function (p) {
       if (p.category && $.inArray(p.category, cats) === -1) cats.push(p.category);
@@ -277,86 +212,109 @@ $(function () {
         (catIcons[c] || '📄') + ' ' + c.charAt(0).toUpperCase() + c.slice(1) + '</button>');
     });
 
-    /* Show search box */
     $('#pdfSearchBox').show();
-
-    renderPdfs(allSorted);
+    currentFiltered = allSorted;
+    loadedCount = 0;
+    $('#pdfContainer').empty();
+    appendBatch();
   }
 
-  function renderPdfs(data) {
-    var $container = $('#pdfContainer').empty();
-    if (!data.length) {
-      $container.html('<p style="color:var(--text-light);text-align:center;grid-column:1/-1;padding:40px;">No publications found.</p>');
-      $('#pdfCounter').text('');
-      return;
-    }
-    $.each(data, function (i, p) {
-      var serial = String(p.serial).padStart(2, '0');
-      var icon   = catIcons[p.category] || '📄';
-      var $card  = $('<div>', { 'class': 'pdf-card fade-in', 'data-category': p.category }).append(
-        $('<div class="pdf-icon-wrap">').text(icon),
-        $('<div class="pdf-info">').append(
-          '<h3 class="pdf-title">' +
-            '<span class="pdf-serial-inline">#' + serial + '</span> ' + p.name +
-          '</h3>',
-          '<p class="pdf-meta">📂 ' + (p.category || '') +
-            (p.pages ? ' &nbsp;|&nbsp; 📄 ' + p.pages + ' pages' : '') +
-          '</p>',
-          '<p style="font-size:0.84rem;color:var(--text-body);line-height:1.6;margin-bottom:12px;">' +
-            p.description +
-          '</p>',
-          $('<a>', {
-            href    : p.file,
-            'class' : 'pdf-download',
-            download: '',
-            text    : '⬇ Download PDF'
-          })
-        )
-      );
-      $container.append($card);
-    });
-    $('#pdfCounter').text('Showing ' + data.length + ' publication' + (data.length !== 1 ? 's' : '') +
-      ' — sorted by Serial No from PDFs sheet');
+  function makeCard(p) {
+    var serial = String(p.serial).padStart(2, '0');
+    var icon   = catIcons[p.category] || '📄';
+    return $('<div>', { 'class': 'pdf-card fade-in', 'data-category': p.category }).append(
+      $('<div class="pdf-icon-wrap">').text(icon),
+      $('<div class="pdf-info">').append(
+        '<h3 class="pdf-title"><span class="pdf-serial-inline">#' + serial + '</span> ' + p.name + '</h3>',
+        '<p class="pdf-meta">📂 ' + (p.category || '') +
+          (p.pages ? ' &nbsp;|&nbsp; 📄 ' + p.pages + ' pages' : '') + '</p>',
+        '<p style="font-size:0.84rem;color:var(--text-body);line-height:1.6;margin-bottom:12px;">' + p.description + '</p>',
+        $('<a>', { href: p.file, 'class': 'pdf-download', download: '', text: '⬇ Download PDF' })
+      )
+    );
+  }
 
+  function appendBatch() {
+    var batch = currentFiltered.slice(loadedCount, loadedCount + BATCH);
+    if (!batch.length && loadedCount === 0) {
+      $('#pdfContainer').html('<p style="color:var(--text-light);text-align:center;grid-column:1/-1;padding:40px;">No publications found.</p>');
+      $('#pdfCounter').text(''); $('#sentinel').hide(); return;
+    }
+    var $container = $('#pdfContainer');
+    $.each(batch, function (i, p) { $container.append(makeCard(p)); });
+    loadedCount += batch.length;
+    updateCounter();
+
+    if (loadedCount < currentFiltered.length) {
+      $('#sentinel').show(); setupObserver();
+    } else {
+      $('#sentinel').hide();
+      if (scrollObserver) { scrollObserver.disconnect(); scrollObserver = null; }
+    }
     if (typeof window.initFade === 'function') window.initFade();
+  }
+
+  function updateCounter() {
+    var total = currentFiltered.length;
+    $('#pdfCounter').text(
+      'Showing ' + Math.min(loadedCount, total) + ' of ' + total +
+      ' publication' + (total !== 1 ? 's' : '')
+    );
+  }
+
+  function setupObserver() {
+    if (scrollObserver) scrollObserver.disconnect();
+    scrollObserver = new IntersectionObserver(function (entries) {
+      if (!entries[0].isIntersecting) return;
+      $('#loadingMore').show();
+      setTimeout(function () { appendBatch(); $('#loadingMore').hide(); }, 250);
+    }, { rootMargin: '300px' });
+    scrollObserver.observe(document.getElementById('sentinel'));
   }
 
   /* ── Combined filter + search ── */
   function applyFilter() {
-    var filter = $('.filter-btn.active').data('filter') || 'all';
-    var q      = $('#pdfSearch').val().toLowerCase().trim();
-    var filtered = allSorted.filter(function (p) {
-      var matchCat  = filter === 'all' || p.category === filter;
-      var matchText = !q ||
-        (p.name        || '').toLowerCase().indexOf(q) !== -1 ||
-        (p.description || '').toLowerCase().indexOf(q) !== -1;
-      return matchCat && matchText;
+    var f = $('.filter-btn.active').data('filter') || 'all';
+    var q = $('#pdfSearch').val().toLowerCase().trim();
+    currentFiltered = allSorted.filter(function (p) {
+      return (f === 'all' || p.category === f) &&
+        (!q || (p.name || '').toLowerCase().indexOf(q) !== -1 ||
+               (p.description || '').toLowerCase().indexOf(q) !== -1);
     });
-    renderPdfs(filtered);
+    loadedCount = 0;
+    $('#pdfContainer').empty();
+    if (scrollObserver) { scrollObserver.disconnect(); scrollObserver = null; }
+    appendBatch();
   }
 
   /* ── Category filter ── */
   $(document).on('click', '.filter-btn', function () {
-    $('.filter-btn').removeClass('active');
-    $(this).addClass('active');
-    applyFilter();
+    $('.filter-btn').removeClass('active'); $(this).addClass('active'); applyFilter();
   });
 
   /* ── Live search ── */
   $(document).on('input keyup', '#pdfSearch', function (e) {
-    if (e.type === 'keyup' && e.key === 'Escape') { $(this).val(''); }
-    applyFilter();
+    if (e.key === 'Escape') $(this).val(''); applyFilter();
   });
   $(document).on('click', '#pdfSearchBtn', function () { applyFilter(); });
 
-  /* ══════════════════════════════════════════════════════════
-     Init
-  ══════════════════════════════════════════════════════════ */
+  /* ── Direct Excel load from PDF page ── */
+  $('#excelFileInput').on('change', function (e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    SITE_DATA.loadFromFile(file, function () {
+      buildAndRender();
+    }, function (err) {
+      alert('Error loading Excel file: ' + err.message);
+    });
+    $(this).val('');
+  });
+
+  /* ── Init ── */
   if (SITE_DATA.loaded && SITE_DATA.pdfs.length) {
-    updateBar(true, SITE_DATA.loadedAt);
     buildAndRender();
   } else {
-    updateBar(false);
+    $('#pdfContainer').html(noDataMsg());
   }
 
 });

@@ -5,14 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Content Manager — Yogi Ramsuratkumar Website</title>
 
-  <!-- jQuery + SheetJS -->
+  <!-- jQuery + SheetJS + Central data loader -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-  <!-- Data files -->
-  <script src="../data/photos.js"></script>
-  <script src="../data/videos.js"></script>
-  <script src="../data/pdfs.js"></script>
+  <script src="../data/data-loader.js"></script>
 
   <style>
     :root {
@@ -33,13 +29,14 @@
     }
     .header h1 { font-size: 1.25rem; }
     .header p  { font-size: 0.78rem; opacity: 0.8; margin-top: 2px; }
-    .header-back { color: var(--gold); font-size: 0.85rem; text-decoration: none; }
+    .header-links { display: flex; gap: 16px; align-items: center; }
+    .header-back { color: var(--gold); font-size: 0.85rem; text-decoration: none; white-space: nowrap; }
     .header-back:hover { text-decoration: underline; }
 
     /* ---- Workflow strip ---- */
     .workflow {
       background: var(--light); border-bottom: 1px solid var(--border);
-      padding: 10px 28px; display: flex; align-items: center; gap: 14px;
+      padding: 10px 28px; display: flex; align-items: center; gap: 12px;
       flex-wrap: wrap;
     }
     .workflow span { font-size: 0.78rem; color: var(--text-light); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
@@ -53,7 +50,7 @@
       border-bottom: 1px solid var(--border);
       display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
     }
-    .btn { padding: 9px 18px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; }
+    .btn { padding: 9px 18px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; white-space: nowrap; }
     .btn-green  { background: var(--green); color: white; }
     .btn-green:hover  { background: var(--green-dark); }
     .btn-gold   { background: var(--gold); color: var(--green-dark); }
@@ -64,6 +61,15 @@
     .btn-red:hover    { background: #a31515; }
     .toolbar-sep { width: 1px; height: 32px; background: var(--border); margin: 0 4px; }
     #uploadInput { display: none; }
+
+    /* ---- Data status pill ---- */
+    .data-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 50px; font-size: 0.78rem; font-weight: 600;
+      border: 1.5px solid;
+    }
+    .data-pill.loaded   { background: #e8f5e9; color: #1b5e20; border-color: #a5d6a7; }
+    .data-pill.no-data  { background: #fff8e1; color: #e65100; border-color: #ffcc80; }
 
     /* ---- Tabs ---- */
     .tabs { display: flex; background: var(--light); border-bottom: 2px solid var(--border); padding: 0 28px; }
@@ -90,7 +96,7 @@
       border-right: 1px solid rgba(255,255,255,0.15);
     }
     thead th:first-child { border-radius: var(--radius) 0 0 0; }
-    thead th:last-child  { border-radius: 0 var(--radius) 0 0; }
+    thead th:last-child  { border-radius: 0 var(--radius) 0 0; border-right: none; }
     .serial-th { width: 70px; text-align: center !important; }
     tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
     tbody tr:nth-child(even) { background: #F5FFFA; }
@@ -124,19 +130,6 @@
     .status-bar.error   { border-color: #c62828; background: #fde8e8; color: #c62828; }
     .status-bar.info    { border-color: var(--green); background: var(--cream); color: var(--green); }
 
-    /* ---- Generated JS preview ---- */
-    .js-preview { display: none; margin-top: 18px; }
-    .js-preview h3 { font-size: 0.9rem; color: var(--green-dark); margin-bottom: 8px; }
-    .js-tabs { display: flex; gap: 6px; margin-bottom: 6px; }
-    .js-tab { padding: 5px 14px; border: 1.5px solid var(--border); border-radius: 5px; background: white; cursor: pointer; font-size: 0.8rem; color: var(--text); }
-    .js-tab.active { background: var(--green); color: white; border-color: var(--green); }
-    pre.code-box {
-      background: #0d1117; color: #58a6ff; padding: 16px; border-radius: var(--radius);
-      font-size: 0.78rem; overflow-x: auto; max-height: 340px; overflow-y: auto;
-      line-height: 1.6; white-space: pre-wrap;
-    }
-    .copy-btn { margin-top: 8px; }
-
     /* ---- Tip box ---- */
     .tip { background: rgba(26,107,46,0.06); border-left: 4px solid var(--green); padding: 10px 14px; border-radius: 0 var(--radius) var(--radius) 0; font-size: 0.82rem; color: var(--text-light); margin-bottom: 14px; line-height: 1.6; }
     .tip strong { color: var(--green-dark); }
@@ -148,33 +141,51 @@
 <div class="header">
   <div>
     <h1>🪔 Content Manager — Yogi Ramsuratkumar Website</h1>
-    <p>Manage Photos · Videos · PDFs via Excel or direct table editing</p>
+    <p>Edit Photos · Videos · PDFs → Save to Website → Gallery pages update instantly</p>
   </div>
-  <a href="../index.html" class="header-back">← Back to Website</a>
+  <div class="header-links">
+    <a href="create-sample-excel.html" class="header-back">📥 Sample Excel</a>
+    <a href="../index.html" class="header-back">← Back to Website</a>
+  </div>
 </div>
 
 <!-- Workflow -->
 <div class="workflow">
   <span>Workflow:</span>
-  <div class="step"><span class="step-num">1</span> Edit rows in the table below</div>
+  <div class="step"><span class="step-num">1</span> Upload <b>content-manager.xlsx</b> (or edit rows directly)</div>
   <span class="step-arrow">→</span>
-  <div class="step"><span class="step-num">2</span> Click <b>Generate JS Files</b></div>
+  <div class="step"><span class="step-num">2</span> Click <b>💾 Save to Website</b></div>
   <span class="step-arrow">→</span>
-  <div class="step"><span class="step-num">3</span> Copy JS code into <b>data/photos.js</b>, <b>data/videos.js</b>, <b>data/pdfs.js</b></div>
-  <span class="step-arrow">→</span>
-  <div class="step"><span class="step-num">4</span> Refresh gallery pages — done! ✓</div>
+  <div class="step"><span class="step-num">3</span> Open any gallery page — data loads automatically ✓</div>
 </div>
 
 <!-- Toolbar -->
 <div class="toolbar">
-  <button class="btn btn-gold" id="btnDownloadExcel">⬇ Download Excel</button>
-  <label class="btn btn-outline" style="cursor:pointer;">
+  <!-- Load Excel -->
+  <label class="btn btn-gold" style="cursor:pointer;">
     📂 Upload Excel <input type="file" id="uploadInput" accept=".xlsx,.xls" />
   </label>
+
+  <!-- Download Excel (export current table) -->
+  <button class="btn btn-outline" id="btnDownloadExcel">⬇ Download Excel</button>
+
   <div class="toolbar-sep"></div>
-  <button class="btn btn-green" id="btnGenJS">⚙ Generate JS Files</button>
+
+  <!-- Save to Website (write localStorage) -->
+  <button class="btn btn-green" id="btnSave">💾 Save to Website</button>
+
   <div class="toolbar-sep"></div>
+
+  <!-- Add row -->
   <button class="btn btn-outline" id="btnAddRow">➕ Add Row</button>
+
+  <!-- Clear cache -->
+  <button class="btn btn-red" id="btnClearCache" title="Clear localStorage data cache">🗑 Clear Cache</button>
+
+  <div class="toolbar-sep"></div>
+
+  <!-- Data status -->
+  <span class="data-pill no-data" id="dataPill">⚠ No data cached</span>
 </div>
 
 <!-- Tabs -->
@@ -191,8 +202,8 @@
   <!-- PHOTOS TAB -->
   <div class="tab-panel active" id="tab-photos">
     <div class="tip">
-      <strong>Photos:</strong> Add photo files to <code>images/gallery/</code> folder, then set the Image File path here.
-      Serial No controls the display order on the gallery page.
+      <strong>Photos:</strong> Add photo files to <code>images/photos/</code> folder, then set the Image File path here.
+      Serial No controls the display order. After editing, click <strong>💾 Save to Website</strong>.
     </div>
     <div class="table-wrap">
       <table id="photosTable">
@@ -214,8 +225,8 @@
   <!-- VIDEOS TAB -->
   <div class="tab-panel" id="tab-videos">
     <div class="tip">
-      <strong>Videos:</strong> Paste the full YouTube embed URL (e.g. <code>https://www.youtube.com/embed/ABC123xyz</code>).
-      Get it from YouTube → Share → Embed → copy the src value.
+      <strong>Videos:</strong> Paste the full YouTube URL (e.g. <code>https://www.youtube.com/watch?v=ABC123</code>).
+      After editing, click <strong>💾 Save to Website</strong>.
     </div>
     <div class="table-wrap">
       <table id="videosTable">
@@ -238,7 +249,8 @@
   <!-- PDFs TAB -->
   <div class="tab-panel" id="tab-pdfs">
     <div class="tip">
-      <strong>PDFs:</strong> Place PDF files in the <code>pdfs/</code> folder, then set the PDF File path here (e.g. <code>pdfs/my-book.pdf</code>).
+      <strong>PDFs:</strong> Place PDF files in the <code>pdfs/</code> folder, then set the PDF File path (e.g. <code>pdfs/my-book.pdf</code>).
+      After editing, click <strong>💾 Save to Website</strong>.
     </div>
     <div class="table-wrap">
       <table id="pdfsTable">
@@ -258,18 +270,6 @@
     </div>
   </div>
 
-  <!-- Generated JS Preview -->
-  <div class="js-preview" id="jsPreview">
-    <h3>⚙ Generated JS Data Files — Copy each tab into the corresponding data/ file:</h3>
-    <div class="js-tabs">
-      <button class="js-tab active" data-jstab="photos">data/photos.js</button>
-      <button class="js-tab" data-jstab="videos">data/videos.js</button>
-      <button class="js-tab" data-jstab="pdfs">data/pdfs.js</button>
-    </div>
-    <pre class="code-box" id="codeBox"></pre>
-    <button class="btn btn-green copy-btn" id="btnCopyCode">📋 Copy to Clipboard</button>
-    <button class="btn btn-gold copy-btn" id="btnDownloadJS" style="margin-left:8px;">⬇ Download JS File</button>
-  </div>
 </div>
 
 <script>
@@ -277,13 +277,25 @@ $(function () {
 
   /* ─── Category options ─────────────────────────────────────── */
   var CAT = {
-    photos: ['darshan','ashram','festival','early','devotees'],
-    videos: ['discourse','bhajan','documentary','rare'],
+    photos: ['darshan','ashram','festival','early','devotees','blessings','bhajan','events','life'],
+    videos: ['discourse','bhajan','documentary','interview','events','rare'],
     pdfs  : ['book','talk','song','magazine','photo']
   };
 
-  var generatedJS = { photos: '', videos: '', pdfs: '' };
-  var activeJsTab = 'photos';
+  var sortBySerial = function (a, b) { return (a.serial || 0) - (b.serial || 0); };
+
+  /* ─── Data pill status ──────────────────────────────────────── */
+  function updatePill() {
+    var $p = $('#dataPill');
+    if (SITE_DATA.loaded) {
+      $p.removeClass('no-data').addClass('loaded')
+        .text('✅ Cached: ' + SITE_DATA.photos.length + ' photos · ' +
+              SITE_DATA.videos.length + ' videos · ' + SITE_DATA.pdfs.length + ' PDFs');
+    } else {
+      $p.removeClass('loaded').addClass('no-data').text('⚠ No data cached');
+    }
+  }
+  updatePill();
 
   /* ─── Tab switching ─────────────────────────────────────────── */
   $('.tab-btn').on('click', function () {
@@ -299,13 +311,17 @@ $(function () {
     cats.forEach(function (c) {
       html += '<option value="' + c + '"' + (c === val ? ' selected' : '') + '>' + c + '</option>';
     });
+    // Allow any custom value not in list
+    if (val && cats.indexOf(val) === -1) {
+      html += '<option value="' + $('<div>').text(val).html() + '" selected>' + $('<div>').text(val).html() + '</option>';
+    }
     html += '</select>';
     return html;
   }
   function cell(val, cls, tag) {
-    cls = cls || ''; tag = tag || 'input';
-    if (tag === 'textarea') return '<textarea class="editable ' + cls + '">' + $('<div>').text(val).html() + '</textarea>';
-    return '<input type="text" class="editable ' + cls + '" value="' + $('<div>').text(val).html() + '" />';
+    cls = cls || ''; tag = tag || 'input'; val = val !== undefined ? val : '';
+    if (tag === 'textarea') return '<textarea class="editable ' + cls + '">' + $('<div>').text(String(val)).html() + '</textarea>';
+    return '<input type="text" class="editable ' + cls + '" value="' + $('<div>').text(String(val)).html() + '" />';
   }
   function delBtn() { return '<button class="del-row" title="Delete row">✕</button>'; }
 
@@ -313,15 +329,14 @@ $(function () {
   function renderPhotos(data) {
     var $body = $('#photosBody').empty();
     $.each(data, function (i, r) {
-      var $tr = $('<tr>').append(
-        $('<td class="serial-td">').text(r.serial),
+      $body.append($('<tr>').append(
+        $('<td class="serial-td">').text(i + 1),
         $('<td>').html(cell(r.name)),
         $('<td class="desc-cell">').html(cell(r.description, '', 'textarea')),
         $('<td>').html(catSelect(CAT.photos, r.category)),
         $('<td>').html(cell(r.image)),
         $('<td>').html(delBtn())
-      );
-      $body.append($tr);
+      ));
     });
     $('#photosCount').text(data.length);
   }
@@ -330,16 +345,15 @@ $(function () {
   function renderVideos(data) {
     var $body = $('#videosBody').empty();
     $.each(data, function (i, r) {
-      var $tr = $('<tr>').append(
-        $('<td class="serial-td">').text(r.serial),
+      $body.append($('<tr>').append(
+        $('<td class="serial-td">').text(i + 1),
         $('<td>').html(cell(r.name)),
         $('<td class="desc-cell">').html(cell(r.description, '', 'textarea')),
         $('<td>').html(catSelect(CAT.videos, r.category)),
         $('<td>').html(cell(r.youtubeUrl)),
         $('<td>').html(cell(r.duration)),
         $('<td>').html(delBtn())
-      );
-      $body.append($tr);
+      ));
     });
     $('#videosCount').text(data.length);
   }
@@ -348,76 +362,25 @@ $(function () {
   function renderPdfs(data) {
     var $body = $('#pdfsBody').empty();
     $.each(data, function (i, r) {
-      var $tr = $('<tr>').append(
-        $('<td class="serial-td">').text(r.serial),
+      $body.append($('<tr>').append(
+        $('<td class="serial-td">').text(i + 1),
         $('<td>').html(cell(r.name)),
         $('<td class="desc-cell">').html(cell(r.description, '', 'textarea')),
         $('<td>').html(catSelect(CAT.pdfs, r.category)),
         $('<td>').html(cell(r.file)),
         $('<td>').html(cell(r.pages)),
         $('<td>').html(delBtn())
-      );
-      $body.append($tr);
+      ));
     });
     $('#pdfsCount').text(data.length);
   }
 
-  /* ─── Initial render from data files ──────────────────────── */
-  var sortBySerial = function (a, b) { return a.serial - b.serial; };
-  renderPhotos(PHOTOS_DATA.slice().sort(sortBySerial));
-  renderVideos(VIDEOS_DATA.slice().sort(sortBySerial));
-  renderPdfs(PDFS_DATA.slice().sort(sortBySerial));
-
-  /* ─── Delete row ────────────────────────────────────────────── */
-  $(document).on('click', '.del-row', function () {
-    if (confirm('Delete this row?')) {
-      $(this).closest('tr').remove();
-      updateCounts();
-    }
-  });
-
-  /* ─── Add row ──────────────────────────────────────────────── */
-  $('#btnAddRow').on('click', function () {
-    var tab = $('.tab-btn.active').data('tab');
-    var nextSerial = 1;
-    if (tab === 'photos') {
-      nextSerial = $('#photosBody tr').length + 1;
-      var $tr = $('<tr>').append(
-        $('<td class="serial-td">').text(nextSerial),
-        $('<td>').html(cell('')), $('<td class="desc-cell">').html(cell('', '', 'textarea')),
-        $('<td>').html(catSelect(CAT.photos, 'darshan')),
-        $('<td>').html(cell('images/gallery/new-photo.jpg')),
-        $('<td>').html(delBtn())
-      );
-      $('#photosBody').append($tr);
-    } else if (tab === 'videos') {
-      nextSerial = $('#videosBody tr').length + 1;
-      var $tr = $('<tr>').append(
-        $('<td class="serial-td">').text(nextSerial),
-        $('<td>').html(cell('')), $('<td class="desc-cell">').html(cell('', '', 'textarea')),
-        $('<td>').html(catSelect(CAT.videos, 'discourse')),
-        $('<td>').html(cell('https://www.youtube.com/embed/VIDEO_ID')),
-        $('<td>').html(cell('')), $('<td>').html(delBtn())
-      );
-      $('#videosBody').append($tr);
-    } else if (tab === 'pdfs') {
-      nextSerial = $('#pdfsBody tr').length + 1;
-      var $tr = $('<tr>').append(
-        $('<td class="serial-td">').text(nextSerial),
-        $('<td>').html(cell('')), $('<td class="desc-cell">').html(cell('', '', 'textarea')),
-        $('<td>').html(catSelect(CAT.pdfs, 'book')),
-        $('<td>').html(cell('pdfs/new-file.pdf')),
-        $('<td>').html(cell('')), $('<td>').html(delBtn())
-      );
-      $('#pdfsBody').append($tr);
-    }
-    updateCounts();
-  });
-
-  function updateCounts() {
-    $('#photosCount').text($('#photosBody tr').length);
-    $('#videosCount').text($('#videosBody tr').length);
-    $('#pdfsCount').text($('#pdfsBody tr').length);
+  /* ─── Load from localStorage on open ───────────────────────── */
+  if (SITE_DATA.loaded) {
+    renderPhotos(SITE_DATA.sorted(SITE_DATA.photos));
+    renderVideos(SITE_DATA.sorted(SITE_DATA.videos));
+    renderPdfs(SITE_DATA.sorted(SITE_DATA.pdfs));
+    showStatus('Loaded existing data from browser cache. Edit and click 💾 Save to Website to update.', 'info');
   }
 
   /* ─── Read table data ───────────────────────────────────────── */
@@ -460,90 +423,28 @@ $(function () {
     }).get();
   }
 
-  /* ─── Generate JS ───────────────────────────────────────────── */
-  function toJsFile(varName, arr, fields) {
-    var lines = ['/* Auto-generated by Content Manager — ' + new Date().toLocaleDateString() + ' */\n'];
-    lines.push('var ' + varName + ' = [\n');
-    arr.forEach(function (item, idx) {
-      lines.push('  {\n');
-      fields.forEach(function (f) {
-        var v = (item[f] !== undefined) ? item[f] : '';
-        lines.push('    ' + f.padEnd(12) + ': ' + JSON.stringify(String(v)) + (f === fields[fields.length-1] ? '' : ',') + '\n');
-      });
-      lines.push('  }' + (idx < arr.length - 1 ? ',' : '') + '\n');
-    });
-    lines.push('];\n');
-    return lines.join('');
-  }
+  /* ─── 💾 SAVE TO WEBSITE (localStorage) ──────────────────────── */
+  $('#btnSave').on('click', function () {
+    var photos = readPhotos();
+    var videos = readVideos();
+    var pdfs   = readPdfs();
 
-  $('#btnGenJS').on('click', function () {
-    generatedJS.photos = toJsFile('PHOTOS_DATA', readPhotos(), ['serial','name','description','category','image']);
-    generatedJS.videos = toJsFile('VIDEOS_DATA', readVideos(), ['serial','name','description','category','youtubeUrl','duration']);
-    generatedJS.pdfs   = toJsFile('PDFS_DATA',   readPdfs(),   ['serial','name','description','category','file','pages']);
-
-    $('#jsPreview').show();
-    activeJsTab = 'photos';
-    $('.js-tab').removeClass('active');
-    $('[data-jstab="photos"]').addClass('active');
-    $('#codeBox').text(generatedJS.photos);
-    showStatus('JS files generated! Copy each tab into the matching data/ file, then refresh gallery pages.', 'success');
-    $('#jsPreview')[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
-
-  /* JS tab switching */
-  $(document).on('click', '.js-tab', function () {
-    activeJsTab = $(this).data('jstab');
-    $('.js-tab').removeClass('active');
-    $(this).addClass('active');
-    $('#codeBox').text(generatedJS[activeJsTab] || '');
-  });
-
-  /* Copy code */
-  $('#btnCopyCode').on('click', function () {
-    var text = $('#codeBox').text();
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(text).then(function () { showStatus('Copied to clipboard!', 'success'); });
-    } else {
-      var ta = document.createElement('textarea');
-      ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-      showStatus('Copied!', 'success');
+    if (!photos.length && !videos.length && !pdfs.length) {
+      showStatus('No data to save. Upload an Excel file or add rows first.', 'error');
+      return;
     }
-  });
 
-  /* Download JS file */
-  $('#btnDownloadJS').on('click', function () {
-    var fname = 'data/' + activeJsTab + '.js';
-    downloadText(generatedJS[activeJsTab] || '', activeJsTab + '.js', 'text/javascript');
-    showStatus('Downloaded ' + activeJsTab + '.js — replace your data/' + activeJsTab + '.js with this file.', 'success');
-  });
+    SITE_DATA.photos = photos;
+    SITE_DATA.videos = videos;
+    SITE_DATA.pdfs   = pdfs;
+    SITE_DATA.saveToStorage();
 
-  /* ─── Download Excel ─────────────────────────────────────────── */
-  $('#btnDownloadExcel').on('click', function () {
-    var wb = XLSX.utils.book_new();
-
-    // Photos sheet
-    var pData = [['Serial No','Name','Description','Category','Image File']];
-    readPhotos().forEach(function (r) { pData.push([r.serial, r.name, r.description, r.category, r.image]); });
-    var pWs = XLSX.utils.aoa_to_sheet(pData);
-    pWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:32}];
-    XLSX.utils.book_append_sheet(wb, pWs, 'Photos');
-
-    // Videos sheet
-    var vData = [['Serial No','Name','Description','Category','YouTube URL','Duration']];
-    readVideos().forEach(function (r) { vData.push([r.serial, r.name, r.description, r.category, r.youtubeUrl, r.duration]); });
-    var vWs = XLSX.utils.aoa_to_sheet(vData);
-    vWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:46},{wch:12}];
-    XLSX.utils.book_append_sheet(wb, vWs, 'Videos');
-
-    // PDFs sheet
-    var dData = [['Serial No','Name','Description','Category','PDF File','Pages']];
-    readPdfs().forEach(function (r) { dData.push([r.serial, r.name, r.description, r.category, r.file, r.pages]); });
-    var dWs = XLSX.utils.aoa_to_sheet(dData);
-    dWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:32},{wch:12}];
-    XLSX.utils.book_append_sheet(wb, dWs, 'PDFs');
-
-    XLSX.writeFile(wb, 'content-manager.xlsx');
-    showStatus('Excel file downloaded: content-manager.xlsx', 'success');
+    updatePill();
+    showStatus(
+      '✅ Saved to website! ' + photos.length + ' photos, ' + videos.length + ' videos, ' + pdfs.length +
+      ' PDFs. Now open any gallery page — data loads automatically without selecting the Excel file.',
+      'success'
+    );
   });
 
   /* ─── Upload Excel ───────────────────────────────────────────── */
@@ -555,10 +456,9 @@ $(function () {
       try {
         var wb = XLSX.read(ev.target.result, { type: 'binary' });
 
-        // Photos
         if (wb.Sheets['Photos']) {
           var rows = XLSX.utils.sheet_to_json(wb.Sheets['Photos'], { defval: '' });
-          var pData = rows.map(function (r, i) {
+          renderPhotos(rows.map(function (r, i) {
             return {
               serial     : Number(r['Serial No']) || (i + 1),
               name       : String(r['Name'] || ''),
@@ -566,14 +466,12 @@ $(function () {
               category   : String(r['Category'] || 'darshan'),
               image      : String(r['Image File'] || '')
             };
-          });
-          renderPhotos(pData.sort(sortBySerial));
+          }).sort(sortBySerial));
         }
 
-        // Videos
         if (wb.Sheets['Videos']) {
           var rows = XLSX.utils.sheet_to_json(wb.Sheets['Videos'], { defval: '' });
-          var vData = rows.map(function (r, i) {
+          renderVideos(rows.map(function (r, i) {
             return {
               serial     : Number(r['Serial No']) || (i + 1),
               name       : String(r['Name'] || ''),
@@ -582,14 +480,12 @@ $(function () {
               youtubeUrl : String(r['YouTube URL'] || ''),
               duration   : String(r['Duration'] || '')
             };
-          });
-          renderVideos(vData.sort(sortBySerial));
+          }).sort(sortBySerial));
         }
 
-        // PDFs
         if (wb.Sheets['PDFs']) {
           var rows = XLSX.utils.sheet_to_json(wb.Sheets['PDFs'], { defval: '' });
-          var dData = rows.map(function (r, i) {
+          renderPdfs(rows.map(function (r, i) {
             return {
               serial     : Number(r['Serial No']) || (i + 1),
               name       : String(r['Name'] || ''),
@@ -598,34 +494,112 @@ $(function () {
               file       : String(r['PDF File'] || ''),
               pages      : String(r['Pages'] || '')
             };
-          });
-          renderPdfs(dData.sort(sortBySerial));
+          }).sort(sortBySerial));
         }
 
-        showStatus('Excel imported successfully! Review data below, then click Generate JS Files.', 'success');
+        showStatus('Excel uploaded! Review the data below, then click 💾 Save to Website.', 'success');
       } catch (err) {
         showStatus('Error reading Excel: ' + err.message, 'error');
       }
-      $(this).val(''); // reset file input
+      $(this).val('');
     };
     reader.readAsBinaryString(file);
   });
 
-  /* ─── Helpers ────────────────────────────────────────────────── */
-  function showStatus(msg, type) {
-    var $s = $('#statusBar');
-    $s.removeClass('success error info').addClass(type || 'info')
-      .html((type === 'success' ? '✅ ' : type === 'error' ? '❌ ' : 'ℹ ') + msg)
-      .show();
-    setTimeout(function () { $s.fadeOut(); }, 6000);
+  /* ─── Download Excel ─────────────────────────────────────────── */
+  $('#btnDownloadExcel').on('click', function () {
+    var wb = XLSX.utils.book_new();
+
+    var pData = [['Serial No','Name','Description','Category','Image File']];
+    readPhotos().forEach(function (r) { pData.push([r.serial, r.name, r.description, r.category, r.image]); });
+    var pWs = XLSX.utils.aoa_to_sheet(pData);
+    pWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:32}];
+    XLSX.utils.book_append_sheet(wb, pWs, 'Photos');
+
+    var vData = [['Serial No','Name','Description','Category','YouTube URL','Duration']];
+    readVideos().forEach(function (r) { vData.push([r.serial, r.name, r.description, r.category, r.youtubeUrl, r.duration]); });
+    var vWs = XLSX.utils.aoa_to_sheet(vData);
+    vWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:46},{wch:12}];
+    XLSX.utils.book_append_sheet(wb, vWs, 'Videos');
+
+    var dData = [['Serial No','Name','Description','Category','PDF File','Pages']];
+    readPdfs().forEach(function (r) { dData.push([r.serial, r.name, r.description, r.category, r.file, r.pages]); });
+    var dWs = XLSX.utils.aoa_to_sheet(dData);
+    dWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:32},{wch:12}];
+    XLSX.utils.book_append_sheet(wb, dWs, 'PDFs');
+
+    XLSX.writeFile(wb, 'content-manager.xlsx');
+    showStatus('Downloaded content-manager.xlsx — edit it and Upload Excel to reload.', 'success');
+  });
+
+  /* ─── Delete row ────────────────────────────────────────────── */
+  $(document).on('click', '.del-row', function () {
+    if (confirm('Delete this row?')) {
+      $(this).closest('tr').remove();
+      updateCounts();
+    }
+  });
+
+  /* ─── Add row ──────────────────────────────────────────────── */
+  $('#btnAddRow').on('click', function () {
+    var tab = $('.tab-btn.active').data('tab');
+    if (tab === 'photos') {
+      var n = $('#photosBody tr').length + 1;
+      $('#photosBody').append($('<tr>').append(
+        $('<td class="serial-td">').text(n),
+        $('<td>').html(cell('')),
+        $('<td class="desc-cell">').html(cell('', '', 'textarea')),
+        $('<td>').html(catSelect(CAT.photos, 'darshan')),
+        $('<td>').html(cell('images/photos/new-photo.jpg')),
+        $('<td>').html(delBtn())
+      ));
+    } else if (tab === 'videos') {
+      var n = $('#videosBody tr').length + 1;
+      $('#videosBody').append($('<tr>').append(
+        $('<td class="serial-td">').text(n),
+        $('<td>').html(cell('')),
+        $('<td class="desc-cell">').html(cell('', '', 'textarea')),
+        $('<td>').html(catSelect(CAT.videos, 'discourse')),
+        $('<td>').html(cell('https://www.youtube.com/watch?v=VIDEO_ID')),
+        $('<td>').html(cell('')),
+        $('<td>').html(delBtn())
+      ));
+    } else if (tab === 'pdfs') {
+      var n = $('#pdfsBody tr').length + 1;
+      $('#pdfsBody').append($('<tr>').append(
+        $('<td class="serial-td">').text(n),
+        $('<td>').html(cell('')),
+        $('<td class="desc-cell">').html(cell('', '', 'textarea')),
+        $('<td>').html(catSelect(CAT.pdfs, 'book')),
+        $('<td>').html(cell('pdfs/new-file.pdf')),
+        $('<td>').html(cell('')),
+        $('<td>').html(delBtn())
+      ));
+    }
+    updateCounts();
+  });
+
+  function updateCounts() {
+    $('#photosCount').text($('#photosBody tr').length);
+    $('#videosCount').text($('#videosBody tr').length);
+    $('#pdfsCount').text($('#pdfsBody tr').length);
   }
 
-  function downloadText(content, filename, mime) {
-    var blob = new Blob([content], { type: mime || 'text/plain' });
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = filename; a.click();
-    URL.revokeObjectURL(a.href);
+  /* ─── Clear cache ───────────────────────────────────────────── */
+  $('#btnClearCache').on('click', function () {
+    if (!confirm('Clear all cached website data from browser storage?\nGallery pages will show empty until you save again.')) return;
+    SITE_DATA.clear();
+    updatePill();
+    showStatus('Browser cache cleared. Upload Excel and click 💾 Save to Website to reload.', 'info');
+  });
+
+  /* ─── Helpers ────────────────────────────────────────────────── */
+  function showStatus(msg, type) {
+    var icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ';
+    $('#statusBar')
+      .removeClass('success error info').addClass(type || 'info')
+      .html(icon + ' ' + msg).show();
+    if (type !== 'error') setTimeout(function () { $('#statusBar').fadeOut(); }, 7000);
   }
 
 });
