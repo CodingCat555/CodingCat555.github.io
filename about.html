@@ -20,24 +20,31 @@
       </div>
     </a>
     <ul class="nav-menu" id="navMenu">
-      <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+      <li class="nav-item"><a href="index.html" class="nav-link" data-i18n="nav_home">Home</a></li>
       <li class="nav-item">
-        <a href="about.html" class="nav-link active">About <span class="arrow">▾</span></a>
+        <a href="about.html" class="nav-link active"><span data-i18n="nav_about">About</span> <span class="arrow">▾</span></a>
         <ul class="dropdown">
-          <li><a href="about.html#life">Life &amp; Journey</a></li>
-          <li><a href="about.html#teachings">Teachings</a></li>
-          <li><a href="about.html#timeline">Timeline</a></li>
+          <li><a href="about.html#life" data-i18n="nav_about_life">Life &amp; Journey</a></li>
+          <li><a href="about.html#teachings" data-i18n="nav_about_teachings">Teachings</a></li>
+          <li><a href="about.html#timeline" data-i18n="nav_about_timeline">Timeline</a></li>
         </ul>
       </li>
       <li class="nav-item">
-        <a href="gallery.html" class="nav-link">Gallery <span class="arrow">▾</span></a>
+        <a href="gallery.html" class="nav-link"><span data-i18n="nav_gallery">Gallery</span> <span class="arrow">▾</span></a>
         <ul class="dropdown">
-          <li><a href="gallery.html">Photo Gallery</a></li>
-          <li><a href="videos.html">Video Gallery</a></li>
-          <li><a href="pdfs.html">PDF Downloads</a></li>
+          <li><a href="gallery.html" data-i18n="nav_gallery_photos">Photo Gallery</a></li>
+          <li><a href="videos.html" data-i18n="nav_gallery_videos">Video Gallery</a></li>
+          <li><a href="pdfs.html" data-i18n="nav_gallery_pdfs">PDF Downloads</a></li>
         </ul>
       </li>
-      <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li>
+      <li class="nav-item"><a href="contact.html" class="nav-link" data-i18n="nav_contact">Contact</a></li>
+      <li class="nav-item">
+        <a href="javascript:void(0)" class="nav-link">🌐 <span id="langNavLabel">EN</span> <span class="arrow">▾</span></a>
+        <ul class="dropdown lang-dropdown">
+          <li><button class="lang-btn" data-lang="en">English</button></li>
+          <li><button class="lang-btn" data-lang="ta">தமிழ்</button></li>
+        </ul>
+      </li>
     </ul>
     <button class="hamburger" id="hamburger" aria-label="Toggle menu">
       <span></span><span></span><span></span>
@@ -271,5 +278,8 @@
 
 <button class="scroll-top" id="scrollTop" aria-label="Scroll to top">↑</button>
 <script src="js/main.js"></script>
+<script src="data/lang/en.js"></script>
+<script src="data/lang/ta.js"></script>
+<script src="data/lang-loader.js"></script>
 </body>
 </html>

@@ -33,6 +33,14 @@
     .pdf-search button:hover { background:var(--green-dark); }
     .gallery-counter { text-align:center; font-size:0.82rem; color:var(--text-light); margin-bottom:18px; }
     .gallery-loading { text-align:center; color:var(--text-light); padding:40px; font-size:1rem; }
+    .pdf-btn-group { display:flex; gap:8px; flex-wrap:wrap; }
+    .pdf-view {
+      display:inline-flex; align-items:center; gap:5px;
+      padding:7px 16px; border-radius:50px; font-size:0.8rem; font-weight:700;
+      text-decoration:none; border:2px solid var(--green);
+      background:white; color:var(--green); transition:all 0.2s;
+    }
+    .pdf-view:hover { background:var(--green); color:white; }
   </style>
 </head>
 <body>
@@ -48,24 +56,31 @@
       </div>
     </a>
     <ul class="nav-menu" id="navMenu">
-      <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+      <li class="nav-item"><a href="index.html" class="nav-link" data-i18n="nav_home">Home</a></li>
       <li class="nav-item">
-        <a href="about.html" class="nav-link">About <span class="arrow">▾</span></a>
+        <a href="about.html" class="nav-link"><span data-i18n="nav_about">About</span> <span class="arrow">▾</span></a>
         <ul class="dropdown">
-          <li><a href="about.html#life">Life &amp; Journey</a></li>
-          <li><a href="about.html#teachings">Teachings</a></li>
-          <li><a href="about.html#timeline">Timeline</a></li>
+          <li><a href="about.html#life" data-i18n="nav_about_life">Life &amp; Journey</a></li>
+          <li><a href="about.html#teachings" data-i18n="nav_about_teachings">Teachings</a></li>
+          <li><a href="about.html#timeline" data-i18n="nav_about_timeline">Timeline</a></li>
         </ul>
       </li>
       <li class="nav-item">
-        <a href="gallery.html" class="nav-link active">Gallery <span class="arrow">▾</span></a>
+        <a href="gallery.html" class="nav-link active"><span data-i18n="nav_gallery">Gallery</span> <span class="arrow">▾</span></a>
         <ul class="dropdown">
-          <li><a href="gallery.html">Photo Gallery</a></li>
-          <li><a href="videos.html">Video Gallery</a></li>
-          <li><a href="pdfs.html">PDF Downloads</a></li>
+          <li><a href="gallery.html" data-i18n="nav_gallery_photos">Photo Gallery</a></li>
+          <li><a href="videos.html" data-i18n="nav_gallery_videos">Video Gallery</a></li>
+          <li><a href="pdfs.html" data-i18n="nav_gallery_pdfs">PDF Downloads</a></li>
         </ul>
       </li>
-      <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li>
+      <li class="nav-item"><a href="contact.html" class="nav-link" data-i18n="nav_contact">Contact</a></li>
+      <li class="nav-item">
+        <a href="javascript:void(0)" class="nav-link">🌐 <span id="langNavLabel">EN</span> <span class="arrow">▾</span></a>
+        <ul class="dropdown lang-dropdown">
+          <li><button class="lang-btn" data-lang="en">English</button></li>
+          <li><button class="lang-btn" data-lang="ta">தமிழ்</button></li>
+        </ul>
+      </li>
     </ul>
     <button class="hamburger" id="hamburger" aria-label="Toggle menu">
       <span></span><span></span><span></span>
@@ -82,7 +97,7 @@
       <a href="gallery.html">Gallery</a><span>›</span>
       <span>PDF Downloads</span>
     </nav>
-    <h1>📚 PDF Downloads</h1>
+    <h1>📚 <span data-i18n="pdfs_page_title">PDF Downloads</span></h1>
     <p>Managed from <strong>content-manager.xlsx</strong> → PDFs sheet. Displayed by Serial No.</p>
   </div>
 </div>
@@ -93,7 +108,7 @@
 
     <!-- Search -->
     <div class="pdf-search" id="pdfSearchBox" style="display:none;">
-      <input type="text" id="pdfSearch" placeholder="Search by name or description…" aria-label="Search PDFs" />
+      <input type="text" id="pdfSearch" placeholder="Search by name or description…" data-i18n-ph="search_pdfs_ph" aria-label="Search PDFs" />
       <button id="pdfSearchBtn">🔍</button>
     </div>
 
@@ -112,7 +127,7 @@
     </div>
     <!-- Infinite scroll sentinel -->
     <div id="sentinel" style="height:2px;display:none;"></div>
-    <div id="loadingMore" style="display:none;text-align:center;padding:18px 0;color:var(--text-light);font-size:0.9rem;">⏳ Loading more publications…</div>
+    <div id="loadingMore" data-i18n="loading_more_pdfs" style="display:none;text-align:center;padding:18px 0;color:var(--text-light);font-size:0.9rem;">⏳ Loading more publications…</div>
 
   </div>
 </section>
@@ -174,7 +189,7 @@ $(function () {
      PDFs — Infinite Scroll
   ══════════════════════════════════════════════════════════ */
   function noDataMsg() {
-    return '<div class="no-data-msg"><span class="nd-icon">📚</span><p>No PDFs found.</p></div>';
+    return '<div class="no-data-msg"><span class="nd-icon">📚</span><p>' + t('no_pdfs') + '</p></div>';
   }
 
   function clearPdfs() {
@@ -193,7 +208,7 @@ $(function () {
       if (p.category && $.inArray(p.category, cats) === -1) cats.push(p.category);
     });
     var $filters = $('#pdfFilters').show().empty()
-      .append('<button class="filter-btn active" data-filter="all">All</button>');
+      .append('<button class="filter-btn active" data-filter="all">' + t('filter_all_pdfs') + '</button>');
     cats.forEach(function (c) {
       $filters.append('<button class="filter-btn" data-filter="' + c + '">' +
         (catIcons[c] || '📄') + ' ' + c.charAt(0).toUpperCase() + c.slice(1) + '</button>');
@@ -216,7 +231,10 @@ $(function () {
         '<p class="pdf-meta">📂 ' + (p.category || '') +
           (p.pages ? ' &nbsp;|&nbsp; 📄 ' + p.pages + ' pages' : '') + '</p>',
         '<p style="font-size:0.84rem;color:var(--text-body);line-height:1.6;margin-bottom:12px;">' + p.description + '</p>',
-        $('<a>', { href: p.file, 'class': 'pdf-download', download: '', text: '⬇ Download PDF' })
+        $('<div class="pdf-btn-group">').append(
+          $('<a>', { href: p.file, 'class': 'pdf-view', target: '_blank', text: t('btn_view') }),
+          $('<a>', { href: p.file, 'class': 'pdf-download', download: '', text: t('btn_download') })
+        )
       )
     );
   }
@@ -224,7 +242,7 @@ $(function () {
   function appendBatch() {
     var batch = currentFiltered.slice(loadedCount, loadedCount + BATCH);
     if (!batch.length && loadedCount === 0) {
-      $('#pdfContainer').html('<p style="color:var(--text-light);text-align:center;grid-column:1/-1;padding:40px;">No publications found.</p>');
+      $('#pdfContainer').html('<p style="color:var(--text-light);text-align:center;grid-column:1/-1;padding:40px;">' + t('no_pdfs') + '</p>');
       $('#pdfCounter').text(''); $('#sentinel').hide(); return;
     }
     var $container = $('#pdfContainer');
@@ -243,10 +261,7 @@ $(function () {
 
   function updateCounter() {
     var total = currentFiltered.length;
-    $('#pdfCounter').text(
-      'Showing ' + Math.min(loadedCount, total) + ' of ' + total +
-      ' publication' + (total !== 1 ? 's' : '')
-    );
+    $('#pdfCounter').text(t('showing') + ' ' + Math.min(loadedCount, total) + ' ' + t('of') + ' ' + total + ' ' + t('label_publications'));
   }
 
   function setupObserver() {
@@ -294,5 +309,8 @@ $(function () {
 
 });
 </script>
+<script src="data/lang/en.js"></script>
+<script src="data/lang/ta.js"></script>
+<script src="data/lang-loader.js"></script>
 </body>
 </html>

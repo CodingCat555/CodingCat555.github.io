@@ -21,6 +21,14 @@
     }
     .no-data-msg .nd-icon { font-size: 2.8rem; display: block; margin-bottom: 12px; }
     .no-data-msg p { font-size: 0.95rem; }
+    /* Lazy image placeholder shimmer */
+    img[data-src] {
+      background: linear-gradient(90deg, #e0f0e5 25%, #c8e6cd 50%, #e0f0e5 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.2s infinite;
+      min-height: 160px; display: block; width: 100%;
+    }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
     .gallery-loading { text-align:center; color:var(--text-light); padding:48px; font-size:1rem; grid-column:1/-1; }
     .gallery-counter { text-align:center; font-size:0.82rem; color:var(--text-light); margin-bottom:18px; }
     .gallery-desc { display:block; font-size:0.75rem; color:rgba(255,255,255,0.72); margin-top:3px; line-height:1.4; }
@@ -47,24 +55,31 @@
       </div>
     </a>
     <ul class="nav-menu" id="navMenu">
-      <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+      <li class="nav-item"><a href="index.html" class="nav-link" data-i18n="nav_home">Home</a></li>
       <li class="nav-item">
-        <a href="about.html" class="nav-link">About <span class="arrow">▾</span></a>
+        <a href="about.html" class="nav-link"><span data-i18n="nav_about">About</span> <span class="arrow">▾</span></a>
         <ul class="dropdown">
-          <li><a href="about.html#life">Life &amp; Journey</a></li>
-          <li><a href="about.html#teachings">Teachings</a></li>
-          <li><a href="about.html#timeline">Timeline</a></li>
+          <li><a href="about.html#life" data-i18n="nav_about_life">Life &amp; Journey</a></li>
+          <li><a href="about.html#teachings" data-i18n="nav_about_teachings">Teachings</a></li>
+          <li><a href="about.html#timeline" data-i18n="nav_about_timeline">Timeline</a></li>
         </ul>
       </li>
       <li class="nav-item">
-        <a href="gallery.html" class="nav-link active">Gallery <span class="arrow">▾</span></a>
+        <a href="gallery.html" class="nav-link active"><span data-i18n="nav_gallery">Gallery</span> <span class="arrow">▾</span></a>
         <ul class="dropdown">
-          <li><a href="gallery.html">Photo Gallery</a></li>
-          <li><a href="videos.html">Video Gallery</a></li>
-          <li><a href="pdfs.html">PDF Downloads</a></li>
+          <li><a href="gallery.html" data-i18n="nav_gallery_photos">Photo Gallery</a></li>
+          <li><a href="videos.html" data-i18n="nav_gallery_videos">Video Gallery</a></li>
+          <li><a href="pdfs.html" data-i18n="nav_gallery_pdfs">PDF Downloads</a></li>
         </ul>
       </li>
-      <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li>
+      <li class="nav-item"><a href="contact.html" class="nav-link" data-i18n="nav_contact">Contact</a></li>
+      <li class="nav-item">
+        <a href="javascript:void(0)" class="nav-link">🌐 <span id="langNavLabel">EN</span> <span class="arrow">▾</span></a>
+        <ul class="dropdown lang-dropdown">
+          <li><button class="lang-btn" data-lang="en">English</button></li>
+          <li><button class="lang-btn" data-lang="ta">தமிழ்</button></li>
+        </ul>
+      </li>
     </ul>
     <button class="hamburger" id="hamburger" aria-label="Toggle menu">
       <span></span><span></span><span></span>
@@ -80,7 +95,7 @@
       <a href="index.html">Home</a><span>›</span>
       <a href="gallery.html">Gallery</a><span>›</span><span>Photos</span>
     </nav>
-    <h1>🖼 Photo Gallery</h1>
+    <h1>🖼 <span data-i18n="gallery_page_title">Photo Gallery</span></h1>
     <p>Managed from <strong>content-manager.xlsx</strong> → Photos sheet. Displayed by Serial No.</p>
   </div>
 </div>
@@ -91,7 +106,7 @@
 
     <!-- ── Search ── -->
     <div class="gallery-search" id="gallerySearchBox" style="display:none;">
-      <input type="text" id="gallerySearch" placeholder="Search photos by name or description…" aria-label="Search photos" />
+      <input type="text" id="gallerySearch" placeholder="Search photos by name or description…" data-i18n-ph="search_photos_ph" aria-label="Search photos" />
       <button id="gallerySearchBtn">🔍</button>
     </div>
 
@@ -110,7 +125,7 @@
     </div>
     <!-- Infinite scroll sentinel -->
     <div id="sentinel" style="height:2px;display:none;"></div>
-    <div id="loadingMore" style="display:none;text-align:center;padding:18px 0;color:var(--text-light);font-size:0.9rem;grid-column:1/-1;">⏳ Loading more photos…</div>
+    <div id="loadingMore" data-i18n="loading_more_photos" style="display:none;text-align:center;padding:18px 0;color:var(--text-light);font-size:0.9rem;grid-column:1/-1;">⏳ Loading more photos…</div>
 
   </div>
 </section>
@@ -170,16 +185,48 @@ $(function () {
   var currentFiltered = [];
   var loadedCount     = 0;
   var scrollObserver  = null;
+  var imgObserver     = null;
+
+  /* ── Lazy image loader ── */
+  function getImgObserver() {
+    if (imgObserver) return imgObserver;
+    if (!('IntersectionObserver' in window)) return null;
+    imgObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        var img = entry.target;
+        var src = img.getAttribute('data-src');
+        if (!src) return;
+        img.src = src;
+        img.removeAttribute('data-src');
+        imgObserver.unobserve(img);
+      });
+    }, { rootMargin: '400px' });
+    return imgObserver;
+  }
+
+  function observeImages($scope) {
+    var obs = getImgObserver();
+    $scope.find('img[data-src]').each(function () {
+      if (obs) { obs.observe(this); }
+      else { $(this).attr('src', $(this).attr('data-src')).removeAttr('data-src'); }
+    });
+  }
+
+  function resetImgObserver() {
+    if (imgObserver) { imgObserver.disconnect(); imgObserver = null; }
+  }
 
   /* ══════════════════════════════════════════════════════════
      Gallery — Infinite Scroll
   ══════════════════════════════════════════════════════════ */
   function noDataMsg() {
-    return '<div class="no-data-msg"><span class="nd-icon">🖼</span><p>No photos found.</p></div>';
+    return '<div class="no-data-msg"><span class="nd-icon">🖼</span><p>' + t('no_photos') + '</p></div>';
   }
 
   function clearGallery() {
     if (scrollObserver) { scrollObserver.disconnect(); scrollObserver = null; }
+    resetImgObserver();
     $('#gallerySearchBox, #galleryFilters, #sentinel, #loadingMore').hide();
     $('#galleryContainer').html(noDataMsg());
     $('#galleryCounter').text('');
@@ -194,7 +241,7 @@ $(function () {
       if (p.category && $.inArray(p.category, cats) === -1) cats.push(p.category);
     });
     var $filters = $('#galleryFilters').show().empty()
-      .append('<button class="filter-btn active" data-filter="all">All Photos</button>');
+      .append('<button class="filter-btn active" data-filter="all">' + t('filter_all_photos') + '</button>');
     cats.forEach(function (c) {
       $filters.append('<button class="filter-btn" data-filter="' + c + '">' +
         c.charAt(0).toUpperCase() + c.slice(1) + '</button>');
@@ -216,7 +263,7 @@ $(function () {
       'data-caption' : item.name
     }).append(
       '<span class="serial-badge">' + sn + '</span>',
-      $('<img>', { src: item.image, alt: item.name }).on('error', function () {
+      $('<img>', { 'data-src': item.image, alt: item.name }).on('error', function () {
         $(this).replaceWith(
           '<div class="gallery-placeholder">' +
             '<span class="ph-icon">🪔</span>' +
@@ -235,11 +282,12 @@ $(function () {
   function appendBatch() {
     var batch = currentFiltered.slice(loadedCount, loadedCount + BATCH);
     if (!batch.length && loadedCount === 0) {
-      $('#galleryContainer').html('<p class="gallery-loading">No photos found.</p>');
+      $('#galleryContainer').html('<p class="gallery-loading">' + t('no_photos') + '</p>');
       $('#galleryCounter').text(''); $('#sentinel').hide(); return;
     }
     var $container = $('#galleryContainer');
     $.each(batch, function (i, item) { $container.append(makeItem(item)); });
+    observeImages($container);
     loadedCount += batch.length;
     updateCounter();
 
@@ -254,10 +302,7 @@ $(function () {
 
   function updateCounter() {
     var total = currentFiltered.length;
-    $('#galleryCounter').text(
-      'Showing ' + Math.min(loadedCount, total) + ' of ' + total +
-      ' photo' + (total !== 1 ? 's' : '')
-    );
+    $('#galleryCounter').text(t('showing') + ' ' + Math.min(loadedCount, total) + ' ' + t('of') + ' ' + total + ' ' + t('label_photos'));
   }
 
   function setupObserver() {
@@ -282,6 +327,7 @@ $(function () {
     loadedCount = 0;
     $('#galleryContainer').empty();
     if (scrollObserver) { scrollObserver.disconnect(); scrollObserver = null; }
+    resetImgObserver();
     appendBatch();
   }
 
@@ -302,5 +348,8 @@ $(function () {
 
 });
 </script>
+<script src="data/lang/en.js"></script>
+<script src="data/lang/ta.js"></script>
+<script src="data/lang-loader.js"></script>
 </body>
 </html>

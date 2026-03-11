@@ -21,26 +21,32 @@
     </a>
 
     <ul class="nav-menu" id="navMenu">
-      <li class="nav-item"><a href="index.html" class="nav-link active">Home</a></li>
+      <li class="nav-item"><a href="index.html" class="nav-link active" data-i18n="nav_home">Home</a></li>
       <li class="nav-item">
-        <a href="about.html" class="nav-link">About <span class="arrow">▾</span></a>
+        <a href="about.html" class="nav-link"><span data-i18n="nav_about">About</span> <span class="arrow">▾</span></a>
         <ul class="dropdown">
-          <li><a href="about.html#life">Life &amp; Journey</a></li>
-          <li><a href="about.html#teachings">Teachings</a></li>
-          <li><a href="about.html#timeline">Timeline</a></li>
+          <li><a href="about.html#life" data-i18n="nav_about_life">Life &amp; Journey</a></li>
+          <li><a href="about.html#teachings" data-i18n="nav_about_teachings">Teachings</a></li>
+          <li><a href="about.html#timeline" data-i18n="nav_about_timeline">Timeline</a></li>
         </ul>
       </li>
       <li class="nav-item">
-        <a href="gallery.html" class="nav-link">Gallery <span class="arrow">▾</span></a>
+        <a href="gallery.html" class="nav-link"><span data-i18n="nav_gallery">Gallery</span> <span class="arrow">▾</span></a>
         <ul class="dropdown">
-          <li><a href="gallery.html">Photo Gallery</a></li>
-          <li><a href="videos.html">Video Gallery</a></li>
-          <li><a href="pdfs.html">PDF Downloads</a></li>
+          <li><a href="gallery.html" data-i18n="nav_gallery_photos">Photo Gallery</a></li>
+          <li><a href="videos.html" data-i18n="nav_gallery_videos">Video Gallery</a></li>
+          <li><a href="pdfs.html" data-i18n="nav_gallery_pdfs">PDF Downloads</a></li>
         </ul>
       </li>
-      <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li>
+      <li class="nav-item"><a href="contact.html" class="nav-link" data-i18n="nav_contact">Contact</a></li>
+      <li class="nav-item">
+        <a href="javascript:void(0)" class="nav-link">🌐 <span id="langNavLabel">EN</span> <span class="arrow">▾</span></a>
+        <ul class="dropdown lang-dropdown">
+          <li><button class="lang-btn" data-lang="en">English</button></li>
+          <li><button class="lang-btn" data-lang="ta">தமிழ்</button></li>
+        </ul>
+      </li>
     </ul>
-
     <button class="hamburger" id="hamburger" aria-label="Toggle menu">
       <span></span><span></span><span></span>
     </button>
@@ -52,10 +58,10 @@
 <section class="hero">
   <div class="hero-content">
     <span class="hero-om">🕉</span>
-    <span class="hero-eyebrow">Sri Ramanasramam · Tiruvannamalai</span>
+    <span class="hero-eyebrow" data-i18n="hero_eyebrow">Sri Ramanasramam · Tiruvannamalai</span>
     <h1 class="hero-title">Yogi Ramsuratkumar</h1>
     <p class="hero-title-sub">யோகி ராம்சுரத்குமார்</p>
-    <p class="hero-dates">December 1, 1918 — February 20, 2001</p>
+    <p class="hero-dates" data-i18n="hero_dates">December 1, 1918 — February 20, 2001</p>
 
     <div class="hero-quote">
       "My Father's name is everything. Everything is His name. Repeat His name — that is all.
@@ -65,9 +71,9 @@
     <p class="hero-chant">✦ &nbsp; Yogi Ramsuratkumar, Yogi Ramsuratkumar, Yogi Ramsuratkumar — Jaya Guru Raya &nbsp; ✦</p>
 
     <div class="hero-cta">
-      <a href="about.html" class="btn btn-primary">✦ Explore His Life</a>
-      <a href="gallery.html" class="btn btn-outline">🖼 View Gallery</a>
-      <a href="pdfs.html" class="btn btn-outline">📄 Sacred Texts</a>
+      <a href="about.html" class="btn btn-primary" data-i18n="hero_cta_life">✦ Explore His Life</a>
+      <a href="gallery.html" class="btn btn-outline" data-i18n="hero_cta_gallery">🖼 View Gallery</a>
+      <a href="pdfs.html" class="btn btn-outline" data-i18n="hero_cta_texts">📄 Sacred Texts</a>
     </div>
   </div>
 </section>
@@ -85,8 +91,8 @@
 
       <div class="about-content fade-in">
         <div>
-          <span class="section-eyebrow">The Beloved Beggar of God</span>
-          <h2 class="section-title" style="text-align:left; margin-top:8px;">A Saint Who Radiated Divine Love</h2>
+          <span class="section-eyebrow" data-i18n="about_eyebrow">The Beloved Beggar of God</span>
+          <h2 class="section-title" style="text-align:left; margin-top:8px;" data-i18n="about_title">A Saint Who Radiated Divine Love</h2>
           <div class="section-divider" style="margin-left:0;"></div>
         </div>
 
@@ -99,15 +105,15 @@
         <div class="about-stats">
           <div class="stat-item">
             <span class="stat-number">1918</span>
-            <span class="stat-label">Year of Birth</span>
+            <span class="stat-label" data-i18n="stat_birth">Year of Birth</span>
           </div>
           <div class="stat-item">
             <span class="stat-number">82</span>
-            <span class="stat-label">Years of Grace</span>
+            <span class="stat-label" data-i18n="stat_grace">Years of Grace</span>
           </div>
           <div class="stat-item">
             <span class="stat-number">2001</span>
-            <span class="stat-label">Mahasamadhi</span>
+            <span class="stat-label" data-i18n="stat_samadhi">Mahasamadhi</span>
           </div>
         </div>
 
@@ -132,8 +138,8 @@
 <section>
   <div class="container">
     <div class="section-header">
-      <span class="section-eyebrow">Explore &amp; Learn</span>
-      <h2 class="section-title">Discover His Universe</h2>
+      <span class="section-eyebrow" data-i18n="sec_explore_eyebrow">Explore &amp; Learn</span>
+      <h2 class="section-title" data-i18n="sec_explore_title">Discover His Universe</h2>
       <div class="section-divider"></div>
       <p class="section-subtitle">Immerse yourself in the life, words, and grace of Sri Yogi Ramsuratkumar through our curated collections.</p>
     </div>
@@ -167,8 +173,8 @@
 <section class="bg-light">
   <div class="container">
     <div class="section-header">
-      <span class="section-eyebrow">Timeless Wisdom</span>
-      <h2 class="section-title">Core Teachings</h2>
+      <span class="section-eyebrow" data-i18n="sec_wisdom_eyebrow">Timeless Wisdom</span>
+      <h2 class="section-title" data-i18n="sec_wisdom_title">Core Teachings</h2>
       <div class="section-divider"></div>
     </div>
 
@@ -201,8 +207,8 @@
 <section>
   <div class="container">
     <div class="section-header">
-      <span class="section-eyebrow">Photo Gallery Preview</span>
-      <h2 class="section-title">Glimpses of Divine Grace</h2>
+      <span class="section-eyebrow" data-i18n="sec_gallery_eyebrow">Photo Gallery Preview</span>
+      <h2 class="section-title" data-i18n="sec_gallery_title">Glimpses of Divine Grace</h2>
       <div class="section-divider"></div>
     </div>
 
@@ -231,7 +237,7 @@
     </div>
 
     <div style="text-align:center; margin-top:36px;">
-      <a href="gallery.html" class="btn btn-saffron">View Full Gallery →</a>
+      <a href="gallery.html" class="btn btn-saffron" data-i18n="btn_full_gallery">View Full Gallery →</a>
     </div>
   </div>
 </section>
@@ -249,7 +255,7 @@
         </p>
       </div>
       <div class="footer-col">
-        <h4>Quick Links</h4>
+        <h4 data-i18n="footer_quick_links">Quick Links</h4>
         <ul>
           <li><a href="index.html">Home</a></li>
           <li><a href="about.html">About Swamiji</a></li>
@@ -303,5 +309,8 @@
 <button class="scroll-top" id="scrollTop" aria-label="Scroll to top">↑</button>
 
 <script src="js/main.js"></script>
+<script src="data/lang/en.js"></script>
+<script src="data/lang/ta.js"></script>
+<script src="data/lang-loader.js"></script>
 </body>
 </html>
