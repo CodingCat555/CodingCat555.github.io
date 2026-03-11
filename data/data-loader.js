@@ -7,13 +7,14 @@
 
 (function () {
 
-  var STORAGE_KEY = 'yrk_content_v1';
+  var STORAGE_KEY = 'yrk_content_v2';
 
   /* ── Public API exposed on window.SITE_DATA ─────────────── */
   window.SITE_DATA = {
     photos : [],
     videos : [],
     pdfs   : [],
+    audios : [],
     loaded : false,
     loadedAt: null,
 
@@ -26,6 +27,7 @@
         this.photos   = d.photos  || [];
         this.videos   = d.videos  || [];
         this.pdfs     = d.pdfs    || [];
+        this.audios   = d.audios  || [];
         this.loaded   = true;
         this.loadedAt = d.loadedAt || null;
         return true;
@@ -38,6 +40,7 @@
         photos   : this.photos,
         videos   : this.videos,
         pdfs     : this.pdfs,
+        audios   : this.audios,
         loadedAt : new Date().toLocaleString()
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
@@ -89,6 +92,15 @@
         pages       : 'Pages'
       });
 
+      this.audios = rows('Audios', {
+        serial      : 'Serial No',
+        name        : 'Name',
+        description : 'Description',
+        category    : 'Category',
+        audioFile   : 'Audio File',
+        duration    : 'Duration'
+      });
+
       this.loaded = true;
       this.saveToStorage();
     },
@@ -112,7 +124,7 @@
     /* Clear all cached data */
     clear: function () {
       localStorage.removeItem(STORAGE_KEY);
-      this.photos = []; this.videos = []; this.pdfs = [];
+      this.photos = []; this.videos = []; this.pdfs = []; this.audios = [];
       this.loaded = false; this.loadedAt = null;
     },
 
@@ -124,7 +136,7 @@
 
   /* Auto-restore on script load:
      1. Try localStorage first (from Excel Manager)
-     2. Fall back to static data JS files (photos.js / videos.js / pdfs.js) */
+     2. Fall back to static data JS files (photos.js / videos.js / pdfs.js / audios.js) */
   if (!window.SITE_DATA.loadFromStorage()) {
     if (typeof PHOTOS_DATA !== 'undefined' && PHOTOS_DATA.length) {
       window.SITE_DATA.photos = PHOTOS_DATA;
@@ -135,7 +147,11 @@
     if (typeof PDFS_DATA !== 'undefined' && PDFS_DATA.length) {
       window.SITE_DATA.pdfs = PDFS_DATA;
     }
-    if (window.SITE_DATA.photos.length || window.SITE_DATA.videos.length || window.SITE_DATA.pdfs.length) {
+    if (typeof AUDIOS_DATA !== 'undefined' && AUDIOS_DATA.length) {
+      window.SITE_DATA.audios = AUDIOS_DATA;
+    }
+    if (window.SITE_DATA.photos.length || window.SITE_DATA.videos.length ||
+        window.SITE_DATA.pdfs.length   || window.SITE_DATA.audios.length) {
       window.SITE_DATA.loaded = true;
     }
   }

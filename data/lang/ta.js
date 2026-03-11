@@ -12,6 +12,7 @@ var LANG_TA = {
   nav_gallery            : 'காட்சியகம்',
   nav_gallery_photos     : 'புகைப்படக் காட்சியகம்',
   nav_gallery_videos     : 'வீடியோ காட்சியகம்',
+  nav_gallery_audios     : 'ஒலி காட்சியகம்',
   nav_gallery_pdfs       : 'PDF பதிவிறக்கம்',
   nav_contact            : 'தொடர்பு',
 
@@ -85,6 +86,15 @@ var LANG_TA = {
   btn_download           : '⬇ பதிவிறக்கம்',
   loading_more_pdfs      : '⏳ மேலும் ஏற்றுகிறது…',
   loading_more_photos    : '⏳ மேலும் படங்கள் ஏற்றுகிறது…',
+
+  /* ── Audio page ── */
+  audios_page_title      : 'ஒலி காட்சியகம்',
+  filter_all_audios      : 'அனைத்து ஒலிகள்',
+  search_audios_ph       : 'ஒலி தேடுக…',
+  label_audios           : 'பதிவுகள்',
+  no_audios              : 'ஒலிகள் இல்லை.',
+  btn_play               : 'இயக்கு',
+  loading_more_audios    : '⏳ மேலும் ஒலிகள் ஏற்றுகிறது…',
 
   /* ── Contact page ── */
   contact_page_title     : 'தொடர்பு கொள்ளுங்கள்',

@@ -13,6 +13,7 @@ var LANG_EN = {
   nav_gallery            : 'Gallery',
   nav_gallery_photos     : 'Photo Gallery',
   nav_gallery_videos     : 'Video Gallery',
+  nav_gallery_audios     : 'Audio Gallery',
   nav_gallery_pdfs       : 'PDF Downloads',
   nav_contact            : 'Contact',
 
@@ -86,6 +87,15 @@ var LANG_EN = {
   btn_download           : '⬇ Download',
   loading_more_pdfs      : '⏳ Loading more…',
   loading_more_photos    : '⏳ Loading more photos…',
+
+  /* ── Audio page ── */
+  audios_page_title      : 'Audio Gallery',
+  filter_all_audios      : 'All Audio',
+  search_audios_ph       : 'Search audio by name or description…',
+  label_audios           : 'recordings',
+  no_audios              : 'No audio found.',
+  btn_play               : 'Play',
+  loading_more_audios    : '⏳ Loading more audio…',
 
   /* ── Contact page ── */
   contact_page_title     : 'Contact Us',

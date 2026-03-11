@@ -8,6 +8,10 @@
   <!-- jQuery + SheetJS + Central data loader -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="../data/photos.js"></script>
+  <script src="../data/videos.js"></script>
+  <script src="../data/pdfs.js"></script>
+  <script src="../data/audios.js"></script>
   <script src="../data/data-loader.js"></script>
 
   <style>
@@ -141,7 +145,7 @@
 <div class="header">
   <div>
     <h1>🪔 Content Manager — Yogi Ramsuratkumar Website</h1>
-    <p>Edit Photos · Videos · PDFs → Save to Website → Gallery pages update instantly</p>
+    <p>Edit Photos · Videos · PDFs · Audios → Save to Website → Gallery pages update instantly</p>
   </div>
   <div class="header-links">
     <a href="create-sample-excel.html" class="header-back">📥 Sample Excel</a>
@@ -193,6 +197,7 @@
   <button class="tab-btn active" data-tab="photos">🖼 Photos <span class="tab-count" id="photosCount">0</span></button>
   <button class="tab-btn" data-tab="videos">🎬 Videos <span class="tab-count" id="videosCount">0</span></button>
   <button class="tab-btn" data-tab="pdfs">📚 PDFs <span class="tab-count" id="pdfsCount">0</span></button>
+  <button class="tab-btn" data-tab="audios">🎵 Audios <span class="tab-count" id="audiosCount">0</span></button>
 </div>
 
 <!-- Content -->
@@ -246,6 +251,30 @@
     </div>
   </div>
 
+  <!-- AUDIOS TAB -->
+  <div class="tab-panel" id="tab-audios">
+    <div class="tip">
+      <strong>Audios:</strong> Place audio files (MP3/WAV/OGG) in the <code>audio/</code> folder, then set the Audio File path (e.g. <code>audio/my-file.mp3</code>).
+      After editing, click <strong>💾 Save to Website</strong>.
+    </div>
+    <div class="table-wrap">
+      <table id="audiosTable">
+        <thead>
+          <tr>
+            <th class="serial-th">S.No</th>
+            <th style="min-width:200px">Name</th>
+            <th style="min-width:280px">Description</th>
+            <th style="min-width:120px">Category</th>
+            <th style="min-width:260px">Audio File</th>
+            <th style="min-width:90px">Duration</th>
+            <th style="width:44px"></th>
+          </tr>
+        </thead>
+        <tbody id="audiosBody"></tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- PDFs TAB -->
   <div class="tab-panel" id="tab-pdfs">
     <div class="tip">
@@ -279,7 +308,8 @@ $(function () {
   var CAT = {
     photos: ['darshan','ashram','festival','early','devotees','blessings','bhajan','events','life'],
     videos: ['discourse','bhajan','documentary','interview','events','rare'],
-    pdfs  : ['book','talk','song','magazine','photo']
+    pdfs  : ['book','talk','song','magazine','photo'],
+    audios: ['discourse','bhajan','chant','talk','rare']
   };
 
   var sortBySerial = function (a, b) { return (a.serial || 0) - (b.serial || 0); };
@@ -290,7 +320,8 @@ $(function () {
     if (SITE_DATA.loaded) {
       $p.removeClass('no-data').addClass('loaded')
         .text('✅ Cached: ' + SITE_DATA.photos.length + ' photos · ' +
-              SITE_DATA.videos.length + ' videos · ' + SITE_DATA.pdfs.length + ' PDFs');
+              SITE_DATA.videos.length + ' videos · ' + SITE_DATA.pdfs.length + ' PDFs · ' +
+              (SITE_DATA.audios ? SITE_DATA.audios.length : 0) + ' audios');
     } else {
       $p.removeClass('loaded').addClass('no-data').text('⚠ No data cached');
     }
@@ -358,6 +389,23 @@ $(function () {
     $('#videosCount').text(data.length);
   }
 
+  /* ─── Render Audios ─────────────────────────────────────────── */
+  function renderAudios(data) {
+    var $body = $('#audiosBody').empty();
+    $.each(data, function (i, r) {
+      $body.append($('<tr>').append(
+        $('<td class="serial-td">').text(i + 1),
+        $('<td>').html(cell(r.name)),
+        $('<td class="desc-cell">').html(cell(r.description, '', 'textarea')),
+        $('<td>').html(catSelect(CAT.audios, r.category)),
+        $('<td>').html(cell(r.audioFile)),
+        $('<td>').html(cell(r.duration)),
+        $('<td>').html(delBtn())
+      ));
+    });
+    $('#audiosCount').text(data.length);
+  }
+
   /* ─── Render PDFs ───────────────────────────────────────────── */
   function renderPdfs(data) {
     var $body = $('#pdfsBody').empty();
@@ -380,6 +428,7 @@ $(function () {
     renderPhotos(SITE_DATA.sorted(SITE_DATA.photos));
     renderVideos(SITE_DATA.sorted(SITE_DATA.videos));
     renderPdfs(SITE_DATA.sorted(SITE_DATA.pdfs));
+    renderAudios(SITE_DATA.sorted(SITE_DATA.audios || []));
     showStatus('Loaded existing data from browser cache. Edit and click 💾 Save to Website to update.', 'info');
   }
 
@@ -422,27 +471,42 @@ $(function () {
       };
     }).get();
   }
+  function readAudios() {
+    return $('#audiosBody tr').map(function (i) {
+      var $tds = $(this).find('td');
+      return {
+        serial     : i + 1,
+        name       : $tds.eq(1).find('.editable').val().trim(),
+        description: $tds.eq(2).find('.editable').val().trim(),
+        category   : $tds.eq(3).find('.editable').val(),
+        audioFile  : $tds.eq(4).find('.editable').val().trim(),
+        duration   : $tds.eq(5).find('.editable').val().trim()
+      };
+    }).get();
+  }
 
   /* ─── 💾 SAVE TO WEBSITE (localStorage) ──────────────────────── */
   $('#btnSave').on('click', function () {
     var photos = readPhotos();
     var videos = readVideos();
     var pdfs   = readPdfs();
+    var audios = readAudios();
 
-    if (!photos.length && !videos.length && !pdfs.length) {
+    if (!photos.length && !videos.length && !pdfs.length && !audios.length) {
       showStatus('No data to save. Upload an Excel file or add rows first.', 'error');
       return;
     }
 
-    SITE_DATA.photos = photos;
-    SITE_DATA.videos = videos;
-    SITE_DATA.pdfs   = pdfs;
+    SITE_DATA.photos  = photos;
+    SITE_DATA.videos  = videos;
+    SITE_DATA.pdfs    = pdfs;
+    SITE_DATA.audios  = audios;
     SITE_DATA.saveToStorage();
 
     updatePill();
     showStatus(
       '✅ Saved to website! ' + photos.length + ' photos, ' + videos.length + ' videos, ' + pdfs.length +
-      ' PDFs. Now open any gallery page — data loads automatically without selecting the Excel file.',
+      ' PDFs, ' + audios.length + ' audios. Now open any gallery page — data loads automatically.',
       'success'
     );
   });
@@ -478,6 +542,20 @@ $(function () {
               description: String(r['Description'] || ''),
               category   : String(r['Category'] || 'discourse'),
               youtubeUrl : String(r['YouTube URL'] || ''),
+              duration   : String(r['Duration'] || '')
+            };
+          }).sort(sortBySerial));
+        }
+
+        if (wb.Sheets['Audios']) {
+          var rows = XLSX.utils.sheet_to_json(wb.Sheets['Audios'], { defval: '' });
+          renderAudios(rows.map(function (r, i) {
+            return {
+              serial     : Number(r['Serial No']) || (i + 1),
+              name       : String(r['Name'] || ''),
+              description: String(r['Description'] || ''),
+              category   : String(r['Category'] || 'discourse'),
+              audioFile  : String(r['Audio File'] || ''),
               duration   : String(r['Duration'] || '')
             };
           }).sort(sortBySerial));
@@ -528,6 +606,12 @@ $(function () {
     dWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:32},{wch:12}];
     XLSX.utils.book_append_sheet(wb, dWs, 'PDFs');
 
+    var aData = [['Serial No','Name','Description','Category','Audio File','Duration']];
+    readAudios().forEach(function (r) { aData.push([r.serial, r.name, r.description, r.category, r.audioFile, r.duration]); });
+    var aWs = XLSX.utils.aoa_to_sheet(aData);
+    aWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:40},{wch:12}];
+    XLSX.utils.book_append_sheet(wb, aWs, 'Audios');
+
     XLSX.writeFile(wb, 'content-manager.xlsx');
     showStatus('Downloaded content-manager.xlsx — edit it and Upload Excel to reload.', 'success');
   });
@@ -564,6 +648,17 @@ $(function () {
         $('<td>').html(cell('')),
         $('<td>').html(delBtn())
       ));
+    } else if (tab === 'audios') {
+      var n = $('#audiosBody tr').length + 1;
+      $('#audiosBody').append($('<tr>').append(
+        $('<td class="serial-td">').text(n),
+        $('<td>').html(cell('')),
+        $('<td class="desc-cell">').html(cell('', '', 'textarea')),
+        $('<td>').html(catSelect(CAT.audios, 'discourse')),
+        $('<td>').html(cell('audio/new-file.mp3')),
+        $('<td>').html(cell('')),
+        $('<td>').html(delBtn())
+      ));
     } else if (tab === 'pdfs') {
       var n = $('#pdfsBody tr').length + 1;
       $('#pdfsBody').append($('<tr>').append(
@@ -583,6 +678,7 @@ $(function () {
     $('#photosCount').text($('#photosBody tr').length);
     $('#videosCount').text($('#videosBody tr').length);
     $('#pdfsCount').text($('#pdfsBody tr').length);
+    $('#audiosCount').text($('#audiosBody tr').length);
   }
 
   /* ─── Clear cache ───────────────────────────────────────────── */

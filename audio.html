@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Audio Gallery — Yogi Ramsuratkumar</title>
+  <meta name="description" content="Listen to discourses, bhajans, chants and rare audio recordings of Sri Yogi Ramsuratkumar." />
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- SheetJS (reads Excel) + jQuery -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <!-- Static data files -->
+  <script src="data/photos.js"></script>
+  <script src="data/videos.js"></script>
+  <script src="data/pdfs.js"></script>
+  <script src="data/audios.js"></script>
+  <!-- Central data loader -->
+  <script src="data/data-loader.js"></script>
+  <style>
+    /* ── No-data message ── */
+    .no-data-msg {
+      text-align: center; padding: 48px 20px;
+      color: var(--text-light);
+    }
+    .no-data-msg .nd-icon { font-size: 2.8rem; display: block; margin-bottom: 12px; }
+    .no-data-msg p { font-size: 0.95rem; }
+
+    /* ── Audio Grid ── */
+    .audio-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 22px;
+      margin-top: 10px;
+    }
+
+    /* ── Audio Card ── */
+    .audio-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+    }
+    .audio-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 28px rgba(26,107,46,0.18);
+    }
+
+    /* ── Audio Thumb (top coloured strip) ── */
+    .audio-thumb {
+      position: relative;
+      height: 110px;
+      background: linear-gradient(135deg, #061A0E 0%, #0F4520 60%, #1A6B2E 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .audio-thumb::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 10px,
+        rgba(255,215,0,0.04) 10px,
+        rgba(255,215,0,0.04) 20px
+      );
+    }
+    .audio-thumb-icon {
+      font-size: 3rem;
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+      animation: pulse-icon 3s ease-in-out infinite;
+    }
+    @keyframes pulse-icon {
+      0%, 100% { transform: scale(1); opacity: 0.85; }
+      50%       { transform: scale(1.08); opacity: 1; }
+    }
+    .serial-badge.audio-serial {
+      position: absolute; top: 10px; left: 10px;
+      background: rgba(0,0,0,0.55); color: var(--gold);
+      padding: 3px 9px; border-radius: 50px; font-size: 0.72rem; font-weight: 700;
+    }
+    .audio-cat-badge {
+      position: absolute; top: 10px; right: 10px;
+      background: rgba(255,215,0,0.18); color: var(--gold);
+      border: 1px solid rgba(255,215,0,0.35);
+      padding: 3px 9px; border-radius: 50px; font-size: 0.7rem; font-weight: 700;
+      text-transform: capitalize;
+    }
+
+    /* ── Audio Info ── */
+    .audio-info {
+      padding: 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .audio-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.4;
+      margin: 0;
+    }
+    .audio-desc {
+      font-size: 0.82rem;
+      color: var(--text-light);
+      line-height: 1.55;
+      margin: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .audio-meta {
+      font-size: 0.76rem;
+      color: var(--text-light);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    /* ── Audio Player ── */
+    .audio-player-wrap {
+      margin-top: 4px;
+    }
+    .audio-player-wrap audio {
+      width: 100%;
+      height: 36px;
+      border-radius: 8px;
+      outline: none;
+      accent-color: var(--green);
+    }
+    /* Custom play button for lazy load */
+    .audio-play-btn {
+      width: 100%;
+      padding: 9px 0;
+      background: linear-gradient(135deg, var(--green), var(--green-dark));
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      transition: all 0.2s;
+    }
+    .audio-play-btn:hover {
+      background: linear-gradient(135deg, var(--green-dark), #071a0a);
+      transform: translateY(-1px);
+    }
+    .audio-play-btn .play-icon { font-size: 1rem; }
+
+    /* ── Gallery utilities ── */
+    .gallery-counter { text-align:center; font-size:0.82rem; color:var(--text-light); margin-bottom:20px; }
+    .gallery-loading { text-align:center; color:var(--text-light); padding:40px; font-size:1rem; }
+    .gallery-search {
+      max-width: 480px; margin: 0 auto 20px;
+      display: flex; border: 2px solid var(--border); border-radius: 50px;
+      overflow: hidden; background: white; box-shadow: var(--shadow);
+    }
+    .gallery-search input { flex:1; padding:11px 20px; border:none; outline:none; font-size:0.92rem; font-family:inherit; background:transparent; color:var(--text-dark); }
+    .gallery-search button { padding:11px 18px; background:var(--green); color:white; border:none; cursor:pointer; font-size:1rem; transition:var(--transition); }
+    .gallery-search button:hover { background:var(--green-dark); }
+
+    /* ── Duration badge ── */
+    .dur-badge {
+      background: rgba(26,107,46,0.1); color: var(--green);
+      border-radius: 4px; padding: 2px 7px; font-size: 0.72rem; font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="header" id="header">
+  <nav class="nav-wrapper">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-icon">🪔</div>
+      <div class="nav-logo-text">
+        <span class="nav-logo-name">Yogi Ramsuratkumar</span>
+        <span class="nav-logo-subtitle">Tiruvannamalai · 1918–2001</span>
+      </div>
+    </a>
+    <ul class="nav-menu" id="navMenu">
+      <li class="nav-item"><a href="index.html" class="nav-link" data-i18n="nav_home">Home</a></li>
+      <li class="nav-item">
+        <a href="about.html" class="nav-link"><span data-i18n="nav_about">About</span> <span class="arrow">▾</span></a>
+        <ul class="dropdown">
+          <li><a href="about.html#life" data-i18n="nav_about_life">Life &amp; Journey</a></li>
+          <li><a href="about.html#teachings" data-i18n="nav_about_teachings">Teachings</a></li>
+          <li><a href="about.html#timeline" data-i18n="nav_about_timeline">Timeline</a></li>
+        </ul>
+      </li>
+      <li class="nav-item">
+        <a href="gallery.html" class="nav-link active"><span data-i18n="nav_gallery">Gallery</span> <span class="arrow">▾</span></a>
+        <ul class="dropdown">
+          <li><a href="gallery.html" data-i18n="nav_gallery_photos">Photo Gallery</a></li>
+          <li><a href="videos.html" data-i18n="nav_gallery_videos">Video Gallery</a></li>
+          <li><a href="audio.html" data-i18n="nav_gallery_audios">Audio Gallery</a></li>
+          <li><a href="pdfs.html" data-i18n="nav_gallery_pdfs">PDF Downloads</a></li>
+        </ul>
+      </li>
+      <li class="nav-item"><a href="contact.html" class="nav-link" data-i18n="nav_contact">Contact</a></li>
+      <li class="nav-item">
+        <a href="javascript:void(0)" class="nav-link">🌐 <span id="langNavLabel">EN</span> <span class="arrow">▾</span></a>
+        <ul class="dropdown lang-dropdown">
+          <li><button class="lang-btn" data-lang="en">English</button></li>
+          <li><button class="lang-btn" data-lang="ta">தமிழ்</button></li>
+        </ul>
+      </li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+</header>
+<div class="menu-overlay" id="menuOverlay"></div>
+
+<!-- ===== PAGE HEADER ===== -->
+<div class="page-header">
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="index.html">Home</a><span>›</span>
+      <a href="gallery.html">Gallery</a><span>›</span>
+      <span>Audio</span>
+    </nav>
+    <h1>🎵 <span data-i18n="audios_page_title">Audio Gallery</span></h1>
+    <p>Managed from <strong>content-manager.xlsx</strong> → Audios sheet. Displayed by Serial No.</p>
+  </div>
+</div>
+
+<!-- ===== AUDIO GALLERY ===== -->
+<section>
+  <div class="container">
+
+    <!-- ── Search ── -->
+    <div class="gallery-search" id="audioSearchBox" style="display:none;">
+      <input type="text" id="audioSearch" placeholder="Search audio by name or description…" data-i18n-ph="search_audios_ph" aria-label="Search audio" />
+      <button id="audioSearchBtn">🔍</button>
+    </div>
+
+    <!-- ── Category Filters ── -->
+    <div class="gallery-filters" id="audioFilters" style="display:none;">
+      <button class="filter-btn active" data-filter="all" data-i18n="filter_all_audios">All Audio</button>
+    </div>
+
+    <p class="gallery-counter" id="audioCounter"></p>
+
+    <!-- Audio Grid -->
+    <div class="audio-grid" id="audioContainer">
+      <div class="gallery-loading" id="audioPlaceholder">
+        📊 Load <strong>content-manager.xlsx</strong> using the bar above to display audio.
+      </div>
+    </div>
+
+    <!-- Infinite scroll sentinel -->
+    <div id="sentinel" style="height:2px;display:none;"></div>
+    <div id="loadingMore" data-i18n="loading_more_audios" style="display:none;text-align:center;padding:18px 0;color:var(--text-light);font-size:0.9rem;">⏳ Loading more audio…</div>
+
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <h3>🪔 Yogi Ramsuratkumar</h3>
+        <p>A tribute website dedicated to the beloved saint of Tiruvannamalai.</p>
+        <p class="footer-chant">"Yogi Ramsuratkumar — Jaya Guru Raya"</p>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="gallery.html">Photo Gallery</a></li>
+          <li><a href="videos.html">Video Gallery</a></li>
+          <li><a href="audio.html">Audio Gallery</a></li>
+          <li><a href="pdfs.html">PDF Downloads</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Gallery</h4>
+        <ul>
+          <li><a href="gallery.html">Photos</a></li>
+          <li><a href="videos.html">Videos</a></li>
+          <li><a href="audio.html">Audio</a></li>
+          <li><a href="pdfs.html">PDFs</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Manage Content</h4>
+        <ul>
+          <li><a href="tools/excel-manager.html">Excel Content Manager</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Yogi Ramsuratkumar Ashram, Tiruvannamalai, Tamil Nadu, India</p>
+    </div>
+  </div>
+</footer>
+
+<button class="scroll-top" id="scrollTop" aria-label="Scroll to top">↑</button>
+
+<script src="js/main.js"></script>
+<script>
+$(function () {
+
+  var BATCH           = 9;    /* 3 cols × 3 rows on desktop */
+  var allSorted       = [];
+  var currentFiltered = [];
+  var loadedCount     = 0;
+  var scrollObserver  = null;
+
+  /* ══════════════════════════════════════════════════════════
+     Audio — Infinite Scroll
+  ══════════════════════════════════════════════════════════ */
+  function noDataMsg() {
+    return '<div class="no-data-msg"><span class="nd-icon">🎵</span><p>' + t('no_audios') + '</p></div>';
+  }
+
+  function clearAudios() {
+    if (scrollObserver) { scrollObserver.disconnect(); scrollObserver = null; }
+    $('#audioSearchBox, #audioFilters, #sentinel, #loadingMore').hide();
+    $('#audioContainer').html(noDataMsg());
+    $('#audioCounter').text('');
+    allSorted = []; currentFiltered = []; loadedCount = 0;
+  }
+
+  function buildAndRender() {
+    allSorted = SITE_DATA.sorted(SITE_DATA.audios);
+
+    /* Build category filter buttons */
+    var cats = [];
+    allSorted.forEach(function (a) {
+      if (a.category && $.inArray(a.category, cats) === -1) cats.push(a.category);
+    });
+    var $filters = $('#audioFilters').show().empty()
+      .append('<button class="filter-btn active" data-filter="all">' + t('filter_all_audios') + '</button>');
+    cats.forEach(function (c) {
+      $filters.append('<button class="filter-btn" data-filter="' + c + '">' +
+        c.charAt(0).toUpperCase() + c.slice(1) + '</button>');
+    });
+
+    $('#audioSearchBox').show();
+    currentFiltered = allSorted;
+    loadedCount = 0;
+    $('#audioContainer').empty();
+    appendBatch();
+  }
+
+  /* Audio category icon map */
+  var CAT_ICONS = {
+    discourse : '🎙',
+    bhajan    : '🎶',
+    chant     : '🕉',
+    talk      : '💬',
+    rare      : '📼'
+  };
+
+  function makeCard(a) {
+    var serial  = '#' + String(a.serial).padStart(2, '0');
+    var icon    = CAT_ICONS[a.category] || '🎵';
+    var durHtml = a.duration ? '<span class="dur-badge">⏱ ' + a.duration + '</span>' : '';
+
+    var $card = $('<div>', { 'class': 'audio-card fade-in', 'data-category': a.category });
+
+    /* Thumb strip */
+    var $thumb = $('<div class="audio-thumb">').append(
+      '<span class="audio-thumb-icon">' + icon + '</span>',
+      '<span class="serial-badge audio-serial">' + serial + '</span>',
+      '<span class="audio-cat-badge">' + (a.category || '') + '</span>'
+    );
+
+    /* Info section */
+    var $info = $('<div class="audio-info">').append(
+      '<h3 class="audio-title">' + $('<div>').text(a.name).html() + '</h3>',
+      '<p class="audio-desc">' + $('<div>').text(a.description).html() + '</p>'
+    );
+
+    /* Audio player — lazy load: show Play button first, reveal <audio> on click */
+    if (a.audioFile) {
+      var audioSrc = a.audioFile;
+      var $playerWrap = $('<div class="audio-player-wrap">');
+      var $playBtn = $('<button class="audio-play-btn">')
+        .html('<span class="play-icon">▶</span> <span data-i18n="btn_play">' + t('btn_play') + '</span>');
+
+      $playBtn.on('click', function () {
+        var $audio = $('<audio controls preload="auto" style="width:100%;border-radius:8px;">')
+          .append('<source src="' + audioSrc + '" type="audio/mpeg">');
+        $playerWrap.empty().append($audio);
+        $audio[0].play().catch(function () {});
+      });
+
+      $playerWrap.append($playBtn);
+      $info.append($playerWrap);
+    }
+
+    /* Meta */
+    $info.append(
+      $('<div class="audio-meta">').append(
+        '<span>📂 ' + (a.category || '') + '</span>',
+        durHtml
+      )
+    );
+
+    $card.append($thumb, $info);
+    return $card;
+  }
+
+  function appendBatch() {
+    var batch = currentFiltered.slice(loadedCount, loadedCount + BATCH);
+    if (!batch.length && loadedCount === 0) {
+      $('#audioContainer').html('<p class="gallery-loading">' + t('no_audios') + '</p>');
+      $('#audioCounter').text(''); $('#sentinel').hide(); return;
+    }
+    var $container = $('#audioContainer');
+    $.each(batch, function (i, a) { $container.append(makeCard(a)); });
+    loadedCount += batch.length;
+    updateCounter();
+
+    if (loadedCount < currentFiltered.length) {
+      $('#sentinel').show(); setupObserver();
+    } else {
+      $('#sentinel').hide();
+      if (scrollObserver) { scrollObserver.disconnect(); scrollObserver = null; }
+    }
+    if (typeof window.initFade === 'function') window.initFade();
+  }
+
+  function updateCounter() {
+    var total = currentFiltered.length;
+    $('#audioCounter').text(t('showing') + ' ' + Math.min(loadedCount, total) + ' ' + t('of') + ' ' + total + ' ' + t('label_audios'));
+  }
+
+  function setupObserver() {
+    if (scrollObserver) scrollObserver.disconnect();
+    scrollObserver = new IntersectionObserver(function (entries) {
+      if (!entries[0].isIntersecting) return;
+      $('#loadingMore').show();
+      setTimeout(function () { appendBatch(); $('#loadingMore').hide(); }, 250);
+    }, { rootMargin: '300px' });
+    scrollObserver.observe(document.getElementById('sentinel'));
+  }
+
+  /* ── Combined filter + search ── */
+  function applyFilter() {
+    var f = $('.filter-btn.active').data('filter') || 'all';
+    var q = $('#audioSearch').val().toLowerCase().trim();
+    currentFiltered = allSorted.filter(function (a) {
+      return (f === 'all' || a.category === f) &&
+        (!q || (a.name || '').toLowerCase().indexOf(q) !== -1 ||
+               (a.description || '').toLowerCase().indexOf(q) !== -1);
+    });
+    loadedCount = 0;
+    $('#audioContainer').empty();
+    if (scrollObserver) { scrollObserver.disconnect(); scrollObserver = null; }
+    appendBatch();
+  }
+
+  $(document).on('click', '.filter-btn', function () {
+    $('.filter-btn').removeClass('active'); $(this).addClass('active'); applyFilter();
+  });
+  $(document).on('input keyup', '#audioSearch', function (e) {
+    if (e.key === 'Escape') $(this).val(''); applyFilter();
+  });
+  $(document).on('click', '#audioSearchBtn', function () { applyFilter(); });
+
+  /* ── Init ── */
+  if (SITE_DATA.loaded && SITE_DATA.audios && SITE_DATA.audios.length) {
+    buildAndRender();
+  } else {
+    $('#audioContainer').html(noDataMsg());
+  }
+
+});
+</script>
+<script src="data/lang/en.js"></script>
+<script src="data/lang/ta.js"></script>
+<script src="data/lang-loader.js"></script>
+</body>
+</html>
