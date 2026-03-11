@@ -71,7 +71,8 @@
         name        : 'Name',
         description : 'Description',
         category    : 'Category',
-        image       : 'Image File'
+        image       : 'Image File',
+        isActive    : 'Is Active'
       });
 
       this.videos = rows('Videos', {
@@ -80,7 +81,8 @@
         description : 'Description',
         category    : 'Category',
         youtubeUrl  : 'YouTube URL',
-        duration    : 'Duration'
+        duration    : 'Duration',
+        isActive    : 'Is Active'
       });
 
       this.pdfs = rows('PDFs', {
@@ -89,7 +91,8 @@
         description : 'Description',
         category    : 'Category',
         file        : 'PDF File',
-        pages       : 'Pages'
+        pages       : 'Pages',
+        isActive    : 'Is Active'
       });
 
       this.audios = rows('Audios', {
@@ -98,7 +101,8 @@
         description : 'Description',
         category    : 'Category',
         audioFile   : 'Audio File',
-        duration    : 'Duration'
+        duration    : 'Duration',
+        isActive    : 'Is Active'
       });
 
       this.loaded = true;
@@ -131,6 +135,13 @@
     /* Helper: sort array by serial number */
     sorted: function (arr) {
       return (arr || []).slice().sort(function (a, b) { return a.serial - b.serial; });
+    },
+
+    /* Helper: return only active items (isActive !== 'no'), sorted by serial */
+    active: function (arr) {
+      return (arr || []).filter(function (item) {
+        return String(item.isActive || 'yes').toLowerCase() !== 'no';
+      }).sort(function (a, b) { return a.serial - b.serial; });
     }
   };
 

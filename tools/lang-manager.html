@@ -27,7 +27,8 @@
     }
     .header h1 { font-size: 1.25rem; }
     .header p  { font-size: 0.78rem; opacity: 0.8; margin-top: 2px; }
-    .header-back { color: var(--gold); font-size: 0.85rem; text-decoration: none; }
+    .header-links { display: flex; gap: 16px; align-items: center; }
+    .header-back { color: var(--gold); font-size: 0.85rem; text-decoration: none; white-space: nowrap; }
     .header-back:hover { text-decoration: underline; }
 
     /* ---- Workflow strip ---- */
@@ -53,6 +54,8 @@
     .btn-gold:hover   { background: #e6c200; }
     .btn-outline{ background: white; color: var(--green); border: 2px solid var(--green); }
     .btn-outline:hover{ background: var(--light); }
+    .btn-red    { background: #c62828; color: white; }
+    .btn-red:hover    { background: #a31515; }
     .toolbar-sep { width: 1px; height: 32px; background: var(--border); margin: 0 4px; }
     #uploadInput { display: none; }
 
@@ -72,6 +75,16 @@
       letter-spacing: 0.08em; color: var(--text-light); margin-bottom: 12px;
     }
 
+    /* ---- Status bar ---- */
+    .status-bar {
+      margin-bottom: 16px; padding: 10px 16px;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      font-size: 0.82rem; display: flex; align-items: center; gap: 8px;
+    }
+    .status-bar.success { border-color: #2e7d32; background: #e8f5e9; color: #2e7d32; }
+    .status-bar.error   { border-color: #c62828; background: #fde8e8; color: #c62828; }
+    .status-bar.info    { border-color: var(--green); background: var(--cream); color: var(--green); }
+
     /* ---- Upload zone ---- */
     .drop-zone {
       border: 2px dashed var(--green); border-radius: var(--radius);
@@ -88,10 +101,14 @@
     table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
     thead th { background: var(--green); color: white; padding: 10px 14px; text-align: left; font-size: 0.8rem; position: sticky; top: 0; }
     tbody tr:nth-child(even) { background: var(--cream); }
+    tbody tr.row-inactive { background: #fff3f3 !important; opacity: 0.7; }
     tbody td { padding: 8px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
     tbody td:first-child { font-family: monospace; font-size: 0.78rem; color: var(--green-dark); white-space: nowrap; }
     tbody td.ta-cell { font-size: 0.9rem; }
+    tbody td.active-cell { text-align: center; }
     .empty-row td { text-align: center; color: var(--text-light); padding: 40px; }
+    .badge-yes { display: inline-block; background: #e8f5e9; color: #1b5e20; border-radius: 4px; padding: 2px 8px; font-size: 0.75rem; font-weight: 700; }
+    .badge-no  { display: inline-block; background: #fde8e8; color: #c62828; border-radius: 4px; padding: 2px 8px; font-size: 0.75rem; font-weight: 700; }
 
     /* ---- Output section ---- */
     .output-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -122,9 +139,12 @@
 <div class="header">
   <div>
     <h1>🌐 Language Manager</h1>
-    <p>Import Excel → Generate en.js &amp; ta.js language files</p>
+    <p>Import Excel → Edit translations → Save to Website (or download JS files)</p>
   </div>
-  <a href="../index.html" class="header-back">← Back to Site</a>
+  <div class="header-links">
+    <a href="gallery-manager.html" class="header-back">🖼 Gallery Manager</a>
+    <a href="../index.html" class="header-back">← Back to Site</a>
+  </div>
 </div>
 
 <!-- ===== WORKFLOW STRIP ===== -->
@@ -132,21 +152,24 @@
   <span>Workflow:</span>
   <div class="step"><span class="step-num">1</span> Download template Excel</div>
   <span class="step-arrow">→</span>
-  <div class="step"><span class="step-num">2</span> Fill translations (key | EN | TA)</div>
+  <div class="step"><span class="step-num">2</span> Fill translations (key | EN | TA | Is Active)</div>
   <span class="step-arrow">→</span>
   <div class="step"><span class="step-num">3</span> Upload Excel here</div>
   <span class="step-arrow">→</span>
-  <div class="step"><span class="step-num">4</span> Download en.js &amp; ta.js</div>
+  <div class="step"><span class="step-num">4</span> Click <b>💾 Save to Website</b></div>
   <span class="step-arrow">→</span>
-  <div class="step"><span class="step-num">5</span> Replace files in <span style="font-family:monospace;margin-left:3px">data/lang/</span></div>
+  <div class="step"><span class="step-num">5</span> Website uses active translations instantly ✓</div>
 </div>
 
 <!-- ===== TOOLBAR ===== -->
 <div class="toolbar">
   <button class="btn btn-gold" id="btnTemplate">📥 Download Excel Template</button>
   <div class="toolbar-sep"></div>
-  <button class="btn btn-green" id="btnUpload">📂 Load Excel File</button>
+  <button class="btn btn-outline" id="btnUpload">📂 Load Excel File</button>
   <input type="file" id="uploadInput" accept=".xlsx,.xls" />
+  <div class="toolbar-sep"></div>
+  <button class="btn btn-green" id="btnSave">💾 Save to Website</button>
+  <button class="btn btn-red"   id="btnClearLang">🗑 Clear Cache</button>
   <div class="toolbar-sep"></div>
   <span id="statusPill" class="pill no-data">⚪ No file loaded</span>
 </div>
@@ -154,25 +177,27 @@
 <!-- ===== MAIN ===== -->
 <div class="main">
 
+  <div id="statusBar" class="status-bar info" style="display:none;"></div>
+
   <!-- Excel format guide -->
   <div class="guide" id="guideBox">
     <div class="section-title">Excel Column Format</div>
     <div class="table-wrap" style="margin-bottom:0">
       <table>
         <thead>
-          <tr><th>Column A</th><th>Column B</th><th>Column C</th></tr>
+          <tr><th>Column A</th><th>Column B</th><th>Column C</th><th>Column D</th></tr>
         </thead>
         <tbody>
-          <tr><td><span class="tag">key</span> (header)</td><td><span class="tag">en</span> (header)</td><td><span class="tag">ta</span> (header)</td></tr>
-          <tr><td>nav_home</td><td>Home</td><td>முகப்பு</td></tr>
-          <tr><td>nav_about</td><td>About</td><td>பற்றி</td></tr>
-          <tr><td>gallery_page_title</td><td>Photo Gallery</td><td>புகைப்படக் காட்சியகம்</td></tr>
+          <tr><td><span class="tag">key</span></td><td><span class="tag">en</span></td><td><span class="tag">ta</span></td><td><span class="tag">is_active</span></td></tr>
+          <tr><td>nav_home</td><td>Home</td><td>முகப்பு</td><td>yes</td></tr>
+          <tr><td>nav_about</td><td>About</td><td>பற்றி</td><td>yes</td></tr>
+          <tr><td>old_key</td><td>Old Text</td><td>பழைய உரை</td><td>no</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="guide-note">• Row 1 must be headers: <span class="tag">key</span> <span class="tag">en</span> <span class="tag">ta</span> (any order, case-insensitive)<br>
-    • Rows with empty key are skipped<br>
-    • Download the template to get all current keys pre-filled</p>
+    <p class="guide-note">• Row 1 must be headers: <span class="tag">key</span> <span class="tag">en</span> <span class="tag">ta</span> <span class="tag">is_active</span> (any order, case-insensitive)<br>
+    • <strong>Is Active = no</strong> → that key is excluded from the website (hidden without deleting)<br>
+    • Rows with empty key are skipped • Download the template to get all current keys pre-filled</p>
   </div>
 
   <!-- Drop zone -->
@@ -192,16 +217,17 @@
             <th style="width:220px">Key</th>
             <th>English</th>
             <th>Tamil (தமிழ்)</th>
+            <th style="width:100px; text-align:center">Is Active</th>
           </tr>
         </thead>
         <tbody id="previewBody">
-          <tr class="empty-row"><td colspan="3">No data</td></tr>
+          <tr class="empty-row"><td colspan="4">No data</td></tr>
         </tbody>
       </table>
     </div>
 
     <!-- Output cards -->
-    <div class="section-title">Generated JS Files</div>
+    <div class="section-title">Generated JS Files (Active keys only)</div>
     <div class="output-grid">
       <div class="output-card">
         <h3>🇬🇧 data/lang/en.js</h3>
@@ -226,122 +252,160 @@
 
 <script>
 /* ============================================================
-   Template data — all current keys with EN + TA values
+   Template data — all current keys with EN + TA + isActive
    ============================================================ */
 var TEMPLATE_ROWS = [
   /* ── Navigation ── */
-  ['nav_home',               'Home',                                       'முகப்பு'],
-  ['nav_about',              'About',                                      'பற்றி'],
-  ['nav_about_life',         'Life & Journey',                             'வாழ்க்கை & பயணம்'],
-  ['nav_about_teachings',    'Teachings',                                  'போதனைகள்'],
-  ['nav_about_timeline',     'Timeline',                                   'காலவரிசை'],
-  ['nav_gallery',            'Gallery',                                    'காட்சியகம்'],
-  ['nav_gallery_photos',     'Photo Gallery',                              'புகைப்படக் காட்சியகம்'],
-  ['nav_gallery_videos',     'Video Gallery',                              'வீடியோ காட்சியகம்'],
-  ['nav_gallery_pdfs',       'PDF Downloads',                              'PDF பதிவிறக்கம்'],
-  ['nav_contact',            'Contact',                                    'தொடர்பு'],
+  ['nav_home',               'Home',                                       'முகப்பு',                            'yes'],
+  ['nav_about',              'About',                                      'பற்றி',                              'yes'],
+  ['nav_about_life',         'Life & Journey',                             'வாழ்க்கை & பயணம்',                  'yes'],
+  ['nav_about_teachings',    'Teachings',                                  'போதனைகள்',                           'yes'],
+  ['nav_about_timeline',     'Timeline',                                   'காலவரிசை',                           'yes'],
+  ['nav_gallery',            'Gallery',                                    'காட்சியகம்',                         'yes'],
+  ['nav_gallery_photos',     'Photo Gallery',                              'புகைப்படக் காட்சியகம்',             'yes'],
+  ['nav_gallery_videos',     'Video Gallery',                              'வீடியோ காட்சியகம்',                 'yes'],
+  ['nav_gallery_audios',     'Audio Gallery',                              'ஆடியோ காட்சியகம்',                  'yes'],
+  ['nav_gallery_pdfs',       'PDF Downloads',                              'PDF பதிவிறக்கம்',                   'yes'],
+  ['nav_contact',            'Contact',                                    'தொடர்பு',                            'yes'],
 
   /* ── Hero ── */
-  ['hero_eyebrow',           'Sri Ramanasramam · Tiruvannamalai',         'ஸ்ரீ ரமணாஸ்ரமம் · திருவண்ணாமலை'],
-  ['hero_dates',             'December 1, 1918 — February 20, 2001',      'டிசம்பர் 1, 1918 — பிப்ரவரி 20, 2001'],
-  ['hero_cta_life',          '✦ Explore His Life',                        '✦ அவரின் வாழ்க்கையை அறிய'],
-  ['hero_cta_gallery',       '🖼 View Gallery',                           '🖼 காட்சியகம் பார்க்க'],
-  ['hero_cta_texts',         '📄 Sacred Texts',                           '📄 புனித நூல்கள்'],
+  ['hero_eyebrow',           'Sri Ramanasramam · Tiruvannamalai',         'ஸ்ரீ ரமணாஸ்ரமம் · திருவண்ணாமலை',   'yes'],
+  ['hero_dates',             'December 1, 1918 — February 20, 2001',      'டிசம்பர் 1, 1918 — பிப்ரவரி 20, 2001', 'yes'],
+  ['hero_cta_life',          '✦ Explore His Life',                        '✦ அவரின் வாழ்க்கையை அறிய',          'yes'],
+  ['hero_cta_gallery',       '🖼 View Gallery',                           '🖼 காட்சியகம் பார்க்க',             'yes'],
+  ['hero_cta_texts',         '📄 Sacred Texts',                           '📄 புனித நூல்கள்',                   'yes'],
 
   /* ── About Preview ── */
-  ['about_eyebrow',          'The Beloved Beggar of God',                 'இறைவனின் அன்பான பிச்சைக்காரர்'],
-  ['about_title',            'A Saint Who Radiated Divine Love',          'தெய்வீக அன்பை வெளிப்படுத்திய ஒரு துறவி'],
-  ['stat_birth',             'Year of Birth',                             'பிறந்த ஆண்டு'],
-  ['stat_grace',             'Years of Grace',                            'அருள் ஆண்டுகள்'],
-  ['stat_samadhi',           'Mahasamadhi',                               'மகாசமாதி'],
-  ['btn_biography',          'Read Full Biography →',                     'முழு வாழ்க்கை வரலாறு படிக்க →'],
+  ['about_eyebrow',          'The Beloved Beggar of God',                 'இறைவனின் அன்பான பிச்சைக்காரர்',      'yes'],
+  ['about_title',            'A Saint Who Radiated Divine Love',          'தெய்வீக அன்பை வெளிப்படுத்திய ஒரு துறவி', 'yes'],
+  ['stat_birth',             'Year of Birth',                             'பிறந்த ஆண்டு',                       'yes'],
+  ['stat_grace',             'Years of Grace',                            'அருள் ஆண்டுகள்',                    'yes'],
+  ['stat_samadhi',           'Mahasamadhi',                               'மகாசமாதி',                           'yes'],
+  ['btn_biography',          'Read Full Biography →',                     'முழு வாழ்க்கை வரலாறு படிக்க →',    'yes'],
 
   /* ── Sections ── */
-  ['sec_explore_eyebrow',    'Explore & Learn',                           'ஆராய்ந்து அறிக'],
-  ['sec_explore_title',      'Discover His Universe',                     'அவரின் உலகை கண்டறியுங்கள்'],
-  ['sec_explore_subtitle',   'Immerse yourself in the life, words, and grace of Sri Yogi Ramsuratkumar through our curated collections.', 'ஸ்ரீ யோகி ராம்சுரத்குமாரின் வாழ்க்கை, வார்த்தைகள் மற்றும் அருளில் உங்களை மூழ்கடியுங்கள்.'],
-  ['sec_wisdom_eyebrow',     'Timeless Wisdom',                           'காலமற்ற ஞானம்'],
-  ['sec_wisdom_title',       'Core Teachings',                            'முக்கிய போதனைகள்'],
-  ['sec_gallery_eyebrow',    'Photo Gallery Preview',                     'புகைப்படக் காட்சியகம் முன்னோட்டம்'],
-  ['sec_gallery_title',      'Glimpses of Divine Grace',                  'தெய்வீக அருளின் தோற்றங்கள்'],
-  ['btn_full_gallery',       'View Full Gallery →',                       'முழு காட்சியகம் பார்க்க →'],
+  ['sec_explore_eyebrow',    'Explore & Learn',                           'ஆராய்ந்து அறிக',                    'yes'],
+  ['sec_explore_title',      'Discover His Universe',                     'அவரின் உலகை கண்டறியுங்கள்',         'yes'],
+  ['sec_explore_subtitle',   'Immerse yourself in the life, words, and grace of Sri Yogi Ramsuratkumar through our curated collections.', 'ஸ்ரீ யோகி ராம்சுரத்குமாரின் வாழ்க்கை, வார்த்தைகள் மற்றும் அருளில் உங்களை மூழ்கடியுங்கள்.', 'yes'],
+  ['sec_wisdom_eyebrow',     'Timeless Wisdom',                           'காலமற்ற ஞானம்',                     'yes'],
+  ['sec_wisdom_title',       'Core Teachings',                            'முக்கிய போதனைகள்',                  'yes'],
+  ['sec_gallery_eyebrow',    'Photo Gallery Preview',                     'புகைப்படக் காட்சியகம் முன்னோட்டம்', 'yes'],
+  ['sec_gallery_title',      'Glimpses of Divine Grace',                  'தெய்வீக அருளின் தோற்றங்கள்',        'yes'],
+  ['btn_full_gallery',       'View Full Gallery →',                       'முழு காட்சியகம் பார்க்க →',         'yes'],
 
   /* ── Highlight cards ── */
-  ['hl_photos_title',        'Photo Gallery',                             'புகைப்படக் காட்சியகம்'],
-  ['hl_videos_title',        'Video Gallery',                             'வீடியோ காட்சியகம்'],
-  ['hl_pdfs_title',          'Sacred Texts & PDFs',                       'புனித நூல்கள் & PDF'],
-  ['hl_teachings_title',     'His Teachings',                             'அவரின் போதனைகள்'],
+  ['hl_photos_title',        'Photo Gallery',                             'புகைப்படக் காட்சியகம்',             'yes'],
+  ['hl_videos_title',        'Video Gallery',                             'வீடியோ காட்சியகம்',                 'yes'],
+  ['hl_audios_title',        'Audio Gallery',                             'ஆடியோ காட்சியகம்',                  'yes'],
+  ['hl_pdfs_title',          'Sacred Texts & PDFs',                       'புனித நூல்கள் & PDF',               'yes'],
+  ['hl_teachings_title',     'His Teachings',                             'அவரின் போதனைகள்',                   'yes'],
 
   /* ── Teaching cards ── */
-  ['teach_name_title',       'The Divine Name',                           'தெய்வீக நாமம்'],
-  ['teach_surrender_title',  'Total Surrender',                           'முழு சரணாகதி'],
-  ['teach_grace_title',      'Divine Grace',                              'தெய்வீக அருள்'],
-  ['teach_love_title',       'Universal Love',                            'உலகளாவிய அன்பு'],
+  ['teach_name_title',       'The Divine Name',                           'தெய்வீக நாமம்',                     'yes'],
+  ['teach_surrender_title',  'Total Surrender',                           'முழு சரணாகதி',                      'yes'],
+  ['teach_grace_title',      'Divine Grace',                              'தெய்வீக அருள்',                     'yes'],
+  ['teach_love_title',       'Universal Love',                            'உலகளாவிய அன்பு',                   'yes'],
 
   /* ── Footer ── */
-  ['footer_quick_links',     'Quick Links',                               'விரைவு இணைப்புகள்'],
-  ['footer_about',           'About',                                     'பற்றி'],
-  ['footer_ashram',          'Ashram',                                    'ஆஸ்ரமம்'],
-  ['footer_copy',            '© 2025 Yogi Ramsuratkumar Ashram, Tiruvannamalai, Tamil Nadu, India', '© 2025 யோகி ராம்சுரத்குமார் ஆஸ்ரமம், திருவண்ணாமலை, தமிழ்நாடு, இந்தியா'],
+  ['footer_quick_links',     'Quick Links',                               'விரைவு இணைப்புகள்',                 'yes'],
+  ['footer_about',           'About',                                     'பற்றி',                              'yes'],
+  ['footer_ashram',          'Ashram',                                    'ஆஸ்ரமம்',                            'yes'],
+  ['footer_copy',            '© 2025 Yogi Ramsuratkumar Ashram, Tiruvannamalai, Tamil Nadu, India', '© 2025 யோகி ராம்சுரத்குமார் ஆஸ்ரமம், திருவண்ணாமலை, தமிழ்நாடு, இந்தியா', 'yes'],
 
   /* ── Gallery page ── */
-  ['gallery_page_title',     'Photo Gallery',                             'புகைப்படக் காட்சியகம்'],
-  ['filter_all_photos',      'All Photos',                                'அனைத்து படங்கள்'],
-  ['search_photos_ph',       'Search photos…',                            'படங்கள் தேடுக…'],
-  ['showing',                'Showing',                                   'காட்டப்படுகிறது'],
-  ['of',                     'of',                                        'இல்'],
-  ['label_photos',           'photos',                                    'படங்கள்'],
-  ['no_photos',              'No photos found.',                          'படங்கள் இல்லை.'],
+  ['gallery_page_title',     'Photo Gallery',                             'புகைப்படக் காட்சியகம்',             'yes'],
+  ['filter_all_photos',      'All Photos',                                'அனைத்து படங்கள்',                   'yes'],
+  ['search_photos_ph',       'Search photos…',                            'படங்கள் தேடுக…',                    'yes'],
+  ['showing',                'Showing',                                   'காட்டப்படுகிறது',                    'yes'],
+  ['of',                     'of',                                        'இல்',                                'yes'],
+  ['label_photos',           'photos',                                    'படங்கள்',                            'yes'],
+  ['no_photos',              'No photos found.',                          'படங்கள் இல்லை.',                    'yes'],
+  ['loading_more_photos',    '⏳ Loading more photos…',                   '⏳ மேலும் படங்கள் ஏற்றுகிறது…',     'yes'],
 
   /* ── Videos page ── */
-  ['videos_page_title',      'Video Gallery',                             'வீடியோ காட்சியகம்'],
-  ['filter_all_videos',      'All Videos',                                'அனைத்து வீடியோக்கள்'],
-  ['search_videos_ph',       'Search videos…',                            'வீடியோக்கள் தேடுக…'],
-  ['label_videos',           'videos',                                    'வீடியோக்கள்'],
-  ['no_videos',              'No videos found.',                          'வீடியோக்கள் இல்லை.'],
-  ['loading_more_videos',    '⏳ Loading more videos…',                   '⏳ மேலும் வீடியோக்கள் ஏற்றுகிறது…'],
+  ['videos_page_title',      'Video Gallery',                             'வீடியோ காட்சியகம்',                 'yes'],
+  ['filter_all_videos',      'All Videos',                                'அனைத்து வீடியோக்கள்',               'yes'],
+  ['search_videos_ph',       'Search videos…',                            'வீடியோக்கள் தேடுக…',                'yes'],
+  ['label_videos',           'videos',                                    'வீடியோக்கள்',                        'yes'],
+  ['no_videos',              'No videos found.',                          'வீடியோக்கள் இல்லை.',                'yes'],
+  ['loading_more_videos',    '⏳ Loading more videos…',                   '⏳ மேலும் வீடியோக்கள் ஏற்றுகிறது…', 'yes'],
+
+  /* ── Audios page ── */
+  ['audios_page_title',      'Audio Gallery',                             'ஆடியோ காட்சியகம்',                  'yes'],
+  ['filter_all_audios',      'All Audios',                                'அனைத்து ஆடியோ',                     'yes'],
+  ['search_audios_ph',       'Search audios…',                            'ஆடியோ தேடுக…',                      'yes'],
+  ['label_audios',           'audios',                                    'ஆடியோ',                              'yes'],
+  ['no_audios',              'No audios found.',                          'ஆடியோ இல்லை.',                      'yes'],
+  ['loading_more_audios',    '⏳ Loading more audios…',                   '⏳ மேலும் ஆடியோ ஏற்றுகிறது…',       'yes'],
 
   /* ── PDFs page ── */
-  ['pdfs_page_title',        'PDF Downloads',                             'PDF பதிவிறக்கம்'],
-  ['filter_all_pdfs',        'All',                                       'அனைத்தும்'],
-  ['search_pdfs_ph',         'Search publications…',                      'நூல்கள் தேடுக…'],
-  ['label_publications',     'publications',                              'நூல்கள்'],
-  ['no_pdfs',                'No PDFs found.',                            'நூல்கள் இல்லை.'],
-  ['btn_view',               '👁 View',                                   '👁 பார்க்க'],
-  ['btn_download',           '⬇ Download',                               '⬇ பதிவிறக்கம்'],
-  ['loading_more_pdfs',      '⏳ Loading more…',                          '⏳ மேலும் ஏற்றுகிறது…'],
-  ['loading_more_photos',    '⏳ Loading more photos…',                   '⏳ மேலும் படங்கள் ஏற்றுகிறது…'],
+  ['pdfs_page_title',        'PDF Downloads',                             'PDF பதிவிறக்கம்',                   'yes'],
+  ['filter_all_pdfs',        'All',                                       'அனைத்தும்',                          'yes'],
+  ['search_pdfs_ph',         'Search publications…',                      'நூல்கள் தேடுக…',                    'yes'],
+  ['label_publications',     'publications',                              'நூல்கள்',                            'yes'],
+  ['no_pdfs',                'No PDFs found.',                            'நூல்கள் இல்லை.',                    'yes'],
+  ['btn_view',               '👁 View',                                   '👁 பார்க்க',                         'yes'],
+  ['btn_download',           '⬇ Download',                               '⬇ பதிவிறக்கம்',                     'yes'],
+  ['loading_more_pdfs',      '⏳ Loading more…',                          '⏳ மேலும் ஏற்றுகிறது…',              'yes'],
 
   /* ── Contact page ── */
-  ['contact_page_title',     'Contact Us',                                'தொடர்பு கொள்ளுங்கள்']
+  ['contact_page_title',     'Contact Us',                                'தொடர்பு கொள்ளுங்கள்',               'yes']
 ];
 
 /* ============================================================
    State
    ============================================================ */
-var rows = []; // parsed from Excel: [{key, en, ta}, ...]
+var LANG_STORAGE_KEY = 'yrk_lang_data';
+
+/* Convert TEMPLATE_ROWS array to row objects */
+function templateToRows() {
+  return TEMPLATE_ROWS.map(function (r) {
+    return { key: r[0], en: r[1], ta: r[2], isActive: r[3] || 'yes' };
+  });
+}
+
+var rows = templateToRows(); // pre-loaded from template so Save to Website works immediately
 
 /* ============================================================
-   Generate JS file content
+   Helpers
+   ============================================================ */
+function activeRows() {
+  return rows.filter(function (r) { return r.isActive !== 'no'; });
+}
+
+function pad(s, n) { return s.length >= n ? s : s + ' '.repeat(n - s.length); }
+
+/* ============================================================
+   Generate JS file content (active keys only)
    ============================================================ */
 function generateJS(lang, varName, langLabel) {
+  var active = activeRows();
   var lines = [];
   lines.push('/* ============================================================');
   lines.push('   data/lang/' + lang + '.js — ' + langLabel + ' translations');
   lines.push('   Auto-generated by Language Manager — ' + new Date().toLocaleDateString());
   lines.push('   ============================================================ */');
   lines.push('var ' + varName + ' = {');
-  rows.forEach(function (r, i) {
+  active.forEach(function (r, i) {
     if (!r.key) return;
-    var val = (r[lang] || '').replace(/'/g, "\\'");
-    var comma = i < rows.length - 1 ? ',' : '';
+    var val = (r[lang] || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    var comma = i < active.length - 1 ? ',' : '';
     lines.push('  ' + pad(r.key, 25) + ": '" + val + "'" + comma);
   });
   lines.push('};');
   return lines.join('\n');
 }
 
-function pad(s, n) { return s.length >= n ? s : s + ' '.repeat(n - s.length); }
+/* ============================================================
+   Build lang object (active keys only)
+   ============================================================ */
+function buildLangObject(lang) {
+  var obj = {};
+  activeRows().forEach(function (r) {
+    if (r.key) obj[r.key] = r[lang] || '';
+  });
+  return obj;
+}
 
 /* ============================================================
    Render preview table
@@ -349,19 +413,25 @@ function pad(s, n) { return s.length >= n ? s : s + ' '.repeat(n - s.length); }
 function renderPreview() {
   var $body = $('#previewBody').empty();
   if (!rows.length) {
-    $body.append('<tr class="empty-row"><td colspan="3">No data</td></tr>');
+    $body.append('<tr class="empty-row"><td colspan="4">No data</td></tr>');
     return;
   }
   rows.forEach(function (r) {
-    $body.append(
-      $('<tr>').append(
-        $('<td>').text(r.key),
-        $('<td>').text(r.en),
-        $('<td class="ta-cell">').text(r.ta)
+    var isNo = (r.isActive === 'no');
+    var $tr = $('<tr>').append(
+      $('<td>').text(r.key),
+      $('<td>').text(r.en),
+      $('<td class="ta-cell">').text(r.ta),
+      $('<td class="active-cell">').html(
+        isNo ? '<span class="badge-no">❌ No</span>' : '<span class="badge-yes">✅ Yes</span>'
       )
     );
+    if (isNo) $tr.addClass('row-inactive');
+    $body.append($tr);
   });
-  $('#previewTitle').text('Preview — ' + rows.length + ' keys');
+
+  var activeCount = activeRows().length;
+  $('#previewTitle').text('Preview — ' + rows.length + ' keys (' + activeCount + ' active)');
 
   var enJS = generateJS('en', 'LANG_EN', 'English');
   var taJS = generateJS('ta', 'LANG_TA', 'Tamil (தமிழ்)');
@@ -380,14 +450,17 @@ function parseWorkbook(wb) {
 
   if (!data.length) { alert('Excel sheet is empty.'); return; }
 
-  // Find header row (first row with "key" in any cell)
   var headerRow = data[0].map(function (h) { return (h + '').toLowerCase().trim(); });
-  var colKey = headerRow.indexOf('key');
-  var colEn  = headerRow.indexOf('en');
-  var colTa  = headerRow.indexOf('ta');
+  var colKey      = headerRow.indexOf('key');
+  var colEn       = headerRow.indexOf('en');
+  var colTa       = headerRow.indexOf('ta');
+  var colIsActive = headerRow.indexOf('is_active');
+  if (colIsActive < 0) colIsActive = headerRow.indexOf('isactive');
+  if (colIsActive < 0) colIsActive = headerRow.indexOf('is active');
+  if (colIsActive < 0) colIsActive = headerRow.indexOf('active');
 
   if (colKey < 0 || colEn < 0 || colTa < 0) {
-    alert('Could not find required columns.\nPlease make sure Row 1 has headers: key  en  ta');
+    alert('Could not find required columns.\nPlease make sure Row 1 has headers: key  en  ta  is_active');
     return;
   }
 
@@ -395,14 +468,85 @@ function parseWorkbook(wb) {
   for (var i = 1; i < data.length; i++) {
     var key = (data[i][colKey] + '').trim();
     if (!key) continue;
-    rows.push({ key: key, en: (data[i][colEn] + '').trim(), ta: (data[i][colTa] + '').trim() });
+    var activeVal = colIsActive >= 0 ? (data[i][colIsActive] + '').toLowerCase().trim() : 'yes';
+    var isActive  = (activeVal === 'no' || activeVal === 'false' || activeVal === '0') ? 'no' : 'yes';
+    rows.push({
+      key      : key,
+      en       : (data[i][colEn] + '').trim(),
+      ta       : (data[i][colTa] + '').trim(),
+      isActive : isActive
+    });
   }
 
   $('#statusPill')
     .removeClass('no-data').addClass('loaded')
-    .text('✅ ' + rows.length + ' keys loaded');
+    .text('✅ ' + rows.length + ' keys loaded (' + activeRows().length + ' active)');
   renderPreview();
 }
+
+/* ============================================================
+   💾 Save to Website (localStorage)
+   ============================================================ */
+/* ─── Write file to a directory handle ──────────────────────── */
+function writeFileToDir(dirHandle, filename, content) {
+  return dirHandle.getFileHandle(filename, { create: true }).then(function (fh) {
+    return fh.createWritable().then(function (w) {
+      return w.write(content).then(function () { return w.close(); });
+    });
+  });
+}
+
+$('#btnSave').on('click', function () {
+  /* If rows is empty for any reason, fall back to template */
+  if (!rows.length) rows = templateToRows();
+
+  var activeCount = activeRows().length;
+  var enJS = generateJS('en', 'LANG_EN', 'English');
+  var taJS = generateJS('ta', 'LANG_TA', 'Tamil (தமிழ்)');
+
+  /* 1. Always save to localStorage */
+  var payload = {
+    en       : buildLangObject('en'),
+    ta       : buildLangObject('ta'),
+    loadedAt : new Date().toLocaleString()
+  };
+  localStorage.setItem(LANG_STORAGE_KEY, JSON.stringify(payload));
+  $('#statusPill').removeClass('no-data').addClass('loaded')
+    .text('✅ Saved: ' + activeCount + ' active keys');
+
+  /* 2. Try to write en.js & ta.js directly to data/lang/ folder */
+  if (window.showDirectoryPicker) {
+    showStatus('ℹ Select the <strong>data/lang/</strong> folder (yogiramsurathkumar/data/lang/) to save JS files…', 'info');
+    window.showDirectoryPicker({ mode: 'readwrite' })
+      .then(function (dirHandle) {
+        return Promise.all([
+          writeFileToDir(dirHandle, 'en.js', enJS),
+          writeFileToDir(dirHandle, 'ta.js', taJS)
+        ]).then(function () {
+          showStatus('✅ Saved! ' + activeCount + ' active keys → localStorage + en.js & ta.js written to data/lang/ folder.', 'success');
+        });
+      })
+      .catch(function (e) {
+        if (e.name === 'AbortError') {
+          showStatus('✅ Saved to localStorage only (' + activeCount + ' keys). JS files not updated — select data/lang/ folder to update them.', 'info');
+        } else {
+          showStatus('✅ Saved to localStorage. JS file write error: ' + e.message, 'info');
+        }
+      });
+  } else {
+    /* Fallback: just localStorage */
+    showStatus('✅ Saved ' + activeCount + ' active language keys to website. Language switcher uses these translations instantly.', 'success');
+  }
+});
+
+/* ============================================================
+   🗑 Clear lang cache
+   ============================================================ */
+$('#btnClearLang').on('click', function () {
+  if (!confirm('Clear saved language data from browser?\nWebsite will fall back to built-in JS language files.')) return;
+  localStorage.removeItem(LANG_STORAGE_KEY);
+  showStatus('Language cache cleared. Website will use built-in en.js / ta.js files.', 'info');
+});
 
 /* ============================================================
    Download helper
@@ -419,12 +563,9 @@ function downloadText(content, filename) {
    Template download
    ============================================================ */
 $('#btnTemplate').on('click', function () {
-  var ws_data = [['key', 'en', 'ta']].concat(TEMPLATE_ROWS);
+  var ws_data = [['key', 'en', 'ta', 'is_active']].concat(TEMPLATE_ROWS);
   var ws = XLSX.utils.aoa_to_sheet(ws_data);
-
-  // Column widths
-  ws['!cols'] = [{ wch: 28 }, { wch: 60 }, { wch: 60 }];
-
+  ws['!cols'] = [{ wch: 28 }, { wch: 60 }, { wch: 60 }, { wch: 10 }];
   var wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Translations');
   XLSX.writeFile(wb, 'lang-translations.xlsx');
@@ -467,14 +608,14 @@ $dz.on('drop', function (e) {
 });
 
 /* ============================================================
-   Download JS files
+   Download JS files (active keys only)
    ============================================================ */
 $('#btnDownloadEn').on('click', function () {
-  if (!rows.length) return alert('Load an Excel file first.');
+  if (!rows.length) rows = templateToRows();
   downloadText(generateJS('en', 'LANG_EN', 'English'), 'en.js');
 });
 $('#btnDownloadTa').on('click', function () {
-  if (!rows.length) return alert('Load an Excel file first.');
+  if (!rows.length) rows = templateToRows();
   downloadText(generateJS('ta', 'LANG_TA', 'Tamil (தமிழ்)'), 'ta.js');
 });
 
@@ -484,13 +625,43 @@ $('#btnDownloadTa').on('click', function () {
 $('#btnCopyEn').on('click', function () {
   if (!rows.length) return;
   navigator.clipboard.writeText(generateJS('en', 'LANG_EN', 'English'))
-    .then(function () { alert('en.js content copied to clipboard!'); });
+    .then(function () { showStatus('en.js content copied to clipboard!', 'success'); });
 });
 $('#btnCopyTa').on('click', function () {
   if (!rows.length) return;
   navigator.clipboard.writeText(generateJS('ta', 'LANG_TA', 'Tamil (தமிழ்)'))
-    .then(function () { alert('ta.js content copied to clipboard!'); });
+    .then(function () { showStatus('ta.js content copied to clipboard!', 'success'); });
 });
+
+/* ============================================================
+   Status bar helper
+   ============================================================ */
+function showStatus(msg, type) {
+  var icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ';
+  $('#statusBar')
+    .removeClass('success error info').addClass(type || 'info')
+    .html(icon + ' ' + msg).show();
+  if (type !== 'error') setTimeout(function () { $('#statusBar').fadeOut(); }, 7000);
+}
+
+/* ============================================================
+   On page load — show template data immediately + saved status
+   ============================================================ */
+/* Render preview with default template rows */
+renderPreview();
+$('#statusPill').removeClass('no-data').addClass('loaded')
+  .text('✅ ' + rows.length + ' default keys ready — click 💾 Save to Website or upload Excel to customise');
+
+/* Also show if website already has saved language data */
+try {
+  var saved = localStorage.getItem('yrk_lang_data');
+  if (saved) {
+    var d = JSON.parse(saved);
+    var enCount = Object.keys(d.en || {}).length;
+    $('#statusPill').removeClass('no-data').addClass('loaded')
+      .text('✅ Website has ' + enCount + ' saved keys (saved ' + (d.loadedAt || '') + ') — upload Excel to update');
+  }
+} catch(e) {}
 </script>
 </body>
 </html>

@@ -27,6 +27,16 @@
     ta: typeof LANG_TA !== 'undefined' ? LANG_TA : {}
   };
 
+  /* Try to load language data saved by Language Manager (overrides static JS files) */
+  try {
+    var _saved = localStorage.getItem('yrk_lang_data');
+    if (_saved) {
+      var _d = JSON.parse(_saved);
+      if (_d.en && Object.keys(_d.en).length) LANGUAGES.en = _d.en;
+      if (_d.ta && Object.keys(_d.ta).length) LANGUAGES.ta = _d.ta;
+    }
+  } catch (e) { /* ignore storage errors */ }
+
   var STORAGE_KEY = 'yrk_lang';
   var currentLang = localStorage.getItem(STORAGE_KEY) || 'en';
 

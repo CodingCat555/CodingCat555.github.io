@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gallery Manager — Yogi Ramsuratkumar Website</title>
+
+  <!-- jQuery + SheetJS + Central data loader -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="../data/photos.js"></script>
+  <script src="../data/videos.js"></script>
+  <script src="../data/pdfs.js"></script>
+  <script src="../data/audios.js"></script>
+  <script src="../data/data-loader.js"></script>
+
+  <style>
+    :root {
+      --green: #1A6B2E; --green-dark: #0F4520; --green-light: #2D9148;
+      --gold: #FFD700; --cream: #F0FFF4; --light: #D8F3DC;
+      --text: #1B4332; --text-light: #3D7A57; --border: rgba(26,107,46,0.22);
+      --card: #F5FFFA; --radius: 10px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: var(--cream); color: var(--text); }
+
+    /* ---- Header ---- */
+    .header {
+      background: linear-gradient(135deg, var(--green-dark), var(--green));
+      color: white; padding: 16px 28px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 3px 14px rgba(0,0,0,0.25);
+    }
+    .header h1 { font-size: 1.25rem; }
+    .header p  { font-size: 0.78rem; opacity: 0.8; margin-top: 2px; }
+    .header-links { display: flex; gap: 16px; align-items: center; }
+    .header-back { color: var(--gold); font-size: 0.85rem; text-decoration: none; white-space: nowrap; }
+    .header-back:hover { text-decoration: underline; }
+
+    /* ---- Workflow strip ---- */
+    .workflow {
+      background: var(--light); border-bottom: 1px solid var(--border);
+      padding: 10px 28px; display: flex; align-items: center; gap: 12px;
+      flex-wrap: wrap;
+    }
+    .workflow span { font-size: 0.78rem; color: var(--text-light); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+    .step { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--text); }
+    .step-num { width: 22px; height: 22px; background: var(--green); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; flex-shrink: 0; }
+    .step-arrow { color: var(--text-light); font-size: 0.9rem; }
+
+    /* ---- Toolbar ---- */
+    .toolbar {
+      padding: 12px 28px; background: white;
+      border-bottom: 1px solid var(--border);
+      display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+    }
+    .btn { padding: 9px 18px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; white-space: nowrap; }
+    .btn-green  { background: var(--green); color: white; }
+    .btn-green:hover  { background: var(--green-dark); }
+    .btn-gold   { background: var(--gold); color: var(--green-dark); }
+    .btn-gold:hover   { background: #e6c200; }
+    .btn-outline{ background: white; color: var(--green); border: 2px solid var(--green); }
+    .btn-outline:hover{ background: var(--light); }
+    .btn-red    { background: #c62828; color: white; }
+    .btn-red:hover    { background: #a31515; }
+    .toolbar-sep { width: 1px; height: 32px; background: var(--border); margin: 0 4px; }
+    #uploadInput { display: none; }
+
+    /* ---- Data status pill ---- */
+    .data-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 50px; font-size: 0.78rem; font-weight: 600;
+      border: 1.5px solid;
+    }
+    .data-pill.loaded   { background: #e8f5e9; color: #1b5e20; border-color: #a5d6a7; }
+    .data-pill.no-data  { background: #fff8e1; color: #e65100; border-color: #ffcc80; }
+
+    /* ---- Tabs ---- */
+    .tabs { display: flex; background: var(--light); border-bottom: 2px solid var(--border); padding: 0 28px; }
+    .tab-btn {
+      padding: 12px 24px; cursor: pointer; font-size: 0.9rem; font-weight: 700;
+      color: var(--text-light); border: none; background: none;
+      border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s;
+    }
+    .tab-btn.active { color: var(--green); border-bottom-color: var(--green); }
+    .tab-btn:hover:not(.active) { color: var(--green); background: rgba(26,107,46,0.05); }
+    .tab-count { background: var(--green); color: white; font-size: 0.68rem; padding: 1px 7px; border-radius: 50px; margin-left: 6px; }
+
+    /* ---- Content ---- */
+    .content { padding: 20px 28px; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ---- Table ---- */
+    .table-wrap { overflow-x: auto; border-radius: var(--radius); box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+    table { width: 100%; border-collapse: collapse; background: white; min-width: 1000px; }
+    thead th {
+      background: var(--green); color: white; padding: 11px 14px;
+      font-size: 0.82rem; text-align: left; white-space: nowrap;
+      border-right: 1px solid rgba(255,255,255,0.15);
+    }
+    thead th:first-child { border-radius: var(--radius) 0 0 0; }
+    thead th:last-child  { border-radius: 0 var(--radius) 0 0; border-right: none; }
+    .serial-th { width: 70px; text-align: center !important; }
+    .active-th  { width: 110px; text-align: center !important; }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+    tbody tr:nth-child(even) { background: #F5FFFA; }
+    tbody tr:hover { background: #E8F5E9; }
+    /* Highlight inactive rows */
+    tbody tr.row-inactive { background: #fff3f3 !important; opacity: 0.7; }
+    tbody tr.row-inactive:hover { background: #ffe0e0 !important; }
+    tbody td { padding: 8px 10px; vertical-align: top; }
+    .serial-td { text-align: center; font-weight: 700; color: var(--green); font-size: 0.9rem; width: 60px; }
+    .active-td { text-align: center; }
+
+    /* Editable cell */
+    .editable {
+      width: 100%; min-height: 32px; padding: 4px 8px;
+      border: 1px solid transparent; border-radius: 5px;
+      font-family: Arial; font-size: 0.83rem; resize: vertical;
+      background: transparent; color: var(--text); transition: border 0.2s;
+    }
+    .editable:focus { outline: none; border-color: var(--green); background: white; box-shadow: 0 0 0 3px rgba(26,107,46,0.1); }
+    .desc-cell .editable { min-height: 54px; }
+    select.editable { cursor: pointer; }
+    .active-select { font-weight: 700; text-align: center; }
+
+    /* Row actions */
+    .del-row { background: none; border: none; color: #c62828; cursor: pointer; font-size: 1rem; padding: 4px 6px; border-radius: 4px; }
+    .del-row:hover { background: #fde8e8; }
+
+    /* ---- Status bar ---- */
+    .status-bar {
+      margin-top: 14px; padding: 10px 16px;
+      background: white; border: 1px solid var(--border);
+      border-radius: var(--radius); font-size: 0.82rem;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .status-bar.success { border-color: #2e7d32; background: #e8f5e9; color: #2e7d32; }
+    .status-bar.error   { border-color: #c62828; background: #fde8e8; color: #c62828; }
+    .status-bar.info    { border-color: var(--green); background: var(--cream); color: var(--green); }
+
+    /* ---- Tip box ---- */
+    .tip { background: rgba(26,107,46,0.06); border-left: 4px solid var(--green); padding: 10px 14px; border-radius: 0 var(--radius) var(--radius) 0; font-size: 0.82rem; color: var(--text-light); margin-bottom: 14px; line-height: 1.6; }
+    .tip strong { color: var(--green-dark); }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div>
+    <h1>🪔 Gallery Manager — Yogi Ramsuratkumar Website</h1>
+    <p>Edit Photos · Videos · PDFs · Audios → Set Is Active → Save to Website → Gallery pages update instantly</p>
+  </div>
+  <div class="header-links">
+    <a href="create-sample-excel.html" class="header-back">📥 Sample Excel</a>
+    <a href="lang-manager.html" class="header-back">🌐 Language Manager</a>
+    <a href="../index.html" class="header-back">← Back to Website</a>
+  </div>
+</div>
+
+<!-- Workflow -->
+<div class="workflow">
+  <span>Workflow:</span>
+  <div class="step"><span class="step-num">1</span> Upload <b>gallery-manager.xlsx</b> (or edit rows directly)</div>
+  <span class="step-arrow">→</span>
+  <div class="step"><span class="step-num">2</span> Set <b>Is Active</b> Yes/No for each item</div>
+  <span class="step-arrow">→</span>
+  <div class="step"><span class="step-num">3</span> Click <b>💾 Save to Website</b></div>
+  <span class="step-arrow">→</span>
+  <div class="step"><span class="step-num">4</span> Gallery pages show only <b>Active</b> items ✓</div>
+</div>
+
+<!-- Toolbar -->
+<div class="toolbar">
+  <!-- Load Excel -->
+  <label class="btn btn-gold" style="cursor:pointer;">
+    📂 Upload Excel <input type="file" id="uploadInput" accept=".xlsx,.xls" />
+  </label>
+
+  <!-- Download Excel (export current table) -->
+  <button class="btn btn-outline" id="btnDownloadExcel">⬇ Download Excel</button>
+
+  <div class="toolbar-sep"></div>
+
+  <!-- Save to Website (write localStorage) -->
+  <button class="btn btn-green" id="btnSave">💾 Save to Website</button>
+
+  <div class="toolbar-sep"></div>
+
+  <!-- Add row -->
+  <button class="btn btn-outline" id="btnAddRow">➕ Add Row</button>
+
+  <!-- Clear cache -->
+  <button class="btn btn-red" id="btnClearCache" title="Clear localStorage data cache">🗑 Clear Cache</button>
+
+  <div class="toolbar-sep"></div>
+
+  <!-- Data status -->
+  <span class="data-pill no-data" id="dataPill">⚠ No data cached</span>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <button class="tab-btn active" data-tab="photos">🖼 Photos <span class="tab-count" id="photosCount">0</span></button>
+  <button class="tab-btn" data-tab="videos">🎬 Videos <span class="tab-count" id="videosCount">0</span></button>
+  <button class="tab-btn" data-tab="pdfs">📚 PDFs <span class="tab-count" id="pdfsCount">0</span></button>
+  <button class="tab-btn" data-tab="audios">🎵 Audios <span class="tab-count" id="audiosCount">0</span></button>
+</div>
+
+<!-- Content -->
+<div class="content">
+  <div id="statusBar" class="status-bar info" style="display:none;"></div>
+
+  <!-- PHOTOS TAB -->
+  <div class="tab-panel active" id="tab-photos">
+    <div class="tip">
+      <strong>Photos:</strong> Add photo files to <code>images/photos/</code> folder, then set the Image File path here.
+      Set <strong>Is Active = No</strong> to hide a photo from the gallery without deleting it. After editing, click <strong>💾 Save to Website</strong>.
+    </div>
+    <div class="table-wrap">
+      <table id="photosTable">
+        <thead>
+          <tr>
+            <th class="serial-th">S.No</th>
+            <th style="min-width:200px">Name</th>
+            <th style="min-width:280px">Description</th>
+            <th style="min-width:120px">Category</th>
+            <th style="min-width:220px">Image File</th>
+            <th class="active-th">Is Active</th>
+            <th style="width:44px"></th>
+          </tr>
+        </thead>
+        <tbody id="photosBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- VIDEOS TAB -->
+  <div class="tab-panel" id="tab-videos">
+    <div class="tip">
+      <strong>Videos:</strong> Paste the full YouTube URL or local video file path.
+      Set <strong>Is Active = No</strong> to hide a video without deleting it. After editing, click <strong>💾 Save to Website</strong>.
+    </div>
+    <div class="table-wrap">
+      <table id="videosTable">
+        <thead>
+          <tr>
+            <th class="serial-th">S.No</th>
+            <th style="min-width:200px">Name</th>
+            <th style="min-width:260px">Description</th>
+            <th style="min-width:120px">Category</th>
+            <th style="min-width:280px">YouTube URL</th>
+            <th style="min-width:90px">Duration</th>
+            <th class="active-th">Is Active</th>
+            <th style="width:44px"></th>
+          </tr>
+        </thead>
+        <tbody id="videosBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- AUDIOS TAB -->
+  <div class="tab-panel" id="tab-audios">
+    <div class="tip">
+      <strong>Audios:</strong> Place audio files (MP3/WAV/OGG) in the <code>audio/</code> folder, then set the Audio File path.
+      Set <strong>Is Active = No</strong> to hide an audio without deleting it. After editing, click <strong>💾 Save to Website</strong>.
+    </div>
+    <div class="table-wrap">
+      <table id="audiosTable">
+        <thead>
+          <tr>
+            <th class="serial-th">S.No</th>
+            <th style="min-width:200px">Name</th>
+            <th style="min-width:260px">Description</th>
+            <th style="min-width:120px">Category</th>
+            <th style="min-width:240px">Audio File</th>
+            <th style="min-width:90px">Duration</th>
+            <th class="active-th">Is Active</th>
+            <th style="width:44px"></th>
+          </tr>
+        </thead>
+        <tbody id="audiosBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PDFs TAB -->
+  <div class="tab-panel" id="tab-pdfs">
+    <div class="tip">
+      <strong>PDFs:</strong> Place PDF files in the <code>pdfs/</code> folder, then set the PDF File path.
+      Set <strong>Is Active = No</strong> to hide a PDF without deleting it. After editing, click <strong>💾 Save to Website</strong>.
+    </div>
+    <div class="table-wrap">
+      <table id="pdfsTable">
+        <thead>
+          <tr>
+            <th class="serial-th">S.No</th>
+            <th style="min-width:200px">Name</th>
+            <th style="min-width:260px">Description</th>
+            <th style="min-width:120px">Category</th>
+            <th style="min-width:220px">PDF File</th>
+            <th style="min-width:90px">Pages</th>
+            <th class="active-th">Is Active</th>
+            <th style="width:44px"></th>
+          </tr>
+        </thead>
+        <tbody id="pdfsBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+$(function () {
+
+  /* ─── Category options ─────────────────────────────────────── */
+  var CAT = {
+    photos: ['darshan','ashram','festival','early','devotees','blessings','bhajan','events','life'],
+    videos: ['discourse','bhajan','documentary','interview','events','rare'],
+    pdfs  : ['book','talk','song','magazine','photo'],
+    audios: ['discourse','bhajan','chant','talk','rare']
+  };
+
+  var sortBySerial = function (a, b) { return (a.serial || 0) - (b.serial || 0); };
+
+  /* ─── Data pill status ──────────────────────────────────────── */
+  function updatePill() {
+    var $p = $('#dataPill');
+    if (SITE_DATA.loaded) {
+      $p.removeClass('no-data').addClass('loaded')
+        .text('✅ Cached: ' + SITE_DATA.photos.length + ' photos · ' +
+              SITE_DATA.videos.length + ' videos · ' + SITE_DATA.pdfs.length + ' PDFs · ' +
+              (SITE_DATA.audios ? SITE_DATA.audios.length : 0) + ' audios');
+    } else {
+      $p.removeClass('loaded').addClass('no-data').text('⚠ No data cached');
+    }
+  }
+  updatePill();
+
+  /* ─── Tab switching ─────────────────────────────────────────── */
+  $('.tab-btn').on('click', function () {
+    $('.tab-btn').removeClass('active');
+    $('.tab-panel').removeClass('active');
+    $(this).addClass('active');
+    $('#tab-' + $(this).data('tab')).addClass('active');
+  });
+
+  /* ─── Render helpers ────────────────────────────────────────── */
+  function catSelect(cats, val) {
+    var html = '<select class="editable">';
+    cats.forEach(function (c) {
+      html += '<option value="' + c + '"' + (c === val ? ' selected' : '') + '>' + c + '</option>';
+    });
+    if (val && cats.indexOf(val) === -1) {
+      html += '<option value="' + $('<div>').text(val).html() + '" selected>' + $('<div>').text(val).html() + '</option>';
+    }
+    html += '</select>';
+    return html;
+  }
+
+  function activeSelect(val) {
+    var v = String(val || '').toLowerCase().trim();
+    var isNo = (v === 'no' || v === 'false' || v === '0');
+    return '<select class="editable active-select">' +
+      '<option value="yes"' + (!isNo ? ' selected' : '') + '>✅ Yes</option>' +
+      '<option value="no"'  + (isNo  ? ' selected' : '') + '>❌ No</option>' +
+      '</select>';
+  }
+
+  function cell(val, cls, tag) {
+    cls = cls || ''; tag = tag || 'input'; val = val !== undefined ? val : '';
+    if (tag === 'textarea') return '<textarea class="editable ' + cls + '">' + $('<div>').text(String(val)).html() + '</textarea>';
+    return '<input type="text" class="editable ' + cls + '" value="' + $('<div>').text(String(val)).html() + '" />';
+  }
+
+  function delBtn() { return '<button class="del-row" title="Delete row">✕</button>'; }
+
+  function markRowActive($tr, isActive) {
+    if (String(isActive).toLowerCase() === 'no') {
+      $tr.addClass('row-inactive');
+    } else {
+      $tr.removeClass('row-inactive');
+    }
+  }
+
+  /* ─── Render Photos ─────────────────────────────────────────── */
+  function renderPhotos(data) {
+    var $body = $('#photosBody').empty();
+    $.each(data, function (i, r) {
+      var $tr = $('<tr>').append(
+        $('<td class="serial-td">').text(i + 1),
+        $('<td>').html(cell(r.name)),
+        $('<td class="desc-cell">').html(cell(r.description, '', 'textarea')),
+        $('<td>').html(catSelect(CAT.photos, r.category)),
+        $('<td>').html(cell(r.image)),
+        $('<td class="active-td">').html(activeSelect(r.isActive)),
+        $('<td>').html(delBtn())
+      );
+      markRowActive($tr, r.isActive);
+      $body.append($tr);
+    });
+    $('#photosCount').text(data.length);
+  }
+
+  /* ─── Render Videos ─────────────────────────────────────────── */
+  function renderVideos(data) {
+    var $body = $('#videosBody').empty();
+    $.each(data, function (i, r) {
+      var $tr = $('<tr>').append(
+        $('<td class="serial-td">').text(i + 1),
+        $('<td>').html(cell(r.name)),
+        $('<td class="desc-cell">').html(cell(r.description, '', 'textarea')),
+        $('<td>').html(catSelect(CAT.videos, r.category)),
+        $('<td>').html(cell(r.youtubeUrl)),
+        $('<td>').html(cell(r.duration)),
+        $('<td class="active-td">').html(activeSelect(r.isActive)),
+        $('<td>').html(delBtn())
+      );
+      markRowActive($tr, r.isActive);
+      $body.append($tr);
+    });
+    $('#videosCount').text(data.length);
+  }
+
+  /* ─── Render Audios ─────────────────────────────────────────── */
+  function renderAudios(data) {
+    var $body = $('#audiosBody').empty();
+    $.each(data, function (i, r) {
+      var $tr = $('<tr>').append(
+        $('<td class="serial-td">').text(i + 1),
+        $('<td>').html(cell(r.name)),
+        $('<td class="desc-cell">').html(cell(r.description, '', 'textarea')),
+        $('<td>').html(catSelect(CAT.audios, r.category)),
+        $('<td>').html(cell(r.audioFile)),
+        $('<td>').html(cell(r.duration)),
+        $('<td class="active-td">').html(activeSelect(r.isActive)),
+        $('<td>').html(delBtn())
+      );
+      markRowActive($tr, r.isActive);
+      $body.append($tr);
+    });
+    $('#audiosCount').text(data.length);
+  }
+
+  /* ─── Render PDFs ───────────────────────────────────────────── */
+  function renderPdfs(data) {
+    var $body = $('#pdfsBody').empty();
+    $.each(data, function (i, r) {
+      var $tr = $('<tr>').append(
+        $('<td class="serial-td">').text(i + 1),
+        $('<td>').html(cell(r.name)),
+        $('<td class="desc-cell">').html(cell(r.description, '', 'textarea')),
+        $('<td>').html(catSelect(CAT.pdfs, r.category)),
+        $('<td>').html(cell(r.file)),
+        $('<td>').html(cell(r.pages)),
+        $('<td class="active-td">').html(activeSelect(r.isActive)),
+        $('<td>').html(delBtn())
+      );
+      markRowActive($tr, r.isActive);
+      $body.append($tr);
+    });
+    $('#pdfsCount').text(data.length);
+  }
+
+  /* ─── Highlight inactive rows on select change ──────────────── */
+  $(document).on('change', '.active-select', function () {
+    markRowActive($(this).closest('tr'), $(this).val());
+  });
+
+  /* ─── Load from localStorage on open ───────────────────────── */
+  if (SITE_DATA.loaded) {
+    renderPhotos(SITE_DATA.sorted(SITE_DATA.photos));
+    renderVideos(SITE_DATA.sorted(SITE_DATA.videos));
+    renderPdfs(SITE_DATA.sorted(SITE_DATA.pdfs));
+    renderAudios(SITE_DATA.sorted(SITE_DATA.audios || []));
+    showStatus('Loaded existing data from browser cache. Edit and click 💾 Save to Website to update.', 'info');
+  }
+
+  /* ─── Read table data ───────────────────────────────────────── */
+  function readPhotos() {
+    return $('#photosBody tr').map(function (i) {
+      var $tds = $(this).find('td');
+      return {
+        serial     : i + 1,
+        name       : $tds.eq(1).find('.editable').val().trim(),
+        description: $tds.eq(2).find('.editable').val().trim(),
+        category   : $tds.eq(3).find('.editable').val(),
+        image      : $tds.eq(4).find('.editable').val().trim(),
+        isActive   : $tds.eq(5).find('.editable').val()
+      };
+    }).get();
+  }
+  function readVideos() {
+    return $('#videosBody tr').map(function (i) {
+      var $tds = $(this).find('td');
+      return {
+        serial     : i + 1,
+        name       : $tds.eq(1).find('.editable').val().trim(),
+        description: $tds.eq(2).find('.editable').val().trim(),
+        category   : $tds.eq(3).find('.editable').val(),
+        youtubeUrl : $tds.eq(4).find('.editable').val().trim(),
+        duration   : $tds.eq(5).find('.editable').val().trim(),
+        isActive   : $tds.eq(6).find('.editable').val()
+      };
+    }).get();
+  }
+  function readPdfs() {
+    return $('#pdfsBody tr').map(function (i) {
+      var $tds = $(this).find('td');
+      return {
+        serial     : i + 1,
+        name       : $tds.eq(1).find('.editable').val().trim(),
+        description: $tds.eq(2).find('.editable').val().trim(),
+        category   : $tds.eq(3).find('.editable').val(),
+        file       : $tds.eq(4).find('.editable').val().trim(),
+        pages      : $tds.eq(5).find('.editable').val().trim(),
+        isActive   : $tds.eq(6).find('.editable').val()
+      };
+    }).get();
+  }
+  function readAudios() {
+    return $('#audiosBody tr').map(function (i) {
+      var $tds = $(this).find('td');
+      return {
+        serial     : i + 1,
+        name       : $tds.eq(1).find('.editable').val().trim(),
+        description: $tds.eq(2).find('.editable').val().trim(),
+        category   : $tds.eq(3).find('.editable').val(),
+        audioFile  : $tds.eq(4).find('.editable').val().trim(),
+        duration   : $tds.eq(5).find('.editable').val().trim(),
+        isActive   : $tds.eq(6).find('.editable').val()
+      };
+    }).get();
+  }
+
+  /* ─── Generate JS file content ─────────────────────────────── */
+  function buildDataJS(varName, comment, fields, data) {
+    var header = '/* ============================================================\n' +
+      '   ' + comment + '\n' +
+      '   Edit this file OR use tools/gallery-manager.html to manage\n' +
+      '   Fields: ' + fields + '\n' +
+      '   isActive: "yes" = show in gallery | "no" = hide without deleting\n' +
+      '   ============================================================ */\n\n';
+    return header + 'var ' + varName + ' = ' + JSON.stringify(data, null, 2) + ';\n';
+  }
+
+  /* ─── Write file to a directory handle ──────────────────────── */
+  function writeFileToDir(dirHandle, filename, content) {
+    return dirHandle.getFileHandle(filename, { create: true }).then(function (fh) {
+      return fh.createWritable().then(function (w) {
+        return w.write(content).then(function () { return w.close(); });
+      });
+    });
+  }
+
+  /* ─── 💾 SAVE TO WEBSITE (localStorage + JS files) ───────────── */
+  $('#btnSave').on('click', function () {
+    var photos = readPhotos();
+    var videos = readVideos();
+    var pdfs   = readPdfs();
+    var audios = readAudios();
+
+    if (!photos.length && !videos.length && !pdfs.length && !audios.length) {
+      showStatus('No data to save. Upload an Excel file or add rows first.', 'error');
+      return;
+    }
+
+    /* 1. Always save to localStorage */
+    SITE_DATA.photos  = photos;
+    SITE_DATA.videos  = videos;
+    SITE_DATA.pdfs    = pdfs;
+    SITE_DATA.audios  = audios;
+    SITE_DATA.saveToStorage();
+    updatePill();
+
+    var activePhotos = photos.filter(function(r){ return r.isActive !== 'no'; }).length;
+    var activeVideos = videos.filter(function(r){ return r.isActive !== 'no'; }).length;
+    var activePdfs   = pdfs.filter(function(r){ return r.isActive !== 'no'; }).length;
+    var activeAudios = audios.filter(function(r){ return r.isActive !== 'no'; }).length;
+    var summary = 'Active: ' + activePhotos + '/' + photos.length + ' photos, ' +
+      activeVideos + '/' + videos.length + ' videos, ' +
+      activePdfs   + '/' + pdfs.length   + ' PDFs, ' +
+      activeAudios + '/' + audios.length + ' audios.';
+
+    /* 2. Try to write JS files directly to data/ folder */
+    if (window.showDirectoryPicker) {
+      showStatus('ℹ Select the <strong>data/</strong> folder (yogiramsurathkumar/data/) to save JS files…', 'info');
+      window.showDirectoryPicker({ mode: 'readwrite' })
+        .then(function (dirHandle) {
+          var photosJS = buildDataJS('PHOTOS_DATA', 'data/photos.js — Photo Gallery Data',
+            'serial, name, description, category, image, isActive', photos);
+          var videosJS = buildDataJS('VIDEOS_DATA', 'data/videos.js — Video Gallery Data',
+            'serial, name, description, category, youtubeUrl, duration, isActive', videos);
+          var pdfsJS   = buildDataJS('PDFS_DATA',   'data/pdfs.js — PDF Downloads Data',
+            'serial, name, description, category, file, pages, isActive', pdfs);
+          var audiosJS = buildDataJS('AUDIOS_DATA', 'data/audios.js — Audio Gallery Data',
+            'serial, name, description, category, audioFile, duration, isActive', audios);
+
+          return Promise.all([
+            writeFileToDir(dirHandle, 'photos.js', photosJS),
+            writeFileToDir(dirHandle, 'videos.js', videosJS),
+            writeFileToDir(dirHandle, 'pdfs.js',   pdfsJS),
+            writeFileToDir(dirHandle, 'audios.js', audiosJS)
+          ]).then(function () {
+            showStatus('✅ Saved! ' + summary + ' localStorage updated + photos.js, videos.js, pdfs.js, audios.js written to data/ folder.', 'success');
+          });
+        })
+        .catch(function (e) {
+          if (e.name === 'AbortError') {
+            showStatus('✅ Saved to localStorage only. ' + summary + ' (JS files not updated — select data/ folder to update them)', 'info');
+          } else {
+            showStatus('✅ Saved to localStorage. JS file write error: ' + e.message, 'info');
+          }
+        });
+    } else {
+      /* Fallback: just localStorage (File System API not available) */
+      showStatus('✅ Saved to website! ' + summary + ' Gallery pages now show only active items.', 'success');
+    }
+  });
+
+  /* ─── Upload Excel ───────────────────────────────────────────── */
+  $('#uploadInput').on('change', function (e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function (ev) {
+      try {
+        var wb = XLSX.read(ev.target.result, { type: 'binary' });
+
+        function parseActive(val) {
+          var v = String(val || '').toLowerCase().trim();
+          return (v === 'no' || v === 'false' || v === '0') ? 'no' : 'yes';
+        }
+
+        if (wb.Sheets['Photos']) {
+          var rows = XLSX.utils.sheet_to_json(wb.Sheets['Photos'], { defval: '' });
+          renderPhotos(rows.map(function (r, i) {
+            return {
+              serial     : Number(r['Serial No']) || (i + 1),
+              name       : String(r['Name'] || ''),
+              description: String(r['Description'] || ''),
+              category   : String(r['Category'] || 'darshan'),
+              image      : String(r['Image File'] || ''),
+              isActive   : parseActive(r['Is Active'])
+            };
+          }).sort(sortBySerial));
+        }
+
+        if (wb.Sheets['Videos']) {
+          var rows = XLSX.utils.sheet_to_json(wb.Sheets['Videos'], { defval: '' });
+          renderVideos(rows.map(function (r, i) {
+            return {
+              serial     : Number(r['Serial No']) || (i + 1),
+              name       : String(r['Name'] || ''),
+              description: String(r['Description'] || ''),
+              category   : String(r['Category'] || 'discourse'),
+              youtubeUrl : String(r['YouTube URL'] || ''),
+              duration   : String(r['Duration'] || ''),
+              isActive   : parseActive(r['Is Active'])
+            };
+          }).sort(sortBySerial));
+        }
+
+        if (wb.Sheets['Audios']) {
+          var rows = XLSX.utils.sheet_to_json(wb.Sheets['Audios'], { defval: '' });
+          renderAudios(rows.map(function (r, i) {
+            return {
+              serial     : Number(r['Serial No']) || (i + 1),
+              name       : String(r['Name'] || ''),
+              description: String(r['Description'] || ''),
+              category   : String(r['Category'] || 'discourse'),
+              audioFile  : String(r['Audio File'] || ''),
+              duration   : String(r['Duration'] || ''),
+              isActive   : parseActive(r['Is Active'])
+            };
+          }).sort(sortBySerial));
+        }
+
+        if (wb.Sheets['PDFs']) {
+          var rows = XLSX.utils.sheet_to_json(wb.Sheets['PDFs'], { defval: '' });
+          renderPdfs(rows.map(function (r, i) {
+            return {
+              serial     : Number(r['Serial No']) || (i + 1),
+              name       : String(r['Name'] || ''),
+              description: String(r['Description'] || ''),
+              category   : String(r['Category'] || 'book'),
+              file       : String(r['PDF File'] || ''),
+              pages      : String(r['Pages'] || ''),
+              isActive   : parseActive(r['Is Active'])
+            };
+          }).sort(sortBySerial));
+        }
+
+        showStatus('Excel uploaded! Review the data and Is Active settings below, then click 💾 Save to Website.', 'success');
+      } catch (err) {
+        showStatus('Error reading Excel: ' + err.message, 'error');
+      }
+      $(this).val('');
+    };
+    reader.readAsBinaryString(file);
+  });
+
+  /* ─── Download Excel ─────────────────────────────────────────── */
+  $('#btnDownloadExcel').on('click', function () {
+    var wb = XLSX.utils.book_new();
+
+    var pData = [['Serial No','Name','Description','Category','Image File','Is Active']];
+    readPhotos().forEach(function (r) { pData.push([r.serial, r.name, r.description, r.category, r.image, r.isActive || 'yes']); });
+    var pWs = XLSX.utils.aoa_to_sheet(pData);
+    pWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:32},{wch:10}];
+    XLSX.utils.book_append_sheet(wb, pWs, 'Photos');
+
+    var vData = [['Serial No','Name','Description','Category','YouTube URL','Duration','Is Active']];
+    readVideos().forEach(function (r) { vData.push([r.serial, r.name, r.description, r.category, r.youtubeUrl, r.duration, r.isActive || 'yes']); });
+    var vWs = XLSX.utils.aoa_to_sheet(vData);
+    vWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:46},{wch:12},{wch:10}];
+    XLSX.utils.book_append_sheet(wb, vWs, 'Videos');
+
+    var dData = [['Serial No','Name','Description','Category','PDF File','Pages','Is Active']];
+    readPdfs().forEach(function (r) { dData.push([r.serial, r.name, r.description, r.category, r.file, r.pages, r.isActive || 'yes']); });
+    var dWs = XLSX.utils.aoa_to_sheet(dData);
+    dWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:32},{wch:12},{wch:10}];
+    XLSX.utils.book_append_sheet(wb, dWs, 'PDFs');
+
+    var aData = [['Serial No','Name','Description','Category','Audio File','Duration','Is Active']];
+    readAudios().forEach(function (r) { aData.push([r.serial, r.name, r.description, r.category, r.audioFile, r.duration, r.isActive || 'yes']); });
+    var aWs = XLSX.utils.aoa_to_sheet(aData);
+    aWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:40},{wch:12},{wch:10}];
+    XLSX.utils.book_append_sheet(wb, aWs, 'Audios');
+
+    XLSX.writeFile(wb, 'gallery-manager.xlsx');
+    showStatus('Downloaded gallery-manager.xlsx — edit it and Upload Excel to reload.', 'success');
+  });
+
+  /* ─── Delete row ────────────────────────────────────────────── */
+  $(document).on('click', '.del-row', function () {
+    if (confirm('Delete this row?')) {
+      $(this).closest('tr').remove();
+      updateCounts();
+    }
+  });
+
+  /* ─── Add row ──────────────────────────────────────────────── */
+  $('#btnAddRow').on('click', function () {
+    var tab = $('.tab-btn.active').data('tab');
+    if (tab === 'photos') {
+      var n = $('#photosBody tr').length + 1;
+      $('#photosBody').append($('<tr>').append(
+        $('<td class="serial-td">').text(n),
+        $('<td>').html(cell('')),
+        $('<td class="desc-cell">').html(cell('', '', 'textarea')),
+        $('<td>').html(catSelect(CAT.photos, 'darshan')),
+        $('<td>').html(cell('images/photos/new-photo.jpg')),
+        $('<td class="active-td">').html(activeSelect('yes')),
+        $('<td>').html(delBtn())
+      ));
+    } else if (tab === 'videos') {
+      var n = $('#videosBody tr').length + 1;
+      $('#videosBody').append($('<tr>').append(
+        $('<td class="serial-td">').text(n),
+        $('<td>').html(cell('')),
+        $('<td class="desc-cell">').html(cell('', '', 'textarea')),
+        $('<td>').html(catSelect(CAT.videos, 'discourse')),
+        $('<td>').html(cell('https://www.youtube.com/watch?v=VIDEO_ID')),
+        $('<td>').html(cell('')),
+        $('<td class="active-td">').html(activeSelect('yes')),
+        $('<td>').html(delBtn())
+      ));
+    } else if (tab === 'audios') {
+      var n = $('#audiosBody tr').length + 1;
+      $('#audiosBody').append($('<tr>').append(
+        $('<td class="serial-td">').text(n),
+        $('<td>').html(cell('')),
+        $('<td class="desc-cell">').html(cell('', '', 'textarea')),
+        $('<td>').html(catSelect(CAT.audios, 'discourse')),
+        $('<td>').html(cell('audio/new-file.mp3')),
+        $('<td>').html(cell('')),
+        $('<td class="active-td">').html(activeSelect('yes')),
+        $('<td>').html(delBtn())
+      ));
+    } else if (tab === 'pdfs') {
+      var n = $('#pdfsBody tr').length + 1;
+      $('#pdfsBody').append($('<tr>').append(
+        $('<td class="serial-td">').text(n),
+        $('<td>').html(cell('')),
+        $('<td class="desc-cell">').html(cell('', '', 'textarea')),
+        $('<td>').html(catSelect(CAT.pdfs, 'book')),
+        $('<td>').html(cell('pdfs/new-file.pdf')),
+        $('<td>').html(cell('')),
+        $('<td class="active-td">').html(activeSelect('yes')),
+        $('<td>').html(delBtn())
+      ));
+    }
+    updateCounts();
+  });
+
+  function updateCounts() {
+    $('#photosCount').text($('#photosBody tr').length);
+    $('#videosCount').text($('#videosBody tr').length);
+    $('#pdfsCount').text($('#pdfsBody tr').length);
+    $('#audiosCount').text($('#audiosBody tr').length);
+  }
+
+  /* ─── Clear cache ───────────────────────────────────────────── */
+  $('#btnClearCache').on('click', function () {
+    if (!confirm('Clear all cached website data from browser storage?\nGallery pages will fall back to static JS data files.')) return;
+    SITE_DATA.clear();
+    updatePill();
+    showStatus('Browser cache cleared. Data will load from static JS files until you save again.', 'info');
+  });
+
+  /* ─── Helpers ────────────────────────────────────────────────── */
+  function showStatus(msg, type) {
+    var icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ';
+    $('#statusBar')
+      .removeClass('success error info').addClass(type || 'info')
+      .html(icon + ' ' + msg).show();
+    if (type !== 'error') setTimeout(function () { $('#statusBar').fadeOut(); }, 7000);
+  }
+
+});
+</script>
+</body>
+</html>

@@ -204,7 +204,7 @@ $(function () {
   }
 
   function buildAndRender() {
-    allSorted = SITE_DATA.sorted(SITE_DATA.pdfs);
+    allSorted = SITE_DATA.active(SITE_DATA.pdfs);
 
     var cats = [];
     allSorted.forEach(function (p) {
