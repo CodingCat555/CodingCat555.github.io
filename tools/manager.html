@@ -394,6 +394,7 @@
             <th style="min-width:110px">Category</th>
             <th style="min-width:200px">PDF File</th>
             <th style="min-width:80px">Pages</th>
+            <th style="min-width:100px">File Size</th>
             <th style="min-width:200px">Thumbnail Image</th>
             <th class="active-th">Is Active</th>
             <th style="width:40px"></th>
@@ -787,6 +788,7 @@ $(function () {
         $('<td>').html(catSelect(CAT.pdfs, r.category)),
         $('<td>').html(cell(r.file)),
         $('<td>').html(cell(r.pages)),
+        $('<td>').html(cell(r.fileSize)),
         $('<td>').html(cell(r.thumbImage)),
         $('<td class="active-td">').html(activeSelect(r.isActive)),
         $('<td>').html(delBtn())
@@ -827,7 +829,7 @@ $(function () {
   function readPdfs() {
     return $('#pdfsBody tr').map(function (i) {
       var $t = $(this).find('td');
-      return { serial: i+1, name: $t.eq(1).find('.editable').val().trim(), author: $t.eq(2).find('.editable').val().trim(), category: $t.eq(3).find('.editable').val(), file: $t.eq(4).find('.editable').val().trim(), pages: $t.eq(5).find('.editable').val().trim(), thumbImage: $t.eq(6).find('.editable').val().trim(), isActive: $t.eq(7).find('.editable').val() };
+      return { serial: i+1, name: $t.eq(1).find('.editable').val().trim(), author: $t.eq(2).find('.editable').val().trim(), category: $t.eq(3).find('.editable').val(), file: $t.eq(4).find('.editable').val().trim(), pages: $t.eq(5).find('.editable').val().trim(), fileSize: $t.eq(6).find('.editable').val().trim(), thumbImage: $t.eq(7).find('.editable').val().trim(), isActive: $t.eq(8).find('.editable').val() };
     }).get();
   }
   function readAudios() {
@@ -854,7 +856,7 @@ $(function () {
       { pre: 'photosOutput', dl: 'btnDownloadPhotosJs', cp: 'btnCopyPhotosJs', fn: 'photos.js', js: buildDataJS('PHOTOS_DATA', 'data/photos.js — Photo Gallery Data', 'serial, name, description, category, image, isActive', photos) },
       { pre: 'videosOutput', dl: 'btnDownloadVideosJs', cp: 'btnCopyVideosJs', fn: 'videos.js', js: buildDataJS('VIDEOS_DATA', 'data/videos.js — Video Gallery Data', 'serial, name, description, category, youtubeUrl, duration, isActive', videos) },
       { pre: 'audiosOutput', dl: 'btnDownloadAudiosJs', cp: 'btnCopyAudiosJs', fn: 'audios.js', js: buildDataJS('AUDIOS_DATA', 'data/audios.js — Audio Gallery Data', 'serial, name, description, category, audioFile, duration, isActive', audios) },
-      { pre: 'pdfsOutput',   dl: 'btnDownloadPdfsJs',   cp: 'btnCopyPdfsJs',   fn: 'pdfs.js',   js: buildDataJS('PDFS_DATA',   'data/pdfs.js — PDF Downloads Data',   'serial, name, author, category, file, pages, thumbImage, isActive', pdfs) }
+      { pre: 'pdfsOutput',   dl: 'btnDownloadPdfsJs',   cp: 'btnCopyPdfsJs',   fn: 'pdfs.js',   js: buildDataJS('PDFS_DATA',   'data/pdfs.js — PDF Downloads Data',   'serial, name, author, category, file, pages, fileSize, thumbImage, isActive', pdfs) }
     ];
     map.forEach(function (m) {
       $('#' + m.pre).text(m.js);
@@ -893,10 +895,10 @@ $(function () {
               writeFileToDir(dir, 'version.js', buildVersionJS(newDataVer, langVer)),
               writeFileToDir(dir, 'photos.js',  buildDataJS('PHOTOS_DATA', 'data/photos.js — Photo Gallery Data', 'serial, name, description, category, image, isActive', photos)),
               writeFileToDir(dir, 'videos.js',  buildDataJS('VIDEOS_DATA', 'data/videos.js — Video Gallery Data', 'serial, name, description, category, youtubeUrl, duration, isActive', videos)),
-              writeFileToDir(dir, 'pdfs.js',    buildDataJS('PDFS_DATA',   'data/pdfs.js — PDF Downloads Data',   'serial, name, author, category, file, pages, thumbImage, isActive', pdfs)),
+              writeFileToDir(dir, 'pdfs.js',    buildDataJS('PDFS_DATA',   'data/pdfs.js — PDF Downloads Data',   'serial, name, author, category, file, pages, fileSize, thumbImage, isActive', pdfs)),
               writeFileToDir(dir, 'audios.js',  buildDataJS('AUDIOS_DATA', 'data/audios.js — Audio Gallery Data', 'serial, name, description, category, audioFile, duration, isActive', audios))
             ]).then(function () {
-              showStatus('✅ Saved! ' + summary + ' Version: <strong>' + newDataVer + '</strong> — old cache auto-clears on next page visit.', 'success', true);
+              showStatus('Saved! ' + summary + ' Version: <strong>' + newDataVer + '</strong> — old cache auto-clears on next page visit.', 'success', true);
             });
           });
         })
@@ -906,7 +908,7 @@ $(function () {
             : '✅ Saved to localStorage (v' + newDataVer + '). JS write error: ' + e.message, 'info');
         });
     } else {
-      showStatus('✅ Saved! ' + summary, 'success', true);
+      showStatus('Saved! ' + summary, 'success', true);
     }
   });
 
@@ -936,7 +938,7 @@ $(function () {
         }
         if (wb.Sheets['PDFs']) {
           renderPdfs(XLSX.utils.sheet_to_json(wb.Sheets['PDFs'], {defval:''}).map(function(r,i){
-            return { serial: Number(r['Serial No'])||(i+1), name: String(r['Name']||''), author: String(r['Author']||''), category: String(r['Category']||'book'), file: String(r['PDF File']||''), pages: String(r['Pages']||''), thumbImage: String(r['Thumbnail Image']||''), isActive: parseActive(r['Is Active']) };
+            return { serial: Number(r['Serial No'])||(i+1), name: String(r['Name']||''), author: String(r['Author']||''), category: String(r['Category']||'book'), file: String(r['PDF File']||''), pages: String(r['Pages']||''), fileSize: String(r['File Size']||''), thumbImage: String(r['Thumbnail Image']||''), isActive: parseActive(r['Is Active']) };
           }).sort(sortBySerial));
         }
         refreshGalleryOutputs();
@@ -960,8 +962,8 @@ $(function () {
     var vWs = XLSX.utils.aoa_to_sheet(vD); vWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:46},{wch:12},{wch:10}];
     XLSX.utils.book_append_sheet(wb, vWs, 'Videos');
 
-    var dD = [['Serial No','Name','Author','Category','PDF File','Pages','Thumbnail Image','Is Active']];
-    readPdfs().forEach(function(r){ dD.push([r.serial,r.name,r.author||'',r.category,r.file,r.pages,r.thumbImage||'',r.isActive||'yes']); });
+    var dD = [['Serial No','Name','Author','Category','PDF File','Pages','File Size','Thumbnail Image','Is Active']];
+    readPdfs().forEach(function(r){ dD.push([r.serial,r.name,r.author||'',r.category,r.file,r.pages,r.fileSize||'',r.thumbImage||'',r.isActive||'yes']); });
     var dWs = XLSX.utils.aoa_to_sheet(dD); dWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:32},{wch:12},{wch:10}];
     XLSX.utils.book_append_sheet(wb, dWs, 'PDFs');
 
@@ -985,7 +987,7 @@ $(function () {
     vWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:46},{wch:12},{wch:10}];
     XLSX.utils.book_append_sheet(wb, vWs, 'Videos');
 
-    var dWs = XLSX.utils.aoa_to_sheet([['Serial No','Name','Author','Category','PDF File','Pages','Thumbnail Image','Is Active']]);
+    var dWs = XLSX.utils.aoa_to_sheet([['Serial No','Name','Author','Category','PDF File','Pages','File Size','Thumbnail Image','Is Active']]);
     dWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:32},{wch:12},{wch:10}];
     XLSX.utils.book_append_sheet(wb, dWs, 'PDFs');
 
@@ -1016,7 +1018,7 @@ $(function () {
       $('#audiosBody').append($('<tr>').append($('<td class="serial-td">').text(n), $('<td>').html(cell('')), $('<td class="desc-cell">').html(cell('','','textarea')), $('<td>').html(catSelect(CAT.audios,'discourse')), $('<td>').html(cell('audio/new.mp3')), $('<td>').html(cell('')), $('<td class="active-td">').html(activeSelect('yes')), $('<td>').html(delBtn())));
     } else if (tab === 'pdfs') {
       var n = $('#pdfsBody tr').length + 1;
-      $('#pdfsBody').append($('<tr>').append($('<td class="serial-td">').text(n), $('<td>').html(cell('')), $('<td>').html(cell('')), $('<td>').html(catSelect(CAT.pdfs,'book')), $('<td>').html(cell('pdfs/new.pdf')), $('<td>').html(cell('')), $('<td>').html(cell('pdfs/images/new.jpg')), $('<td class="active-td">').html(activeSelect('yes')), $('<td>').html(delBtn())));
+      $('#pdfsBody').append($('<tr>').append($('<td class="serial-td">').text(n), $('<td>').html(cell('')), $('<td>').html(cell('')), $('<td>').html(catSelect(CAT.pdfs,'book')), $('<td>').html(cell('pdfs/new.pdf')), $('<td>').html(cell('')), $('<td>').html(cell('')), $('<td>').html(cell('pdfs/images/new.jpg')), $('<td class="active-td">').html(activeSelect('yes')), $('<td>').html(delBtn())));
     }
     updateGalleryCounts();
   });
@@ -1344,7 +1346,7 @@ $('#btnLangSave').on('click', function () {
               writeFileToDir(langDir, 'en.js', enJS),
               writeFileToDir(langDir, 'ta.js', taJS)
             ]).then(function () {
-              showStatus('✅ Saved! ' + activeCount + ' active keys → localStorage + version.js, en.js & ta.js written. Version: <strong>' + newLangVer + '</strong>', 'success', true);
+              showStatus('Saved! ' + activeCount + ' active keys → localStorage + version.js, en.js & ta.js written. Version: <strong>' + newLangVer + '</strong>', 'success', true);
             });
           });
         });
@@ -1355,7 +1357,7 @@ $('#btnLangSave').on('click', function () {
           : '✅ Saved to localStorage (v' + newLangVer + '). JS write error: ' + e.message, 'info');
       });
   } else {
-    showStatus('✅ Saved ' + activeCount + ' active language keys (v' + newLangVer + '). Language switcher uses these translations instantly.', 'success', true);
+    showStatus('Saved ' + activeCount + ' active language keys (v' + newLangVer + '). Language switcher uses these translations instantly.', 'success', true);
   }
 });
 

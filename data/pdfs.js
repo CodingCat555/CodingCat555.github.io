@@ -1,7 +1,7 @@
 /* ============================================================
    data/pdfs.js — PDF Downloads Data
    Edit using tools/manager.html → Gallery Manager
-   Fields: serial, name, author, category, file, pages, thumbImage, isActive
+   Fields: serial, name, author, category, file, pages, fileSize, thumbImage, isActive
    isActive: "yes" = show | "no" = hide without deleting
    ============================================================ */
 
@@ -12,7 +12,8 @@ var PDFS_DATA = [
     "author": "S. Parthasarathy",
     "category": "book",
     "file": "pdfs/Amarakavyam.pdf",
-    "pages": "~250 pages",
+    "pages": "~250",
+    "fileSize": "2.44 MB",
     "thumbImage": "pdfs/images/Amarakavyam.jpg",
     "isActive": "yes"
   },
@@ -22,7 +23,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "book",
     "file": "pdfs/song-of-the-beggar.pdf",
-    "pages": "~180 pages",
+    "pages": "~180",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -32,7 +34,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "book",
     "file": "pdfs/saint-of-twentieth-century.pdf",
-    "pages": "~200 pages",
+    "pages": "~200",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -42,7 +45,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "book",
     "file": "pdfs/godman-of-tiruvannamalai.pdf",
-    "pages": "~320 pages",
+    "pages": "~320",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -52,7 +56,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "talk",
     "file": "pdfs/satsang-talks-vol-1.pdf",
-    "pages": "~120 pages",
+    "pages": "~120",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -62,7 +67,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "talk",
     "file": "pdfs/satsang-talks-vol-2.pdf",
-    "pages": "~130 pages",
+    "pages": "~130",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -72,7 +78,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "talk",
     "file": "pdfs/his-words-tamil.pdf",
-    "pages": "~90 pages",
+    "pages": "~90",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -82,7 +89,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "song",
     "file": "pdfs/devotional-songs.pdf",
-    "pages": "~60 pages",
+    "pages": "~60",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -92,7 +100,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "song",
     "file": "pdfs/ashtakam-stotras.pdf",
-    "pages": "~40 pages",
+    "pages": "~40",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -102,7 +111,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "magazine",
     "file": "pdfs/anandam-magazine.pdf",
-    "pages": "~80 pages",
+    "pages": "~80",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -112,7 +122,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "magazine",
     "file": "pdfs/jayanti-souvenir-2000.pdf",
-    "pages": "~100 pages",
+    "pages": "~100",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -122,7 +133,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "photo",
     "file": "pdfs/divine-glimpses.pdf",
-    "pages": "~60 pages",
+    "pages": "~60",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -132,7 +144,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "book",
     "file": "pdfs/beggar-prince.pdf",
-    "pages": "~250 pages",
+    "pages": "~250",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -142,7 +155,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "book",
     "file": "pdfs/song-of-the-beggar.pdf",
-    "pages": "~180 pages",
+    "pages": "~180",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -152,7 +166,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "book",
     "file": "pdfs/saint-of-twentieth-century.pdf",
-    "pages": "~200 pages",
+    "pages": "~200",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -162,7 +177,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "book",
     "file": "pdfs/godman-of-tiruvannamalai.pdf",
-    "pages": "~320 pages",
+    "pages": "~320",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -172,7 +188,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "talk",
     "file": "pdfs/satsang-talks-vol-1.pdf",
-    "pages": "~120 pages",
+    "pages": "~120",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -182,7 +199,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "talk",
     "file": "pdfs/satsang-talks-vol-2.pdf",
-    "pages": "~130 pages",
+    "pages": "~130",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -192,7 +210,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "talk",
     "file": "pdfs/his-words-tamil.pdf",
-    "pages": "~90 pages",
+    "pages": "~90",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -202,7 +221,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "song",
     "file": "pdfs/devotional-songs.pdf",
-    "pages": "~60 pages",
+    "pages": "~60",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -212,7 +232,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "song",
     "file": "pdfs/ashtakam-stotras.pdf",
-    "pages": "~40 pages",
+    "pages": "~40",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -222,7 +243,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "magazine",
     "file": "pdfs/anandam-magazine.pdf",
-    "pages": "~80 pages",
+    "pages": "~80",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -232,7 +254,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "magazine",
     "file": "pdfs/jayanti-souvenir-2000.pdf",
-    "pages": "~100 pages",
+    "pages": "~100",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -242,7 +265,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "photo",
     "file": "pdfs/divine-glimpses.pdf",
-    "pages": "~60 pages",
+    "pages": "~60",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -252,7 +276,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "book",
     "file": "pdfs/beggar-prince.pdf",
-    "pages": "~250 pages",
+    "pages": "~250",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -262,7 +287,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "book",
     "file": "pdfs/song-of-the-beggar.pdf",
-    "pages": "~180 pages",
+    "pages": "~180",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -272,7 +298,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "book",
     "file": "pdfs/saint-of-twentieth-century.pdf",
-    "pages": "~200 pages",
+    "pages": "~200",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -282,7 +309,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "book",
     "file": "pdfs/godman-of-tiruvannamalai.pdf",
-    "pages": "~320 pages",
+    "pages": "~320",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -292,7 +320,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "talk",
     "file": "pdfs/satsang-talks-vol-1.pdf",
-    "pages": "~120 pages",
+    "pages": "~120",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -302,7 +331,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "talk",
     "file": "pdfs/satsang-talks-vol-2.pdf",
-    "pages": "~130 pages",
+    "pages": "~130",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -312,7 +342,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "talk",
     "file": "pdfs/his-words-tamil.pdf",
-    "pages": "~90 pages",
+    "pages": "~90",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -322,7 +353,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "song",
     "file": "pdfs/devotional-songs.pdf",
-    "pages": "~60 pages",
+    "pages": "~60",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -332,7 +364,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "song",
     "file": "pdfs/ashtakam-stotras.pdf",
-    "pages": "~40 pages",
+    "pages": "~40",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -342,7 +375,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "magazine",
     "file": "pdfs/anandam-magazine.pdf",
-    "pages": "~80 pages",
+    "pages": "~80",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -352,7 +386,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "magazine",
     "file": "pdfs/jayanti-souvenir-2000.pdf",
-    "pages": "~100 pages",
+    "pages": "~100",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -362,7 +397,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "photo",
     "file": "pdfs/divine-glimpses.pdf",
-    "pages": "~60 pages",
+    "pages": "~60",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -372,7 +408,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "book",
     "file": "pdfs/beggar-prince.pdf",
-    "pages": "~250 pages",
+    "pages": "~250",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -382,7 +419,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "book",
     "file": "pdfs/song-of-the-beggar.pdf",
-    "pages": "~180 pages",
+    "pages": "~180",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -392,7 +430,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "book",
     "file": "pdfs/saint-of-twentieth-century.pdf",
-    "pages": "~200 pages",
+    "pages": "~200",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -402,7 +441,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "book",
     "file": "pdfs/godman-of-tiruvannamalai.pdf",
-    "pages": "~320 pages",
+    "pages": "~320",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -412,7 +452,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "talk",
     "file": "pdfs/satsang-talks-vol-1.pdf",
-    "pages": "~120 pages",
+    "pages": "~120",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -422,7 +463,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "talk",
     "file": "pdfs/satsang-talks-vol-2.pdf",
-    "pages": "~130 pages",
+    "pages": "~130",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -432,7 +474,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "talk",
     "file": "pdfs/his-words-tamil.pdf",
-    "pages": "~90 pages",
+    "pages": "~90",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -442,7 +485,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "song",
     "file": "pdfs/devotional-songs.pdf",
-    "pages": "~60 pages",
+    "pages": "~60",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -452,7 +496,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "song",
     "file": "pdfs/ashtakam-stotras.pdf",
-    "pages": "~40 pages",
+    "pages": "~40",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -462,7 +507,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "magazine",
     "file": "pdfs/anandam-magazine.pdf",
-    "pages": "~80 pages",
+    "pages": "~80",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -472,7 +518,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "magazine",
     "file": "pdfs/jayanti-souvenir-2000.pdf",
-    "pages": "~100 pages",
+    "pages": "~100",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   },
@@ -482,7 +529,8 @@ var PDFS_DATA = [
     "author": "",
     "category": "photo",
     "file": "pdfs/divine-glimpses.pdf",
-    "pages": "~60 pages",
+    "pages": "~60",
+    "fileSize": "",
     "thumbImage": "",
     "isActive": "yes"
   }

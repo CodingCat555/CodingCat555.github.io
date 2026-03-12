@@ -285,7 +285,8 @@ $(function () {
       $('<div class="pdf-info">').append(
         '<h3 class="pdf-title"><span class="pdf-serial-inline">#' + serial + '</span> ' + p.name + '</h3>',
         '<p class="pdf-meta">📂 ' + (p.category || '') +
-          (p.pages ? ' &nbsp;|&nbsp; 📄 ' + p.pages + ' pages' : '') + '</p>',
+          (p.pages ? ' &nbsp;|&nbsp; 📄 ' + p.pages + ' pages' : '') +
+          (p.fileSize ? ' &nbsp;|&nbsp; 💾 ' + p.fileSize : '') + '</p>',
         (p.author ? '<p style="font-size:0.84rem;color:var(--text-body);line-height:1.6;margin-bottom:12px;">✍ ' + p.author + '</p>' : ''),
         $('<div class="pdf-btn-group">').append(
           $('<a>', { href: p.file, 'class': 'pdf-view', target: '_blank', text: t('btn_view') }),
