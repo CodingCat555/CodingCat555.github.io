@@ -277,7 +277,7 @@
     <button class="btn btn-green" id="btnGallerySave">💾 Save to Website</button>
     <div class="toolbar-sep"></div>
     <button class="btn btn-outline" id="btnAddRow">➕ Add Row</button>
-    <button class="btn btn-outline" id="btnGenThumbs">🖼 Generate Thumbnails</button>
+    <button class="btn btn-outline" id="btnGenThumbs">🖼 Generate Photo Thumbnails</button>
     <button class="btn btn-outline" id="btnGenPdfThumbs">📄 Generate PDF Thumbnails</button>
     <button class="btn btn-red" id="btnGalleryClearCache">🗑 Clear Cache</button>
     <div class="toolbar-sep"></div>
@@ -1169,26 +1169,38 @@ $(function () {
         });
       }
 
-      /* Render PDF page 1 → JPEG blob using PDF.js */
+      /* Render PDF page 1 → fixed 360×480 JPEG (cover crop) */
+      var THUMB_W = 360, THUMB_H = 480;
       function renderPdfPage(arrayBuffer) {
         return pdfjsLib.getDocument({ data: arrayBuffer }).promise.then(function (pdf) {
           return pdf.getPage(1).then(function (page) {
-            /* Scale so longest edge ≤ 480px */
-            var vp0 = page.getViewport({ scale: 1 });
-            var scale = Math.min(480 / vp0.width, 640 / vp0.height, 1.5);
+            /* Scale to FILL 360×480 (cover — larger scale wins) */
+            var vp0   = page.getViewport({ scale: 1 });
+            var scale = Math.max(THUMB_W / vp0.width, THUMB_H / vp0.height);
             var viewport = page.getViewport({ scale: scale });
-            var canvas = document.createElement('canvas');
-            canvas.width  = Math.round(viewport.width);
-            canvas.height = Math.round(viewport.height);
-            var ctx = canvas.getContext('2d');
-            return page.render({ canvasContext: ctx, viewport: viewport }).promise.then(function () {
-              return new Promise(function (resolve, reject) {
-                canvas.toBlob(
-                  function (b) { b ? resolve(b) : reject(new Error('toBlob failed')); },
-                  'image/jpeg', 0.85
-                );
+
+            /* Render to a temp canvas at the scaled size */
+            var tmp = document.createElement('canvas');
+            tmp.width  = Math.round(viewport.width);
+            tmp.height = Math.round(viewport.height);
+            return page.render({ canvasContext: tmp.getContext('2d'), viewport: viewport }).promise
+              .then(function () {
+                /* Crop-center onto the fixed 360×480 output canvas */
+                var out = document.createElement('canvas');
+                out.width = THUMB_W; out.height = THUMB_H;
+                var ctx = out.getContext('2d');
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, THUMB_W, THUMB_H);
+                var sx = Math.max(0, Math.round((tmp.width  - THUMB_W) / 2));
+                var sy = Math.max(0, Math.round((tmp.height - THUMB_H) / 2));
+                ctx.drawImage(tmp, sx, sy, THUMB_W, THUMB_H, 0, 0, THUMB_W, THUMB_H);
+                return new Promise(function (resolve, reject) {
+                  out.toBlob(
+                    function (b) { b ? resolve(b) : reject(new Error('toBlob failed')); },
+                    'image/jpeg', 0.85
+                  );
+                });
               });
-            });
           });
         });
       }
