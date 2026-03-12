@@ -11,7 +11,7 @@ var PHOTOS_DATA = [
     "name": "Swamiji in Morning Darshan",
     "description": "A divine photograph of Swamiji during morning darshan hours at the ashram, radiating infinite compassion.",
     "category": "darshan",
-    "image": "images/gallery/darshan-1.jpg",
+    "image": "images/gallery/YRSK1.jpg",
     "isActive": "yes"
   },
   {

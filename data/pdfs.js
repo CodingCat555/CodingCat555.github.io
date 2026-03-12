@@ -11,7 +11,7 @@ var PDFS_DATA = [
     "name": "Beggar Prince",
     "description": "The complete biography of the life and extraordinary spiritual journey of Yogi Ramsuratkumar.",
     "category": "book",
-    "file": "pdfs/beggar-prince.pdf",
+    "file": "pdfs/Amarakavyam.pdf",
     "pages": "~250 pages",
     "isActive": "yes"
   },
