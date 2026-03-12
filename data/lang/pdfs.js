@@ -1,6 +1,6 @@
 /* ============================================================
    data/pdfs.js — PDF Downloads Data
-   Edit this file OR use tools/gallery-manager.html to manage
+   Edit this file OR use tools/manager.html to manage
    Fields: serial, name, description, category, file, pages, isActive
    isActive: "yes" = show in gallery | "no" = hide without deleting
    ============================================================ */

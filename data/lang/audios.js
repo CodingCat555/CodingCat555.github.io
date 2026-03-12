@@ -1,6 +1,6 @@
 /* ============================================================
    data/audios.js — Audio Gallery Data
-   Edit this file OR use tools/gallery-manager.html to manage
+   Edit this file OR use tools/manager.html to manage
    Fields: serial, name, description, category, audioFile, duration, isActive
    isActive: "yes" = show in gallery | "no" = hide without deleting
    ============================================================ */

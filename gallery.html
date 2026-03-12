@@ -13,6 +13,7 @@
   <script src="data/videos.js"></script>
   <script src="data/pdfs.js"></script>
   <script src="data/audios.js"></script>
+  <script src="data/version.js"></script>
   <!-- Central data loader (localStorage › falls back to data JS files) -->
   <script src="data/data-loader.js"></script>
   <style>
@@ -41,6 +42,45 @@
     .gallery-search input { flex:1; padding:11px 20px; border:none; outline:none; font-size:0.92rem; font-family:inherit; background:transparent; color:var(--text-dark); }
     .gallery-search button { padding:11px 18px; background:var(--green); color:white; border:none; cursor:pointer; font-size:1rem; transition:var(--transition); }
     .gallery-search button:hover { background:var(--green-dark); }
+
+    /* ── Share button ── */
+    .gallery-share { position:absolute; top:8px; right:8px; z-index:10; }
+    .share-toggle {
+      width:34px; height:34px; border-radius:50%; border:none; cursor:pointer;
+      background:rgba(255,255,255,0.95); color:var(--green-dark); font-size:1rem;
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:0 2px 10px rgba(0,0,0,0.22); transition:all 0.2s;
+      opacity:1;
+    }
+    .share-toggle:hover { background:var(--green); color:white; transform:scale(1.12); }
+    .share-menu {
+      position:absolute; top:38px; right:0; background:white;
+      border-radius:10px; box-shadow:0 4px 20px rgba(0,0,0,0.18);
+      padding:6px; min-width:160px; display:none; z-index:99;
+    }
+    .share-menu.open { display:block; }
+    .share-option {
+      display:flex; align-items:center; gap:10px;
+      padding:8px 12px; border-radius:7px; cursor:pointer;
+      font-size:0.83rem; font-weight:600; color:#333;
+      text-decoration:none; transition:background 0.15s;
+      border:none; background:none; width:100%; text-align:left;
+    }
+    .share-option:hover { background:#f4f4f4; }
+    .share-option .sh-icon { width:22px; height:22px; border-radius:5px; display:flex; align-items:center; justify-content:center; font-size:0.85rem; flex-shrink:0; }
+    .sh-native { background:var(--green); color:white; }
+    .sh-fb     { background:#1877f2; color:white; }
+    .sh-wa     { background:#25d366; color:white; }
+    .sh-tw     { background:#000;    color:white; }
+    .sh-dl     { background:#e67e22; color:white; }
+    .sh-copy   { background:#6c757d; color:white; }
+    .share-divider { height:1px; background:#eee; margin:4px 0; }
+    /* Allow share menu to overflow gallery card bounds and sit above other cards */
+    .gallery-item.share-open { overflow: visible; z-index: 200; position: relative; }
+    .gallery-item.share-open > img,
+    .gallery-item.share-open .gallery-overlay,
+    .gallery-item.share-open .gallery-zoom,
+    .gallery-item.share-open .serial-badge { border-radius: var(--radius-lg); }
   </style>
 </head>
 <body>
@@ -257,6 +297,29 @@ $(function () {
     appendBatch();
   }
 
+  var SVG_SHARE = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>';
+
+  function makeShareMenu(item) {
+    var text = encodeURIComponent('Yogi Ramsuratkumar — ' + item.name);
+    var pageUrl = encodeURIComponent(window.location.href.split('?')[0]);
+    var waUrl = 'https://api.whatsapp.com/send?text=' + text + '%20' + pageUrl;
+    var twUrl = 'https://twitter.com/intent/tweet?text=' + text + '&url=' + pageUrl;
+    var fbUrl = 'https://www.facebook.com/sharer/sharer.php?u=' + pageUrl;
+    return '<div class="gallery-share" data-img="' + item.image + '" data-name="' + item.name.replace(/"/g,'&quot;') + '">' +
+      '<button class="share-toggle" title="Share Photo">' + SVG_SHARE + '</button>' +
+      '<div class="share-menu">' +
+        '<button class="share-option share-native"><span class="sh-icon sh-native">📤</span> Share Photo</button>' +
+        '<div class="share-divider"></div>' +
+        '<a class="share-option" href="' + waUrl + '" target="_blank" rel="noopener"><span class="sh-icon sh-wa">&#128172;</span> WhatsApp</a>' +
+        '<a class="share-option" href="' + fbUrl + '" target="_blank" rel="noopener"><span class="sh-icon sh-fb">f</span> Facebook</a>' +
+        '<a class="share-option" href="' + twUrl + '" target="_blank" rel="noopener"><span class="sh-icon sh-tw">𝕏</span> Twitter / X</a>' +
+        '<div class="share-divider"></div>' +
+        '<button class="share-option share-download"><span class="sh-icon sh-dl">⬇</span> Download Photo</button>' +
+        '<button class="share-option share-copy"><span class="sh-icon sh-copy">&#128279;</span> Copy Link</button>' +
+      '</div>' +
+    '</div>';
+  }
+
   function makeItem(item) {
     var sn = '#' + String(item.serial).padStart(2, '0');
     return $('<div>', {
@@ -278,7 +341,8 @@ $(function () {
         '<span class="gallery-caption">' + item.name + '</span>' +
         '<span class="gallery-desc">' + item.description + '</span>' +
       '</div>',
-      '<div class="gallery-zoom">🔍</div>'
+      '<div class="gallery-zoom">🔍</div>',
+      makeShareMenu(item)
     );
   }
 
@@ -333,6 +397,87 @@ $(function () {
     resetImgObserver();
     appendBatch();
   }
+
+  /* ── Share helpers ── */
+  function getShareData($wrap) {
+    return { img: $wrap.data('img'), name: $wrap.data('name') };
+  }
+
+  function fetchImageFile(imgSrc, name) {
+    return fetch(imgSrc)
+      .then(function (r) { return r.blob(); })
+      .then(function (blob) {
+        var ext = (blob.type.split('/')[1] || 'jpg').split('+')[0];
+        return new File([blob], 'yogi-ramsuratkumar-' + name.replace(/\s+/g,'-') + '.' + ext, { type: blob.type });
+      });
+  }
+
+  /* Toggle share menu */
+  function closeAllShareMenus() {
+    $('.share-menu').removeClass('open');
+    $('.gallery-item.share-open').removeClass('share-open');
+  }
+
+  $(document).on('click', '.share-toggle', function (e) {
+    e.stopPropagation();
+    var $menu = $(this).next('.share-menu');
+    var $item = $(this).closest('.gallery-item');
+    var isOpen = $menu.hasClass('open');
+    closeAllShareMenus();
+    if (!isOpen) {
+      $menu.addClass('open');
+      $item.addClass('share-open');
+    }
+  });
+
+  /* 📤 Share Photo — Web Share API with actual image file */
+  $(document).on('click', '.share-native', function (e) {
+    e.stopPropagation();
+    closeAllShareMenus();
+    var d = getShareData($(this).closest('.gallery-share'));
+    var $icon = $(this).find('.sh-icon');
+    $icon.text('⏳');
+    fetchImageFile(d.img, d.name).then(function (file) {
+      var shareData = { title: 'Yogi Ramsuratkumar — ' + d.name, files: [file] };
+      if (navigator.canShare && navigator.canShare(shareData)) {
+        return navigator.share(shareData);
+      } else if (navigator.share) {
+        return navigator.share({ title: 'Yogi Ramsuratkumar — ' + d.name, url: window.location.href });
+      } else {
+        /* Desktop fallback: download the image */
+        var a = document.createElement('a');
+        a.href = d.img; a.download = file.name; a.click();
+      }
+    }).catch(function (err) {
+      if (err.name !== 'AbortError') console.warn('Share failed:', err);
+    }).finally(function () { $icon.text('📤'); });
+  });
+
+  /* ⬇ Download Photo */
+  $(document).on('click', '.share-download', function (e) {
+    e.stopPropagation();
+    closeAllShareMenus();
+    var d = getShareData($(this).closest('.gallery-share'));
+    var a = document.createElement('a');
+    a.href = d.img;
+    a.download = 'yogi-ramsuratkumar-' + d.name.replace(/\s+/g,'-') + '.jpg';
+    a.click();
+  });
+
+  /* 🔗 Copy Link */
+  $(document).on('click', '.share-copy', function (e) {
+    e.stopPropagation();
+    var url = window.location.href.split('?')[0];
+    navigator.clipboard.writeText(url).then(function () {
+      var $icon = $(e.currentTarget).find('.sh-icon');
+      $icon.text('✓');
+      setTimeout(function () { $icon.html('&#128279;'); }, 1800);
+    });
+    closeAllShareMenus();
+  });
+
+  $(document).on('click', function () { closeAllShareMenus(); });
+  $(document).on('click', '.share-menu', function (e) { e.stopPropagation(); });
 
   $(document).on('click', '.filter-btn', function () {
     $('.filter-btn').removeClass('active'); $(this).addClass('active'); applyFilter();

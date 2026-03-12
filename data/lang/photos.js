@@ -1,6 +1,6 @@
 /* ============================================================
    data/photos.js — Photo Gallery Data
-   Edit this file OR use tools/gallery-manager.html to manage
+   Edit this file OR use tools/manager.html to manage
    Fields: serial, name, description, category, image, isActive
    isActive: "yes" = show in gallery | "no" = hide without deleting
    ============================================================ */

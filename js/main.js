@@ -182,7 +182,8 @@ document.addEventListener('DOMContentLoaded', function () {
   function attachGalleryClicks() {
     document.querySelectorAll('.gallery-item').forEach(item => {
       item.removeEventListener('click', item._lbHandler || function(){});
-      item._lbHandler = function () {
+      item._lbHandler = function (e) {
+        if (e.target.closest('.gallery-share')) return;
         buildLightboxIndex();
         const visIdx = lbItems.indexOf(this);
         openLightbox(visIdx >= 0 ? visIdx : 0);
@@ -194,6 +195,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   /* Also handle dynamically added items via event delegation */
   document.addEventListener('click', function (e) {
+    if (e.target.closest('.gallery-share')) return; /* ignore share button/menu clicks */
     const item = e.target.closest('.gallery-item');
     if (!item) return;
     buildLightboxIndex();
@@ -203,7 +205,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
   /* Attach click to gallery items */
   document.querySelectorAll('.gallery-item').forEach((item, idx) => {
-    item.addEventListener('click', function () {
+    item.addEventListener('click', function (e) {
+      if (e.target.closest('.gallery-share')) return;
       buildLightboxIndex();
       const visIdx = lbItems.indexOf(this);
       openLightbox(visIdx >= 0 ? visIdx : 0);

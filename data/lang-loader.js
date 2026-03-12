@@ -2,7 +2,8 @@
    data/lang-loader.js — Language / i18n system
    ------------------------------------------------------------
    Usage:
-     1. Include lang files BEFORE this file:
+     1. Include version + lang files BEFORE this file:
+        <script src="data/version.js"></script>
         <script src="data/lang/en.js"></script>
         <script src="data/lang/ta.js"></script>
         <script src="data/lang-loader.js"></script>
@@ -27,13 +28,24 @@
     ta: typeof LANG_TA !== 'undefined' ? LANG_TA : {}
   };
 
-  /* Try to load language data saved by Language Manager (overrides static JS files) */
+  /* Try to load language data saved by Language Manager
+     Version-aware: if lang version changed, clears stale cache
+     and falls back to static JS lang files */
   try {
     var _saved = localStorage.getItem('yrk_lang_data');
     if (_saved) {
       var _d = JSON.parse(_saved);
-      if (_d.en && Object.keys(_d.en).length) LANGUAGES.en = _d.en;
-      if (_d.ta && Object.keys(_d.ta).length) LANGUAGES.ta = _d.ta;
+      var _curVer = (typeof SITE_VERSION !== 'undefined') ? SITE_VERSION.lang : null;
+
+      if (_curVer && _d.version !== _curVer) {
+        /* Version mismatch → clear stale lang cache, use static JS files */
+        localStorage.removeItem('yrk_lang_data');
+        console.info('[LANG] Lang version changed (' + _d.version + ' → ' + _curVer + '). Cache cleared, loading fresh lang files.');
+      } else {
+        /* Version matches (or no versioning) → use cached translations */
+        if (_d.en && Object.keys(_d.en).length) LANGUAGES.en = _d.en;
+        if (_d.ta && Object.keys(_d.ta).length) LANGUAGES.ta = _d.ta;
+      }
     }
   } catch (e) { /* ignore storage errors */ }
 

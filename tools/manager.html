@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Site Manager — Yogi Ramsuratkumar Website</title>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="../data/version.js"></script>
+  <script src="../data/photos.js"></script>
+  <script src="../data/videos.js"></script>
+  <script src="../data/pdfs.js"></script>
+  <script src="../data/audios.js"></script>
+  <script src="../data/data-loader.js"></script>
+
+  <style>
+    :root {
+      --green: #1A6B2E; --green-dark: #0F4520; --green-light: #2D9148;
+      --gold: #FFD700; --cream: #F0FFF4; --light: #D8F3DC;
+      --text: #1B4332; --text-light: #3D7A57; --border: rgba(26,107,46,0.22);
+      --card: #F5FFFA; --radius: 10px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: var(--cream); color: var(--text); }
+
+    /* ---- Header ---- */
+    .header {
+      background: linear-gradient(135deg, var(--green-dark), var(--green));
+      color: white; padding: 14px 28px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 3px 14px rgba(0,0,0,0.25);
+    }
+    .header-left { display: flex; align-items: center; gap: 16px; }
+    .header h1 { font-size: 1.2rem; }
+    .header p  { font-size: 0.76rem; opacity: 0.8; margin-top: 2px; }
+    .header-links { display: flex; gap: 16px; align-items: center; }
+    .header-back { color: var(--gold); font-size: 0.85rem; text-decoration: none; white-space: nowrap; }
+    .header-back:hover { text-decoration: underline; }
+
+    /* ---- Mode selector ---- */
+    .mode-bar {
+      background: #0b3a1c; padding: 8px 28px;
+      display: flex; align-items: center; gap: 12px;
+      border-bottom: 2px solid var(--gold);
+    }
+    .mode-bar label { color: rgba(255,255,255,0.7); font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; }
+    #modeSelect {
+      background: rgba(255,255,255,0.12); color: white; border: 1.5px solid rgba(255,215,0,0.5);
+      border-radius: 6px; padding: 6px 32px 6px 12px; font-size: 0.9rem; font-weight: 700;
+      cursor: pointer; outline: none; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23FFD700' d='M0 0l6 8 6-8z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 10px center;
+    }
+    #modeSelect option { background: #0F4520; color: white; }
+    .mode-desc { font-size: 0.78rem; color: rgba(255,255,255,0.55); }
+
+    /* ---- Workflow strip ---- */
+    .workflow {
+      background: var(--light); border-bottom: 1px solid var(--border);
+      padding: 9px 28px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    .workflow span { font-size: 0.78rem; color: var(--text-light); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+    .step { display: flex; align-items: center; gap: 6px; font-size: 0.79rem; color: var(--text); }
+    .step-num { width: 21px; height: 21px; background: var(--green); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; flex-shrink: 0; }
+    .step-arrow { color: var(--text-light); font-size: 0.9rem; }
+
+    /* ---- Toolbar ---- */
+    .toolbar {
+      padding: 10px 28px; background: white;
+      border-bottom: 1px solid var(--border);
+      display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+      min-height: 56px;
+    }
+    .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.84rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; white-space: nowrap; }
+    .btn-green  { background: var(--green); color: white; }
+    .btn-green:hover  { background: var(--green-dark); }
+    .btn-gold   { background: var(--gold); color: var(--green-dark); }
+    .btn-gold:hover   { background: #e6c200; }
+    .btn-outline{ background: white; color: var(--green); border: 2px solid var(--green); }
+    .btn-outline:hover{ background: var(--light); }
+    .btn-red    { background: #c62828; color: white; }
+    .btn-red:hover    { background: #a31515; }
+    .toolbar-sep { width: 1px; height: 32px; background: var(--border); margin: 0 4px; }
+    #galleryUploadInput, #langUploadInput { position:absolute; opacity:0; width:0; height:0; overflow:hidden; }
+
+    /* ---- Pills ---- */
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 50px; font-size: 0.78rem; font-weight: 600;
+      border: 1.5px solid;
+    }
+    .pill.loaded   { background: #e8f5e9; color: #1b5e20; border-color: #a5d6a7; }
+    .pill.no-data  { background: #fff8e1; color: #e65100; border-color: #ffcc80; }
+
+    /* ---- Tabs (gallery) ---- */
+    .tabs { display: flex; background: var(--light); border-bottom: 2px solid var(--border); padding: 0 28px; }
+    .tab-btn {
+      padding: 11px 22px; cursor: pointer; font-size: 0.88rem; font-weight: 700;
+      color: var(--text-light); border: none; background: none;
+      border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s;
+    }
+    .tab-btn.active { color: var(--green); border-bottom-color: var(--green); }
+    .tab-btn:hover:not(.active) { color: var(--green); background: rgba(26,107,46,0.05); }
+    .tab-count { background: var(--green); color: white; font-size: 0.67rem; padding: 1px 7px; border-radius: 50px; margin-left: 6px; }
+
+    /* ---- Content ---- */
+    .content { padding: 18px 28px; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ---- Table ---- */
+    .table-wrap { overflow-x: auto; border-radius: var(--radius); box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+    .tab-panel .table-wrap { max-height: 420px; overflow-y: auto; }
+    #langPreviewSection .table-wrap { max-height: 420px; overflow-y: auto; }
+    table { width: 100%; border-collapse: collapse; background: white; }
+    thead th {
+      background: var(--green); color: white; padding: 10px 13px;
+      font-size: 0.8rem; text-align: left; white-space: nowrap;
+      border-right: 1px solid rgba(255,255,255,0.15);
+      position: sticky; top: 0; z-index: 2;
+    }
+    thead th:first-child { border-radius: var(--radius) 0 0 0; }
+    thead th:last-child  { border-radius: 0 var(--radius) 0 0; border-right: none; }
+    .serial-th { width: 60px; text-align: center !important; }
+    .active-th  { width: 110px; text-align: center !important; }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+    tbody tr:nth-child(even) { background: #F5FFFA; }
+    tbody tr:hover { background: #E8F5E9; }
+    tbody tr.row-inactive { background: #fff3f3 !important; opacity: 0.7; }
+    tbody tr.row-inactive:hover { background: #ffe0e0 !important; }
+    tbody td { padding: 7px 10px; vertical-align: top; }
+    .serial-td { text-align: center; font-weight: 700; color: var(--green); font-size: 0.88rem; }
+    .active-td { text-align: center; }
+
+    /* Editable cell */
+    .editable {
+      width: 100%; min-height: 30px; padding: 3px 7px;
+      border: 1px solid transparent; border-radius: 5px;
+      font-family: Arial; font-size: 0.82rem; resize: vertical;
+      background: transparent; color: var(--text); transition: border 0.2s;
+    }
+    .editable:focus { outline: none; border-color: var(--green); background: white; box-shadow: 0 0 0 3px rgba(26,107,46,0.1); }
+    .desc-cell .editable { min-height: 50px; }
+    select.editable { cursor: pointer; }
+    .active-select { font-weight: 700; }
+    .del-row { background: none; border: none; color: #c62828; cursor: pointer; font-size: 1rem; padding: 3px 5px; border-radius: 4px; }
+    .del-row:hover { background: #fde8e8; }
+
+    /* ---- Status bar ---- */
+    .status-bar {
+      margin-bottom: 14px; padding: 10px 16px;
+      background: white; border: 1px solid var(--border);
+      border-radius: var(--radius); font-size: 0.82rem;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .status-bar.success { border-color: #2e7d32; background: #e8f5e9; color: #2e7d32; }
+    .status-bar.error   { border-color: #c62828; background: #fde8e8; color: #c62828; }
+    .status-bar.info    { border-color: var(--green); background: var(--cream); color: var(--green); }
+
+    /* ---- Tip box ---- */
+    .tip { background: rgba(26,107,46,0.06); border-left: 4px solid var(--green); padding: 9px 13px; border-radius: 0 var(--radius) var(--radius) 0; font-size: 0.81rem; color: var(--text-light); margin-bottom: 13px; line-height: 1.6; }
+    .tip strong { color: var(--green-dark); }
+
+    /* ---- Lang panel specific ---- */
+    .section-title {
+      font-size: 0.78rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--text-light); margin-bottom: 12px; margin-top: 8px;
+    }
+    .drop-zone {
+      border: 2px dashed var(--green); border-radius: var(--radius);
+      background: white; padding: 32px 20px; text-align: center;
+      cursor: pointer; transition: all 0.2s; margin-bottom: 20px;
+    }
+    .drop-zone:hover, .drop-zone.drag-over { background: var(--light); border-color: var(--green-dark); }
+    .drop-zone .dz-icon { font-size: 2.2rem; display: block; margin-bottom: 8px; }
+    .drop-zone .dz-title { font-size: 0.98rem; font-weight: 700; color: var(--green-dark); margin-bottom: 5px; }
+    .drop-zone .dz-sub { font-size: 0.8rem; color: var(--text-light); }
+
+    /* Lang preview table */
+    #langPreviewTable thead th { font-size: 0.78rem; }
+    #langPreviewTable tbody td { padding: 7px 13px; border-bottom: 1px solid var(--border); vertical-align: top; font-size: 0.84rem; }
+    #langPreviewTable tbody td:first-child { font-family: monospace; font-size: 0.77rem; color: var(--green-dark); white-space: nowrap; }
+    #langPreviewTable tbody td.ta-cell { }
+    #langPreviewTable tbody td.active-cell { text-align: center; }
+    #langPreviewTable .empty-row td { text-align: center; color: var(--text-light); padding: 36px; }
+    .badge-yes { display: inline-block; background: #e8f5e9; color: #1b5e20; border-radius: 4px; padding: 2px 8px; font-size: 0.74rem; font-weight: 700; }
+    .badge-no  { display: inline-block; background: #fde8e8; color: #c62828; border-radius: 4px; padding: 2px 8px; font-size: 0.74rem; font-weight: 700; }
+
+    /* Output cards */
+    .output-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 6px; }
+    @media (max-width: 700px) { .output-grid { grid-template-columns: 1fr; } }
+    .output-card { background: white; border-radius: var(--radius); padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+    .output-card h3 { font-size: 0.88rem; margin-bottom: 9px; color: var(--green-dark); }
+    .output-card pre {
+      background: #f4f9f5; border: 1px solid var(--border); border-radius: 6px;
+      padding: 10px; font-size: 0.71rem; max-height: 180px; overflow-y: auto;
+      white-space: pre-wrap; word-break: break-all; color: var(--text);
+    }
+    .output-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+
+    /* Format guide */
+    .guide {
+      background: white; border-radius: var(--radius); padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07); margin-bottom: 20px;
+    }
+    .guide table { font-size: 0.81rem; }
+    .guide thead th { font-size: 0.74rem; }
+    .guide-note { margin-top: 9px; font-size: 0.79rem; color: var(--text-light); line-height: 1.6; }
+    .tag { display: inline-block; background: var(--light); color: var(--green-dark); border-radius: 4px; padding: 1px 6px; font-family: monospace; font-size: 0.77rem; }
+
+    /* Panel visibility */
+    .manager-panel { display: none; }
+    .manager-panel.active { display: block; }
+  </style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<div class="header">
+  <div class="header-left">
+    <div>
+      <h1 id="headerTitle">🪔 Site Manager — Yogi Ramsuratkumar Website</h1>
+      <p id="headerSub">Manage gallery content and language translations from one place</p>
+    </div>
+  </div>
+  <div class="header-links">
+    <a href="../index.html" class="header-back">← Back to Website</a>
+  </div>
+</div>
+
+<!-- ===== MODE SELECTOR ===== -->
+<div class="mode-bar">
+  <label for="modeSelect">Manager Mode:</label>
+  <select id="modeSelect">
+    <option value="gallery">🖼 Gallery Manager — Photos · Videos · Audios · PDFs</option>
+    <option value="lang">🌐 Language Manager — English &amp; Tamil Translations</option>
+  </select>
+  <span class="mode-desc" id="modeDesc">Upload Excel or edit rows → set Is Active → Save to Website</span>
+</div>
+
+<!-- ===== WORKFLOW STRIP ===== -->
+<div class="workflow" id="workflowGallery">
+  <span>Workflow:</span>
+  <div class="step"><span class="step-num">1</span> Upload <b>gallery-manager.xlsx</b> (or edit rows directly)</div>
+  <span class="step-arrow">→</span>
+  <div class="step"><span class="step-num">2</span> Set <b>Is Active</b> Yes/No per item</div>
+  <span class="step-arrow">→</span>
+  <div class="step"><span class="step-num">3</span> Click <b>💾 Save to Website</b></div>
+  <span class="step-arrow">→</span>
+  <div class="step"><span class="step-num">4</span> Gallery pages show only Active items ✓</div>
+</div>
+<div class="workflow" id="workflowLang" style="display:none;">
+  <span>Workflow:</span>
+  <div class="step"><span class="step-num">1</span> Download <b>Excel template</b></div>
+  <span class="step-arrow">→</span>
+  <div class="step"><span class="step-num">2</span> Fill translations (key | EN | TA | is_active)</div>
+  <span class="step-arrow">→</span>
+  <div class="step"><span class="step-num">3</span> Upload Excel here</div>
+  <span class="step-arrow">→</span>
+  <div class="step"><span class="step-num">4</span> Click <b>💾 Save to Website</b></div>
+  <span class="step-arrow">→</span>
+  <div class="step"><span class="step-num">5</span> Site uses active translations ✓</div>
+</div>
+
+<!-- ===== TOOLBAR ===== -->
+<div class="toolbar">
+  <!-- Gallery toolbar -->
+  <div id="galleryToolbar" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+    <label class="btn btn-gold" style="cursor:pointer;">
+      📂 Upload Excel <input type="file" id="galleryUploadInput" accept=".xlsx,.xls" />
+    </label>
+    <button class="btn btn-outline" id="btnGalleryDownloadExcel">📊 Download Excel</button>
+    <button class="btn btn-outline" id="btnGalleryTemplate">📋 Download Template</button>
+    <div class="toolbar-sep"></div>
+    <button class="btn btn-green" id="btnGallerySave">💾 Save to Website</button>
+    <div class="toolbar-sep"></div>
+    <button class="btn btn-outline" id="btnAddRow">➕ Add Row</button>
+    <button class="btn btn-red" id="btnGalleryClearCache">🗑 Clear Cache</button>
+    <div class="toolbar-sep"></div>
+    <span class="pill no-data" id="galleryDataPill">⚠ No data cached</span>
+  </div>
+
+  <!-- Lang toolbar -->
+  <div id="langToolbar" style="display:none; gap:10px; flex-wrap:wrap; align-items:center;">
+    <label class="btn btn-gold" style="cursor:pointer;">
+      📂 Upload Excel <input type="file" id="langUploadInput" accept=".xlsx,.xls" />
+    </label>
+    <button class="btn btn-outline" id="btnLangDownload">📊 Download Excel</button>
+    <button class="btn btn-outline" id="btnLangTemplate">📋 Download Template</button>
+    <div class="toolbar-sep"></div>
+    <button class="btn btn-green" id="btnLangSave">💾 Save to Website</button>
+    <button class="btn btn-red"   id="btnLangClearCache">🗑 Clear Cache</button>
+    <div class="toolbar-sep"></div>
+    <span id="langStatusPill" class="pill no-data">⚪ No file loaded</span>
+  </div>
+</div>
+
+<!-- ===== GALLERY TABS ===== -->
+<div id="galleryTabs" class="tabs">
+  <button class="tab-btn active" data-tab="photos">🖼 Photos <span class="tab-count" id="photosCount">0</span></button>
+  <button class="tab-btn" data-tab="videos">🎬 Videos <span class="tab-count" id="videosCount">0</span></button>
+  <button class="tab-btn" data-tab="audios">🎵 Audios <span class="tab-count" id="audiosCount">0</span></button>
+  <button class="tab-btn" data-tab="pdfs">📚 PDFs <span class="tab-count" id="pdfsCount">0</span></button>
+</div>
+
+<!-- ===== SHARED STATUS BAR ===== -->
+<div class="content" style="padding-bottom:0;">
+  <div id="statusBar" class="status-bar info" style="display:none;"></div>
+</div>
+
+<!-- ===== GALLERY PANEL ===== -->
+<div id="galleryPanel" class="manager-panel active">
+  <div class="content" style="padding-top:10px;">
+
+    <!-- PHOTOS TAB -->
+    <div class="tab-panel active" id="tab-photos">
+      <div class="tip"><strong>Photos:</strong> Add photo files to <code>images/photos/</code> folder, then set the Image File path here. Set <strong>Is Active = No</strong> to hide a photo without deleting it.</div>
+      <div class="table-wrap">
+        <table id="photosTable" style="min-width:900px;">
+          <thead><tr>
+            <th class="serial-th">S.No</th>
+            <th style="min-width:180px">Name</th>
+            <th style="min-width:240px">Description</th>
+            <th style="min-width:110px">Category</th>
+            <th style="min-width:200px">Image File</th>
+            <th class="active-th">Is Active</th>
+            <th style="width:40px"></th>
+          </tr></thead>
+          <tbody id="photosBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- VIDEOS TAB -->
+    <div class="tab-panel" id="tab-videos">
+      <div class="tip"><strong>Videos:</strong> Paste the full YouTube URL or local video file path. Set <strong>Is Active = No</strong> to hide a video without deleting it.</div>
+      <div class="table-wrap">
+        <table id="videosTable" style="min-width:1000px;">
+          <thead><tr>
+            <th class="serial-th">S.No</th>
+            <th style="min-width:180px">Name</th>
+            <th style="min-width:220px">Description</th>
+            <th style="min-width:110px">Category</th>
+            <th style="min-width:260px">YouTube URL</th>
+            <th style="min-width:80px">Duration</th>
+            <th class="active-th">Is Active</th>
+            <th style="width:40px"></th>
+          </tr></thead>
+          <tbody id="videosBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- AUDIOS TAB -->
+    <div class="tab-panel" id="tab-audios">
+      <div class="tip"><strong>Audios:</strong> Place audio files (MP3/WAV) in the <code>audio/</code> folder, then set the Audio File path. Set <strong>Is Active = No</strong> to hide without deleting.</div>
+      <div class="table-wrap">
+        <table id="audiosTable" style="min-width:1000px;">
+          <thead><tr>
+            <th class="serial-th">S.No</th>
+            <th style="min-width:180px">Name</th>
+            <th style="min-width:220px">Description</th>
+            <th style="min-width:110px">Category</th>
+            <th style="min-width:220px">Audio File</th>
+            <th style="min-width:80px">Duration</th>
+            <th class="active-th">Is Active</th>
+            <th style="width:40px"></th>
+          </tr></thead>
+          <tbody id="audiosBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PDFs TAB -->
+    <div class="tab-panel" id="tab-pdfs">
+      <div class="tip"><strong>PDFs:</strong> Place PDF files in the <code>pdfs/</code> folder, then set the PDF File path. Set <strong>Is Active = No</strong> to hide without deleting.</div>
+      <div class="table-wrap">
+        <table id="pdfsTable" style="min-width:960px;">
+          <thead><tr>
+            <th class="serial-th">S.No</th>
+            <th style="min-width:180px">Name</th>
+            <th style="min-width:220px">Description</th>
+            <th style="min-width:110px">Category</th>
+            <th style="min-width:200px">PDF File</th>
+            <th style="min-width:80px">Pages</th>
+            <th class="active-th">Is Active</th>
+            <th style="width:40px"></th>
+          </tr></thead>
+          <tbody id="pdfsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Generated JS Files -->
+    <div class="content" style="padding-top:18px; padding-bottom:4px;">
+      <div class="section-title">Generated JS Files (active items only)</div>
+      <div class="output-grid" style="grid-template-columns:1fr 1fr 1fr 1fr;">
+        <div class="output-card">
+          <h3>📸 data/photos.js</h3>
+          <pre id="photosOutput"></pre>
+          <div class="output-actions">
+            <button class="btn btn-green" id="btnDownloadPhotosJs">⬇ Download photos.js</button>
+            <button class="btn btn-outline" id="btnCopyPhotosJs">📋 Copy</button>
+          </div>
+        </div>
+        <div class="output-card">
+          <h3>🎬 data/videos.js</h3>
+          <pre id="videosOutput"></pre>
+          <div class="output-actions">
+            <button class="btn btn-green" id="btnDownloadVideosJs">⬇ Download videos.js</button>
+            <button class="btn btn-outline" id="btnCopyVideosJs">📋 Copy</button>
+          </div>
+        </div>
+        <div class="output-card">
+          <h3>🎵 data/audios.js</h3>
+          <pre id="audiosOutput"></pre>
+          <div class="output-actions">
+            <button class="btn btn-green" id="btnDownloadAudiosJs">⬇ Download audios.js</button>
+            <button class="btn btn-outline" id="btnCopyAudiosJs">📋 Copy</button>
+          </div>
+        </div>
+        <div class="output-card">
+          <h3>📚 data/pdfs.js</h3>
+          <pre id="pdfsOutput"></pre>
+          <div class="output-actions">
+            <button class="btn btn-green" id="btnDownloadPdfsJs">⬇ Download pdfs.js</button>
+            <button class="btn btn-outline" id="btnCopyPdfsJs">📋 Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== LANGUAGE PANEL ===== -->
+<div id="langPanel" class="manager-panel">
+  <div class="content" style="padding-top:10px;">
+
+    <!-- Preview -->
+    <div id="langPreviewSection">
+      <div class="section-title" id="langPreviewTitle">Preview — 0 keys</div>
+      <div class="table-wrap" style="margin-bottom:20px;">
+        <table id="langPreviewTable" style="min-width:600px;">
+          <thead><tr>
+            <th style="width:220px">Key</th>
+            <th>English</th>
+            <th>Tamil (தமிழ்)</th>
+            <th style="width:100px; text-align:center;">Is Active</th>
+          </tr></thead>
+          <tbody id="langPreviewBody">
+            <tr class="empty-row"><td colspan="4" style="text-align:center;padding:36px;color:var(--text-light)">Loading default keys…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section-title">Generated JS Files (active keys only)</div>
+      <div class="output-grid">
+        <div class="output-card">
+          <h3>🇬🇧 data/lang/en.js</h3>
+          <pre id="enOutput"></pre>
+          <div class="output-actions">
+            <button class="btn btn-green" id="btnDownloadEn">⬇ Download en.js</button>
+            <button class="btn btn-outline" id="btnCopyEn">📋 Copy</button>
+          </div>
+        </div>
+        <div class="output-card">
+          <h3>🇮🇳 data/lang/ta.js</h3>
+          <pre id="taOutput"></pre>
+          <div class="output-actions">
+            <button class="btn btn-green" id="btnDownloadTa">⬇ Download ta.js</button>
+            <button class="btn btn-outline" id="btnCopyTa">📋 Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== SCRIPTS ===== -->
+<script>
+/* ============================================================
+   Language template — all current keys with EN + TA + isActive
+   ============================================================ */
+var TEMPLATE_ROWS = [
+  /* ── Navigation ── */
+  ['nav_home',               'Home',                                       'முகப்பு',                            'yes'],
+  ['nav_about',              'About',                                      'பற்றி',                              'yes'],
+  ['nav_about_life',         'Life & Journey',                             'வாழ்க்கை & பயணம்',                  'yes'],
+  ['nav_about_teachings',    'Teachings',                                  'போதனைகள்',                           'yes'],
+  ['nav_about_timeline',     'Timeline',                                   'காலவரிசை',                           'yes'],
+  ['nav_gallery',            'Gallery',                                    'காட்சியகம்',                         'yes'],
+  ['nav_gallery_photos',     'Photo Gallery',                              'புகைப்படக் காட்சியகம்',             'yes'],
+  ['nav_gallery_videos',     'Video Gallery',                              'வீடியோ காட்சியகம்',                 'yes'],
+  ['nav_gallery_audios',     'Audio Gallery',                              'ஆடியோ காட்சியகம்',                  'yes'],
+  ['nav_gallery_pdfs',       'PDF Downloads',                              'PDF பதிவிறக்கம்',                   'yes'],
+  ['nav_contact',            'Contact',                                    'தொடர்பு',                            'yes'],
+  /* ── Hero ── */
+  ['hero_eyebrow',           'Sri Ramanasramam · Tiruvannamalai',         'ஸ்ரீ ரமணாஸ்ரமம் · திருவண்ணாமலை',   'yes'],
+  ['hero_dates',             'December 1, 1918 — February 20, 2001',      'டிசம்பர் 1, 1918 — பிப்ரவரி 20, 2001', 'yes'],
+  ['hero_cta_life',          '✦ Explore His Life',                        '✦ அவரின் வாழ்க்கையை அறிய',          'yes'],
+  ['hero_cta_gallery',       '🖼 View Gallery',                           '🖼 காட்சியகம் பார்க்க',             'yes'],
+  ['hero_cta_texts',         '📄 Sacred Texts',                           '📄 புனித நூல்கள்',                   'yes'],
+  /* ── About Preview ── */
+  ['about_eyebrow',          'The Beloved Beggar of God',                 'இறைவனின் அன்பான பிச்சைக்காரர்',      'yes'],
+  ['about_title',            'A Saint Who Radiated Divine Love',          'தெய்வீக அன்பை வெளிப்படுத்திய ஒரு துறவி', 'yes'],
+  ['stat_birth',             'Year of Birth',                             'பிறந்த ஆண்டு',                       'yes'],
+  ['stat_grace',             'Years of Grace',                            'அருள் ஆண்டுகள்',                    'yes'],
+  ['stat_samadhi',           'Mahasamadhi',                               'மகாசமாதி',                           'yes'],
+  ['btn_biography',          'Read Full Biography →',                     'முழு வாழ்க்கை வரலாறு படிக்க →',    'yes'],
+  /* ── Sections ── */
+  ['sec_explore_eyebrow',    'Explore & Learn',                           'ஆராய்ந்து அறிக',                    'yes'],
+  ['sec_explore_title',      'Discover His Universe',                     'அவரின் உலகை கண்டறியுங்கள்',         'yes'],
+  ['sec_explore_subtitle',   'Immerse yourself in the life, words, and grace of Sri Yogi Ramsuratkumar through our curated collections.', 'ஸ்ரீ யோகி ராம்சுரத்குமாரின் வாழ்க்கை, வார்த்தைகள் மற்றும் அருளில் உங்களை மூழ்கடியுங்கள்.', 'yes'],
+  ['sec_wisdom_eyebrow',     'Timeless Wisdom',                           'காலமற்ற ஞானம்',                     'yes'],
+  ['sec_wisdom_title',       'Core Teachings',                            'முக்கிய போதனைகள்',                  'yes'],
+  ['sec_gallery_eyebrow',    'Photo Gallery Preview',                     'புகைப்படக் காட்சியகம் முன்னோட்டம்', 'yes'],
+  ['sec_gallery_title',      'Glimpses of Divine Grace',                  'தெய்வீக அருளின் தோற்றங்கள்',        'yes'],
+  ['btn_full_gallery',       'View Full Gallery →',                       'முழு காட்சியகம் பார்க்க →',         'yes'],
+  /* ── Highlight cards ── */
+  ['hl_photos_title',        'Photo Gallery',                             'புகைப்படக் காட்சியகம்',             'yes'],
+  ['hl_videos_title',        'Video Gallery',                             'வீடியோ காட்சியகம்',                 'yes'],
+  ['hl_audios_title',        'Audio Gallery',                             'ஆடியோ காட்சியகம்',                  'yes'],
+  ['hl_pdfs_title',          'Sacred Texts & PDFs',                       'புனித நூல்கள் & PDF',               'yes'],
+  ['hl_teachings_title',     'His Teachings',                             'அவரின் போதனைகள்',                   'yes'],
+  /* ── Teaching cards ── */
+  ['teach_name_title',       'The Divine Name',                           'தெய்வீக நாமம்',                     'yes'],
+  ['teach_surrender_title',  'Total Surrender',                           'முழு சரணாகதி',                      'yes'],
+  ['teach_grace_title',      'Divine Grace',                              'தெய்வீக அருள்',                     'yes'],
+  ['teach_love_title',       'Universal Love',                            'உலகளாவிய அன்பு',                   'yes'],
+  /* ── Footer ── */
+  ['footer_quick_links',     'Quick Links',                               'விரைவு இணைப்புகள்',                 'yes'],
+  ['footer_about',           'About',                                     'பற்றி',                              'yes'],
+  ['footer_ashram',          'Ashram',                                    'ஆஸ்ரமம்',                            'yes'],
+  ['footer_copy',            '© 2025 Yogi Ramsuratkumar Ashram, Tiruvannamalai, Tamil Nadu, India', '© 2025 யோகி ராம்சுரத்குமார் ஆஸ்ரமம், திருவண்ணாமலை, தமிழ்நாடு, இந்தியா', 'yes'],
+  /* ── Gallery page ── */
+  ['gallery_page_title',     'Photo Gallery',                             'புகைப்படக் காட்சியகம்',             'yes'],
+  ['filter_all_photos',      'All Photos',                                'அனைத்து படங்கள்',                   'yes'],
+  ['search_photos_ph',       'Search photos…',                            'படங்கள் தேடுக…',                    'yes'],
+  ['showing',                'Showing',                                   'காட்டப்படுகிறது',                    'yes'],
+  ['of',                     'of',                                        'இல்',                                'yes'],
+  ['label_photos',           'photos',                                    'படங்கள்',                            'yes'],
+  ['no_photos',              'No photos found.',                          'படங்கள் இல்லை.',                    'yes'],
+  ['loading_more_photos',    '⏳ Loading more photos…',                   '⏳ மேலும் படங்கள் ஏற்றுகிறது…',     'yes'],
+  /* ── Videos page ── */
+  ['videos_page_title',      'Video Gallery',                             'வீடியோ காட்சியகம்',                 'yes'],
+  ['filter_all_videos',      'All Videos',                                'அனைத்து வீடியோக்கள்',               'yes'],
+  ['search_videos_ph',       'Search videos…',                            'வீடியோக்கள் தேடுக…',                'yes'],
+  ['label_videos',           'videos',                                    'வீடியோக்கள்',                        'yes'],
+  ['no_videos',              'No videos found.',                          'வீடியோக்கள் இல்லை.',                'yes'],
+  ['loading_more_videos',    '⏳ Loading more videos…',                   '⏳ மேலும் வீடியோக்கள் ஏற்றுகிறது…', 'yes'],
+  /* ── Audios page ── */
+  ['audios_page_title',      'Audio Gallery',                             'ஆடியோ காட்சியகம்',                  'yes'],
+  ['filter_all_audios',      'All Audios',                                'அனைத்து ஆடியோ',                     'yes'],
+  ['search_audios_ph',       'Search audios…',                            'ஆடியோ தேடுக…',                      'yes'],
+  ['label_audios',           'audios',                                    'ஆடியோ',                              'yes'],
+  ['no_audios',              'No audios found.',                          'ஆடியோ இல்லை.',                      'yes'],
+  ['loading_more_audios',    '⏳ Loading more audios…',                   '⏳ மேலும் ஆடியோ ஏற்றுகிறது…',       'yes'],
+  /* ── PDFs page ── */
+  ['pdfs_page_title',        'PDF Downloads',                             'PDF பதிவிறக்கம்',                   'yes'],
+  ['filter_all_pdfs',        'All',                                       'அனைத்தும்',                          'yes'],
+  ['search_pdfs_ph',         'Search publications…',                      'நூல்கள் தேடுக…',                    'yes'],
+  ['label_publications',     'publications',                              'நூல்கள்',                            'yes'],
+  ['no_pdfs',                'No PDFs found.',                            'நூல்கள் இல்லை.',                    'yes'],
+  ['btn_view',               '👁 View',                                   '👁 பார்க்க',                         'yes'],
+  ['btn_download',           '⬇ Download',                               '⬇ பதிவிறக்கம்',                     'yes'],
+  ['loading_more_pdfs',      '⏳ Loading more…',                          '⏳ மேலும் ஏற்றுகிறது…',              'yes'],
+  /* ── Contact page ── */
+  ['contact_page_title',     'Contact Us',                                'தொடர்பு கொள்ளுங்கள்',               'yes']
+];
+
+/* ============================================================
+   Shared helpers
+   ============================================================ */
+function makeVersion() {
+  var d = new Date();
+  return d.getFullYear() + '.' +
+    String(d.getMonth() + 1).padStart(2, '0') + '.' +
+    String(d.getDate()).padStart(2, '0') + '.' +
+    String(d.getHours()).padStart(2, '0') +
+    String(d.getMinutes()).padStart(2, '0');
+}
+
+function buildVersionJS(dataVer, langVer) {
+  return '/* ============================================================\n' +
+    '   data/version.js — Site Data Version Control\n' +
+    '   Auto-updated by manager.html\n' +
+    '   When version changes, browser auto-clears old cache\n' +
+    '   and loads fresh data from JS files on next page visit.\n' +
+    '   ============================================================ */\n\n' +
+    'var SITE_VERSION = {\n' +
+    '  data: \'' + dataVer + '\',\n' +
+    '  lang: \'' + langVer + '\'\n' +
+    '};\n';
+}
+
+function writeFileToDir(dirHandle, filename, content) {
+  return dirHandle.getFileHandle(filename, { create: true }).then(function (fh) {
+    return fh.createWritable().then(function (w) {
+      return w.write(content).then(function () { return w.close(); });
+    });
+  });
+}
+
+function showStatus(msg, type) {
+  var icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ';
+  $('#statusBar')
+    .removeClass('success error info').addClass(type || 'info')
+    .html(icon + ' ' + msg).show();
+  if (type !== 'error') setTimeout(function () { $('#statusBar').fadeOut(); }, 8000);
+}
+
+/* ============================================================
+   Mode switching
+   ============================================================ */
+var MODE_DESC = {
+  gallery: 'Upload Excel or edit rows directly → set Is Active → Save to Website',
+  lang:    'Download template → fill translations → upload Excel → Save to Website'
+};
+
+$('#modeSelect').on('change', function () {
+  var mode = $(this).val();
+  $('#modeDesc').text(MODE_DESC[mode]);
+
+  if (mode === 'gallery') {
+    $('#workflowGallery').show(); $('#workflowLang').hide();
+    $('#galleryToolbar').css('display', 'flex'); $('#langToolbar').hide();
+    $('#galleryTabs').show();
+    $('#galleryPanel').addClass('active'); $('#langPanel').removeClass('active');
+    $('#headerTitle').text('🪔 Gallery Manager — Yogi Ramsuratkumar Website');
+    $('#headerSub').text('Edit Photos · Videos · Audios · PDFs → Set Is Active → Save to Website');
+  } else {
+    $('#workflowGallery').hide(); $('#workflowLang').show();
+    $('#galleryToolbar').hide(); $('#langToolbar').css('display', 'flex');
+    $('#galleryTabs').hide();
+    $('#galleryPanel').removeClass('active'); $('#langPanel').addClass('active');
+    $('#headerTitle').text('🌐 Language Manager — Yogi Ramsuratkumar Website');
+    $('#headerSub').text('Import Excel → Edit translations → Save to Website');
+  }
+});
+
+/* ============================================================
+   GALLERY MANAGER
+   ============================================================ */
+$(function () {
+  var CAT = {
+    photos: ['darshan','ashram','festival','early','devotees','blessings','bhajan','events','life'],
+    videos: ['discourse','bhajan','documentary','interview','events','rare'],
+    pdfs  : ['book','talk','song','magazine','photo'],
+    audios: ['discourse','bhajan','chant','talk','rare']
+  };
+  var sortBySerial = function (a, b) { return (a.serial || 0) - (b.serial || 0); };
+
+  function updateGalleryPill() {
+    var $p = $('#galleryDataPill');
+    if (SITE_DATA.loaded) {
+      $p.removeClass('no-data').addClass('loaded')
+        .text('✅ Cached: ' + SITE_DATA.photos.length + ' photos · ' +
+              SITE_DATA.videos.length + ' videos · ' + SITE_DATA.pdfs.length + ' PDFs · ' +
+              (SITE_DATA.audios ? SITE_DATA.audios.length : 0) + ' audios');
+    } else {
+      $p.removeClass('loaded').addClass('no-data').text('⚠ No data cached');
+    }
+  }
+  updateGalleryPill();
+
+  /* Tab switching */
+  $('.tab-btn').on('click', function () {
+    $('.tab-btn').removeClass('active');
+    $('.tab-panel').removeClass('active');
+    $(this).addClass('active');
+    $('#tab-' + $(this).data('tab')).addClass('active');
+  });
+
+  /* Render helpers */
+  function catSelect(cats, val) {
+    var html = '<select class="editable">';
+    cats.forEach(function (c) { html += '<option value="' + c + '"' + (c === val ? ' selected' : '') + '>' + c + '</option>'; });
+    if (val && cats.indexOf(val) === -1) html += '<option value="' + $('<div>').text(val).html() + '" selected>' + $('<div>').text(val).html() + '</option>';
+    html += '</select>';
+    return html;
+  }
+
+  function activeSelect(val) {
+    var isNo = (String(val || '').toLowerCase().trim() === 'no');
+    return '<select class="editable active-select">' +
+      '<option value="yes"' + (!isNo ? ' selected' : '') + '>✅ Yes</option>' +
+      '<option value="no"'  + (isNo  ? ' selected' : '') + '>❌ No</option>' +
+      '</select>';
+  }
+
+  function cell(val, cls, tag) {
+    cls = cls || ''; tag = tag || 'input'; val = val !== undefined ? val : '';
+    if (tag === 'textarea') return '<textarea class="editable ' + cls + '">' + $('<div>').text(String(val)).html() + '</textarea>';
+    return '<input type="text" class="editable ' + cls + '" value="' + $('<div>').text(String(val)).html() + '" />';
+  }
+
+  function delBtn() { return '<button class="del-row" title="Delete row">✕</button>'; }
+
+  function markRowActive($tr, isActive) {
+    String(isActive).toLowerCase() === 'no' ? $tr.addClass('row-inactive') : $tr.removeClass('row-inactive');
+  }
+
+  /* Render functions */
+  function renderPhotos(data) {
+    var $body = $('#photosBody').empty();
+    $.each(data, function (i, r) {
+      var $tr = $('<tr>').append(
+        $('<td class="serial-td">').text(i + 1),
+        $('<td>').html(cell(r.name)),
+        $('<td class="desc-cell">').html(cell(r.description, '', 'textarea')),
+        $('<td>').html(catSelect(CAT.photos, r.category)),
+        $('<td>').html(cell(r.image)),
+        $('<td class="active-td">').html(activeSelect(r.isActive)),
+        $('<td>').html(delBtn())
+      );
+      markRowActive($tr, r.isActive);
+      $body.append($tr);
+    });
+    $('#photosCount').text(data.length);
+  }
+
+  function renderVideos(data) {
+    var $body = $('#videosBody').empty();
+    $.each(data, function (i, r) {
+      var $tr = $('<tr>').append(
+        $('<td class="serial-td">').text(i + 1),
+        $('<td>').html(cell(r.name)),
+        $('<td class="desc-cell">').html(cell(r.description, '', 'textarea')),
+        $('<td>').html(catSelect(CAT.videos, r.category)),
+        $('<td>').html(cell(r.youtubeUrl)),
+        $('<td>').html(cell(r.duration)),
+        $('<td class="active-td">').html(activeSelect(r.isActive)),
+        $('<td>').html(delBtn())
+      );
+      markRowActive($tr, r.isActive);
+      $body.append($tr);
+    });
+    $('#videosCount').text(data.length);
+  }
+
+  function renderAudios(data) {
+    var $body = $('#audiosBody').empty();
+    $.each(data, function (i, r) {
+      var $tr = $('<tr>').append(
+        $('<td class="serial-td">').text(i + 1),
+        $('<td>').html(cell(r.name)),
+        $('<td class="desc-cell">').html(cell(r.description, '', 'textarea')),
+        $('<td>').html(catSelect(CAT.audios, r.category)),
+        $('<td>').html(cell(r.audioFile)),
+        $('<td>').html(cell(r.duration)),
+        $('<td class="active-td">').html(activeSelect(r.isActive)),
+        $('<td>').html(delBtn())
+      );
+      markRowActive($tr, r.isActive);
+      $body.append($tr);
+    });
+    $('#audiosCount').text(data.length);
+  }
+
+  function renderPdfs(data) {
+    var $body = $('#pdfsBody').empty();
+    $.each(data, function (i, r) {
+      var $tr = $('<tr>').append(
+        $('<td class="serial-td">').text(i + 1),
+        $('<td>').html(cell(r.name)),
+        $('<td class="desc-cell">').html(cell(r.description, '', 'textarea')),
+        $('<td>').html(catSelect(CAT.pdfs, r.category)),
+        $('<td>').html(cell(r.file)),
+        $('<td>').html(cell(r.pages)),
+        $('<td class="active-td">').html(activeSelect(r.isActive)),
+        $('<td>').html(delBtn())
+      );
+      markRowActive($tr, r.isActive);
+      $body.append($tr);
+    });
+    $('#pdfsCount').text(data.length);
+  }
+
+  $(document).on('change', '.active-select', function () {
+    markRowActive($(this).closest('tr'), $(this).val());
+  });
+
+  /* Load from localStorage/JS files on open */
+  if (SITE_DATA.loaded) {
+    renderPhotos(SITE_DATA.sorted(SITE_DATA.photos));
+    renderVideos(SITE_DATA.sorted(SITE_DATA.videos));
+    renderPdfs(SITE_DATA.sorted(SITE_DATA.pdfs));
+    renderAudios(SITE_DATA.sorted(SITE_DATA.audios || []));
+    showStatus('Loaded existing data from browser cache. Edit and click 💾 Save to Website to update.', 'info');
+  }
+  refreshGalleryOutputs();
+
+  /* Read table data */
+  function readPhotos() {
+    return $('#photosBody tr').map(function (i) {
+      var $t = $(this).find('td');
+      return { serial: i+1, name: $t.eq(1).find('.editable').val().trim(), description: $t.eq(2).find('.editable').val().trim(), category: $t.eq(3).find('.editable').val(), image: $t.eq(4).find('.editable').val().trim(), isActive: $t.eq(5).find('.editable').val() };
+    }).get();
+  }
+  function readVideos() {
+    return $('#videosBody tr').map(function (i) {
+      var $t = $(this).find('td');
+      return { serial: i+1, name: $t.eq(1).find('.editable').val().trim(), description: $t.eq(2).find('.editable').val().trim(), category: $t.eq(3).find('.editable').val(), youtubeUrl: $t.eq(4).find('.editable').val().trim(), duration: $t.eq(5).find('.editable').val().trim(), isActive: $t.eq(6).find('.editable').val() };
+    }).get();
+  }
+  function readPdfs() {
+    return $('#pdfsBody tr').map(function (i) {
+      var $t = $(this).find('td');
+      return { serial: i+1, name: $t.eq(1).find('.editable').val().trim(), description: $t.eq(2).find('.editable').val().trim(), category: $t.eq(3).find('.editable').val(), file: $t.eq(4).find('.editable').val().trim(), pages: $t.eq(5).find('.editable').val().trim(), isActive: $t.eq(6).find('.editable').val() };
+    }).get();
+  }
+  function readAudios() {
+    return $('#audiosBody tr').map(function (i) {
+      var $t = $(this).find('td');
+      return { serial: i+1, name: $t.eq(1).find('.editable').val().trim(), description: $t.eq(2).find('.editable').val().trim(), category: $t.eq(3).find('.editable').val(), audioFile: $t.eq(4).find('.editable').val().trim(), duration: $t.eq(5).find('.editable').val().trim(), isActive: $t.eq(6).find('.editable').val() };
+    }).get();
+  }
+
+  function buildDataJS(varName, comment, fields, data) {
+    return '/* ============================================================\n' +
+      '   ' + comment + '\n' +
+      '   Edit using tools/manager.html → Gallery Manager\n' +
+      '   Fields: ' + fields + '\n' +
+      '   isActive: "yes" = show | "no" = hide without deleting\n' +
+      '   ============================================================ */\n\n' +
+      'var ' + varName + ' = ' + JSON.stringify(data, null, 2) + ';\n';
+  }
+
+  /* Gallery JS Output preview */
+  function refreshGalleryOutputs() {
+    var photos = readPhotos(), videos = readVideos(), pdfs = readPdfs(), audios = readAudios();
+    var map = [
+      { pre: 'photosOutput', dl: 'btnDownloadPhotosJs', cp: 'btnCopyPhotosJs', fn: 'photos.js', js: buildDataJS('PHOTOS_DATA', 'data/photos.js — Photo Gallery Data', 'serial, name, description, category, image, isActive', photos) },
+      { pre: 'videosOutput', dl: 'btnDownloadVideosJs', cp: 'btnCopyVideosJs', fn: 'videos.js', js: buildDataJS('VIDEOS_DATA', 'data/videos.js — Video Gallery Data', 'serial, name, description, category, youtubeUrl, duration, isActive', videos) },
+      { pre: 'audiosOutput', dl: 'btnDownloadAudiosJs', cp: 'btnCopyAudiosJs', fn: 'audios.js', js: buildDataJS('AUDIOS_DATA', 'data/audios.js — Audio Gallery Data', 'serial, name, description, category, audioFile, duration, isActive', audios) },
+      { pre: 'pdfsOutput',   dl: 'btnDownloadPdfsJs',   cp: 'btnCopyPdfsJs',   fn: 'pdfs.js',   js: buildDataJS('PDFS_DATA',   'data/pdfs.js — PDF Downloads Data',   'serial, name, description, category, file, pages, isActive', pdfs) }
+    ];
+    map.forEach(function (m) {
+      $('#' + m.pre).text(m.js);
+      $('#' + m.dl).off('click').on('click', function () { downloadText(m.js, m.fn); });
+      $('#' + m.cp).off('click').on('click', function () {
+        navigator.clipboard.writeText(m.js).then(function () { showStatus(m.fn + ' copied to clipboard!', 'success'); });
+      });
+    });
+  }
+
+  /* 💾 Save to Website — Gallery */
+  $('#btnGallerySave').on('click', function () {
+    var photos = readPhotos(), videos = readVideos(), pdfs = readPdfs(), audios = readAudios();
+    if (!photos.length && !videos.length && !pdfs.length && !audios.length) {
+      showStatus('No data to save. Upload an Excel file or add rows first.', 'error'); return;
+    }
+    var newDataVer = makeVersion();
+    var langVer = (typeof SITE_VERSION !== 'undefined' && SITE_VERSION.lang) ? SITE_VERSION.lang : '1.0';
+    if (typeof SITE_VERSION !== 'undefined') SITE_VERSION.data = newDataVer;
+    SITE_DATA.photos = photos; SITE_DATA.videos = videos; SITE_DATA.pdfs = pdfs; SITE_DATA.audios = audios;
+    SITE_DATA.saveToStorage();
+    updateGalleryPill();
+
+    var ap = photos.filter(function(r){ return r.isActive !== 'no'; }).length;
+    var av = videos.filter(function(r){ return r.isActive !== 'no'; }).length;
+    var ad = pdfs.filter(function(r){ return r.isActive !== 'no'; }).length;
+    var aa = audios.filter(function(r){ return r.isActive !== 'no'; }).length;
+    var summary = 'Active: ' + ap + '/' + photos.length + ' photos, ' + av + '/' + videos.length + ' videos, ' + ad + '/' + pdfs.length + ' PDFs, ' + aa + '/' + audios.length + ' audios.';
+
+    if (window.showDirectoryPicker) {
+      showStatus('ℹ Select the <strong>data/</strong> folder (yogiramsurathkumar/data/) to save JS files…', 'info');
+      window.showDirectoryPicker({ mode: 'readwrite' })
+        .then(function (dir) {
+          return Promise.all([
+            writeFileToDir(dir, 'version.js', buildVersionJS(newDataVer, langVer)),
+            writeFileToDir(dir, 'photos.js',  buildDataJS('PHOTOS_DATA', 'data/photos.js — Photo Gallery Data', 'serial, name, description, category, image, isActive', photos)),
+            writeFileToDir(dir, 'videos.js',  buildDataJS('VIDEOS_DATA', 'data/videos.js — Video Gallery Data', 'serial, name, description, category, youtubeUrl, duration, isActive', videos)),
+            writeFileToDir(dir, 'pdfs.js',    buildDataJS('PDFS_DATA',   'data/pdfs.js — PDF Downloads Data',   'serial, name, description, category, file, pages, isActive', pdfs)),
+            writeFileToDir(dir, 'audios.js',  buildDataJS('AUDIOS_DATA', 'data/audios.js — Audio Gallery Data', 'serial, name, description, category, audioFile, duration, isActive', audios))
+          ]).then(function () {
+            showStatus('✅ Saved! ' + summary + ' Version: <strong>' + newDataVer + '</strong> — old cache auto-clears on next page visit.', 'success');
+          });
+        })
+        .catch(function (e) {
+          showStatus(e.name === 'AbortError'
+            ? '✅ Saved to localStorage (v' + newDataVer + '). ' + summary + ' Select data/ folder to also update JS files.'
+            : '✅ Saved to localStorage (v' + newDataVer + '). JS write error: ' + e.message, 'info');
+        });
+    } else {
+      showStatus('✅ Saved! ' + summary, 'success');
+    }
+  });
+
+  /* Upload Excel — Gallery */
+  $('#galleryUploadInput').on('change', function (e) {
+    var file = e.target.files[0]; if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function (ev) {
+      try {
+        var wb = XLSX.read(ev.target.result, { type: 'binary' });
+        function parseActive(val) { var v = String(val||'').toLowerCase().trim(); return (v==='no'||v==='false'||v==='0') ? 'no' : 'yes'; }
+
+        if (wb.Sheets['Photos']) {
+          renderPhotos(XLSX.utils.sheet_to_json(wb.Sheets['Photos'], {defval:''}).map(function(r,i){
+            return { serial: Number(r['Serial No'])||(i+1), name: String(r['Name']||''), description: String(r['Description']||''), category: String(r['Category']||'darshan'), image: String(r['Image File']||''), isActive: parseActive(r['Is Active']) };
+          }).sort(sortBySerial));
+        }
+        if (wb.Sheets['Videos']) {
+          renderVideos(XLSX.utils.sheet_to_json(wb.Sheets['Videos'], {defval:''}).map(function(r,i){
+            return { serial: Number(r['Serial No'])||(i+1), name: String(r['Name']||''), description: String(r['Description']||''), category: String(r['Category']||'discourse'), youtubeUrl: String(r['YouTube URL']||''), duration: String(r['Duration']||''), isActive: parseActive(r['Is Active']) };
+          }).sort(sortBySerial));
+        }
+        if (wb.Sheets['Audios']) {
+          renderAudios(XLSX.utils.sheet_to_json(wb.Sheets['Audios'], {defval:''}).map(function(r,i){
+            return { serial: Number(r['Serial No'])||(i+1), name: String(r['Name']||''), description: String(r['Description']||''), category: String(r['Category']||'discourse'), audioFile: String(r['Audio File']||''), duration: String(r['Duration']||''), isActive: parseActive(r['Is Active']) };
+          }).sort(sortBySerial));
+        }
+        if (wb.Sheets['PDFs']) {
+          renderPdfs(XLSX.utils.sheet_to_json(wb.Sheets['PDFs'], {defval:''}).map(function(r,i){
+            return { serial: Number(r['Serial No'])||(i+1), name: String(r['Name']||''), description: String(r['Description']||''), category: String(r['Category']||'book'), file: String(r['PDF File']||''), pages: String(r['Pages']||''), isActive: parseActive(r['Is Active']) };
+          }).sort(sortBySerial));
+        }
+        refreshGalleryOutputs();
+        showStatus('Excel uploaded! Review the data below, then click 💾 Save to Website.', 'success');
+      } catch (err) { showStatus('Error reading Excel: ' + err.message, 'error'); }
+      $(this).val('');
+    };
+    reader.readAsBinaryString(file);
+  });
+
+  /* Download Excel — Gallery */
+  $('#btnGalleryDownloadExcel').on('click', function () {
+    var wb = XLSX.utils.book_new();
+    var pD = [['Serial No','Name','Description','Category','Image File','Is Active']];
+    readPhotos().forEach(function(r){ pD.push([r.serial,r.name,r.description,r.category,r.image,r.isActive||'yes']); });
+    var pWs = XLSX.utils.aoa_to_sheet(pD); pWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:32},{wch:10}];
+    XLSX.utils.book_append_sheet(wb, pWs, 'Photos');
+
+    var vD = [['Serial No','Name','Description','Category','YouTube URL','Duration','Is Active']];
+    readVideos().forEach(function(r){ vD.push([r.serial,r.name,r.description,r.category,r.youtubeUrl,r.duration,r.isActive||'yes']); });
+    var vWs = XLSX.utils.aoa_to_sheet(vD); vWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:46},{wch:12},{wch:10}];
+    XLSX.utils.book_append_sheet(wb, vWs, 'Videos');
+
+    var dD = [['Serial No','Name','Description','Category','PDF File','Pages','Is Active']];
+    readPdfs().forEach(function(r){ dD.push([r.serial,r.name,r.description,r.category,r.file,r.pages,r.isActive||'yes']); });
+    var dWs = XLSX.utils.aoa_to_sheet(dD); dWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:32},{wch:12},{wch:10}];
+    XLSX.utils.book_append_sheet(wb, dWs, 'PDFs');
+
+    var aD = [['Serial No','Name','Description','Category','Audio File','Duration','Is Active']];
+    readAudios().forEach(function(r){ aD.push([r.serial,r.name,r.description,r.category,r.audioFile,r.duration,r.isActive||'yes']); });
+    var aWs = XLSX.utils.aoa_to_sheet(aD); aWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:40},{wch:12},{wch:10}];
+    XLSX.utils.book_append_sheet(wb, aWs, 'Audios');
+
+    XLSX.writeFile(wb, 'gallery-manager.xlsx');
+    showStatus('Downloaded gallery-manager.xlsx — edit and Upload Excel to reload.', 'success');
+  });
+
+  /* Download Template — blank headers only */
+  $('#btnGalleryTemplate').on('click', function () {
+    var wb = XLSX.utils.book_new();
+    var pWs = XLSX.utils.aoa_to_sheet([['Serial No','Name','Description','Category','Image File','Is Active']]);
+    pWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:32},{wch:10}];
+    XLSX.utils.book_append_sheet(wb, pWs, 'Photos');
+
+    var vWs = XLSX.utils.aoa_to_sheet([['Serial No','Name','Description','Category','YouTube URL','Duration','Is Active']]);
+    vWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:46},{wch:12},{wch:10}];
+    XLSX.utils.book_append_sheet(wb, vWs, 'Videos');
+
+    var dWs = XLSX.utils.aoa_to_sheet([['Serial No','Name','Description','Category','PDF File','Pages','Is Active']]);
+    dWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:32},{wch:12},{wch:10}];
+    XLSX.utils.book_append_sheet(wb, dWs, 'PDFs');
+
+    var aWs = XLSX.utils.aoa_to_sheet([['Serial No','Name','Description','Category','Audio File','Duration','Is Active']]);
+    aWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:40},{wch:12},{wch:10}];
+    XLSX.utils.book_append_sheet(wb, aWs, 'Audios');
+
+    XLSX.writeFile(wb, 'gallery-template.xlsx');
+    showStatus('Downloaded gallery-template.xlsx — fill in your data and Upload Excel.', 'success');
+  });
+
+  /* Delete row */
+  $(document).on('click', '.del-row', function () {
+    if (confirm('Delete this row?')) { $(this).closest('tr').remove(); updateGalleryCounts(); }
+  });
+
+  /* Add row */
+  $('#btnAddRow').on('click', function () {
+    var tab = $('.tab-btn.active').data('tab');
+    if (tab === 'photos') {
+      var n = $('#photosBody tr').length + 1;
+      $('#photosBody').append($('<tr>').append($('<td class="serial-td">').text(n), $('<td>').html(cell('')), $('<td class="desc-cell">').html(cell('','','textarea')), $('<td>').html(catSelect(CAT.photos,'darshan')), $('<td>').html(cell('images/photos/new.jpg')), $('<td class="active-td">').html(activeSelect('yes')), $('<td>').html(delBtn())));
+    } else if (tab === 'videos') {
+      var n = $('#videosBody tr').length + 1;
+      $('#videosBody').append($('<tr>').append($('<td class="serial-td">').text(n), $('<td>').html(cell('')), $('<td class="desc-cell">').html(cell('','','textarea')), $('<td>').html(catSelect(CAT.videos,'discourse')), $('<td>').html(cell('https://www.youtube.com/watch?v=VIDEO_ID')), $('<td>').html(cell('')), $('<td class="active-td">').html(activeSelect('yes')), $('<td>').html(delBtn())));
+    } else if (tab === 'audios') {
+      var n = $('#audiosBody tr').length + 1;
+      $('#audiosBody').append($('<tr>').append($('<td class="serial-td">').text(n), $('<td>').html(cell('')), $('<td class="desc-cell">').html(cell('','','textarea')), $('<td>').html(catSelect(CAT.audios,'discourse')), $('<td>').html(cell('audio/new.mp3')), $('<td>').html(cell('')), $('<td class="active-td">').html(activeSelect('yes')), $('<td>').html(delBtn())));
+    } else if (tab === 'pdfs') {
+      var n = $('#pdfsBody tr').length + 1;
+      $('#pdfsBody').append($('<tr>').append($('<td class="serial-td">').text(n), $('<td>').html(cell('')), $('<td class="desc-cell">').html(cell('','','textarea')), $('<td>').html(catSelect(CAT.pdfs,'book')), $('<td>').html(cell('pdfs/new.pdf')), $('<td>').html(cell('')), $('<td class="active-td">').html(activeSelect('yes')), $('<td>').html(delBtn())));
+    }
+    updateGalleryCounts();
+  });
+
+  function updateGalleryCounts() {
+    $('#photosCount').text($('#photosBody tr').length);
+    $('#videosCount').text($('#videosBody tr').length);
+    $('#pdfsCount').text($('#pdfsBody tr').length);
+    $('#audiosCount').text($('#audiosBody tr').length);
+  }
+
+  /* Clear gallery cache */
+  $('#btnGalleryClearCache').on('click', function () {
+    if (!confirm('Clear all cached gallery data from browser storage?\nPages will fall back to static JS data files.')) return;
+    SITE_DATA.clear();
+    updateGalleryPill();
+    showStatus('Gallery cache cleared. Pages will load from static JS files until you save again.', 'info');
+  });
+});
+
+/* ============================================================
+   LANGUAGE MANAGER
+   ============================================================ */
+var LANG_STORAGE_KEY = 'yrk_lang_data';
+var langRows = [];
+
+function templateToRows() {
+  return TEMPLATE_ROWS.map(function (r) {
+    return { key: r[0], en: r[1], ta: r[2], isActive: r[3] || 'yes' };
+  });
+}
+
+function activeLangRows() {
+  return langRows.filter(function (r) { return r.isActive !== 'no'; });
+}
+
+function pad(s, n) { return s.length >= n ? s : s + ' '.repeat(n - s.length); }
+
+function generateJS(lang, varName, langLabel) {
+  var active = activeLangRows();
+  var lines = [
+    '/* ============================================================',
+    '   data/lang/' + lang + '.js — ' + langLabel + ' translations',
+    '   Auto-generated by Site Manager — ' + new Date().toLocaleDateString(),
+    '   ============================================================ */',
+    'var ' + varName + ' = {'
+  ];
+  active.forEach(function (r, i) {
+    if (!r.key) return;
+    var val = (r[lang] || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    lines.push('  ' + pad(r.key, 25) + ": '" + val + "'" + (i < active.length - 1 ? ',' : ''));
+  });
+  lines.push('};');
+  return lines.join('\n');
+}
+
+function buildLangObject(lang) {
+  var obj = {};
+  activeLangRows().forEach(function (r) { if (r.key) obj[r.key] = r[lang] || ''; });
+  return obj;
+}
+
+function renderLangPreview() {
+  var $body = $('#langPreviewBody').empty();
+  if (!langRows.length) {
+    $body.append('<tr class="empty-row"><td colspan="4" style="text-align:center;padding:36px;color:var(--text-light)">No data</td></tr>');
+    return;
+  }
+  langRows.forEach(function (r) {
+    var isNo = (r.isActive === 'no');
+    var $tr = $('<tr>').append(
+      $('<td>').text(r.key),
+      $('<td>').text(r.en),
+      $('<td class="ta-cell">').text(r.ta),
+      $('<td class="active-cell">').html(isNo ? '<span class="badge-no">❌ No</span>' : '<span class="badge-yes">✅ Yes</span>')
+    );
+    if (isNo) $tr.addClass('row-inactive');
+    $body.append($tr);
+  });
+  var activeCount = activeLangRows().length;
+  $('#langPreviewTitle').text('Preview — ' + langRows.length + ' keys (' + activeCount + ' active)');
+  $('#enOutput').text(generateJS('en', 'LANG_EN', 'English'));
+  $('#taOutput').text(generateJS('ta', 'LANG_TA', 'Tamil (தமிழ்)'));
+}
+
+function parseLangWorkbook(wb) {
+  var ws = wb.Sheets[wb.SheetNames[0]];
+  var data = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+  if (!data.length) { alert('Excel sheet is empty.'); return; }
+  var hdr = data[0].map(function (h) { return (h + '').toLowerCase().trim(); });
+  var colKey = hdr.indexOf('key');
+  var colEn = hdr.indexOf('english'); if (colEn < 0) colEn = hdr.indexOf('en');
+  var colTa = hdr.indexOf('tamil');   if (colTa < 0) colTa = hdr.indexOf('ta');
+  var colAct = hdr.indexOf('is_active'); if (colAct < 0) colAct = hdr.indexOf('isactive'); if (colAct < 0) colAct = hdr.indexOf('is active'); if (colAct < 0) colAct = hdr.indexOf('active');
+  if (colKey < 0 || colEn < 0 || colTa < 0) { alert('Could not find required columns.\nPlease make sure Row 1 has headers: key  English  Tamil  is_active'); return; }
+  langRows = [];
+  for (var i = 1; i < data.length; i++) {
+    var key = (data[i][colKey] + '').trim(); if (!key) continue;
+    var av = colAct >= 0 ? (data[i][colAct] + '').toLowerCase().trim() : 'yes';
+    langRows.push({ key: key, en: (data[i][colEn]+'').trim(), ta: (data[i][colTa]+'').trim(), isActive: (av==='no'||av==='false'||av==='0') ? 'no' : 'yes' });
+  }
+  $('#langStatusPill').removeClass('no-data').addClass('loaded').text('✅ ' + langRows.length + ' keys loaded (' + activeLangRows().length + ' active)');
+  renderLangPreview();
+}
+
+/* 💾 Save to Website — Lang */
+$('#btnLangSave').on('click', function () {
+  if (!langRows.length) langRows = templateToRows();
+  var activeCount = activeLangRows().length;
+  var enJS = generateJS('en', 'LANG_EN', 'English');
+  var taJS = generateJS('ta', 'LANG_TA', 'Tamil (தமிழ்)');
+  var newLangVer = makeVersion();
+  var dataVer = (typeof SITE_VERSION !== 'undefined' && SITE_VERSION.data) ? SITE_VERSION.data : '1.0';
+  if (typeof SITE_VERSION !== 'undefined') SITE_VERSION.lang = newLangVer;
+  localStorage.setItem(LANG_STORAGE_KEY, JSON.stringify({ version: newLangVer, en: buildLangObject('en'), ta: buildLangObject('ta'), loadedAt: new Date().toLocaleString() }));
+  $('#langStatusPill').removeClass('no-data').addClass('loaded').text('✅ Saved: ' + activeCount + ' active keys (v' + newLangVer + ')');
+
+  if (window.showDirectoryPicker) {
+    showStatus('ℹ Select the <strong>data/</strong> folder (yogiramsurathkumar/data/) to save JS files…', 'info');
+    window.showDirectoryPicker({ mode: 'readwrite' })
+      .then(function (dir) {
+        return dir.getDirectoryHandle('lang', { create: false }).then(function (langDir) {
+          return Promise.all([
+            writeFileToDir(dir,     'version.js', buildVersionJS(dataVer, newLangVer)),
+            writeFileToDir(langDir, 'en.js', enJS),
+            writeFileToDir(langDir, 'ta.js', taJS)
+          ]).then(function () {
+            showStatus('✅ Saved! ' + activeCount + ' active keys → localStorage + version.js, en.js & ta.js written. Version: <strong>' + newLangVer + '</strong>', 'success');
+          });
+        });
+      })
+      .catch(function (e) {
+        showStatus(e.name === 'AbortError'
+          ? '✅ Saved to localStorage (v' + newLangVer + ', ' + activeCount + ' keys). Select data/ folder to also update JS files.'
+          : '✅ Saved to localStorage (v' + newLangVer + '). JS write error: ' + e.message, 'info');
+      });
+  } else {
+    showStatus('✅ Saved ' + activeCount + ' active language keys (v' + newLangVer + '). Language switcher uses these translations instantly.', 'success');
+  }
+});
+
+/* 🗑 Clear lang cache */
+$('#btnLangClearCache').on('click', function () {
+  if (!confirm('Clear saved language data from browser?\nWebsite will fall back to built-in JS language files.')) return;
+  localStorage.removeItem(LANG_STORAGE_KEY);
+  showStatus('Language cache cleared. Website will use built-in en.js / ta.js files.', 'info');
+});
+
+/* Download template Excel */
+/* Download Excel — current data */
+$('#btnLangDownload').on('click', function () {
+  if (!rows.length) rows = templateToRows();
+  var aoa = [['key','English','Tamil','is_active']];
+  rows.forEach(function (r) { aoa.push([r.key, r.en, r.ta, r.isActive || 'yes']); });
+  var ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols'] = [{wch:28},{wch:60},{wch:60},{wch:10}];
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Translations');
+  XLSX.writeFile(wb, 'lang-translations.xlsx');
+});
+
+/* Download Excel Template — headers + template rows */
+$('#btnLangTemplate').on('click', function () {
+  var ws = XLSX.utils.aoa_to_sheet([['key','English','Tamil','is_active']].concat(TEMPLATE_ROWS));
+  ws['!cols'] = [{wch:28},{wch:60},{wch:60},{wch:10}];
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Translations');
+  XLSX.writeFile(wb, 'lang-translations.xlsx');
+});
+
+/* Upload Excel — Lang */
+$('#langUploadInput').on('change', function (e) {
+  var file = e.target.files[0]; if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function (ev) { parseLangWorkbook(XLSX.read(ev.target.result, { type: 'binary' })); };
+  reader.readAsBinaryString(file);
+  this.value = '';
+});
+
+/* Drag & drop — Lang */
+/* Download JS files */
+function downloadText(content, filename) {
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], { type: 'text/javascript;charset=utf-8' }));
+  a.download = filename; a.click();
+}
+$('#btnDownloadEn').on('click', function () { if (!langRows.length) langRows = templateToRows(); downloadText(generateJS('en','LANG_EN','English'), 'en.js'); });
+$('#btnDownloadTa').on('click', function () { if (!langRows.length) langRows = templateToRows(); downloadText(generateJS('ta','LANG_TA','Tamil (தமிழ்)'), 'ta.js'); });
+
+/* Copy to clipboard */
+$('#btnCopyEn').on('click', function () { navigator.clipboard.writeText(generateJS('en','LANG_EN','English')).then(function(){ showStatus('en.js copied to clipboard!','success'); }); });
+$('#btnCopyTa').on('click', function () { navigator.clipboard.writeText(generateJS('ta','LANG_TA','Tamil (தமிழ்)')).then(function(){ showStatus('ta.js copied to clipboard!','success'); }); });
+
+/* Init lang on load */
+langRows = templateToRows();
+renderLangPreview();
+$('#langStatusPill').removeClass('no-data').addClass('loaded')
+  .text('✅ ' + langRows.length + ' default keys ready — click 💾 Save to Website or upload Excel');
+try {
+  var _saved = localStorage.getItem('yrk_lang_data');
+  if (_saved) {
+    var _d = JSON.parse(_saved);
+    var _ec = Object.keys(_d.en || {}).length;
+    var _vi = _d.version ? ' · v' + _d.version : '';
+    $('#langStatusPill').text('✅ Website has ' + _ec + ' saved keys' + _vi + ' (saved ' + (_d.loadedAt || '') + ') — upload Excel to update');
+  }
+} catch(e) {}
+</script>
+</body>
+</html>

@@ -1,8 +1,9 @@
 /* ============================================================
    data/data-loader.js
-   Single source of truth: reads from content-manager.xlsx
-   Caches parsed data in localStorage so all gallery pages
-   can use it without re-loading the file each time.
+   Single source of truth: reads from gallery-manager or static
+   JS files. Version-aware cache: when SITE_VERSION.data changes,
+   old localStorage cache is auto-cleared and fresh data is loaded
+   from the static JS files on next page visit.
    ============================================================ */
 
 (function () {
@@ -18,12 +19,22 @@
     loaded : false,
     loadedAt: null,
 
-    /* Try to restore from localStorage */
+    /* Try to restore from localStorage — version-aware */
     loadFromStorage: function () {
       try {
         var raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return false;
         var d = JSON.parse(raw);
+
+        /* Version check: if site version changed, discard stale cache */
+        var currentVer = (typeof SITE_VERSION !== 'undefined') ? SITE_VERSION.data : null;
+        if (currentVer && d.version !== currentVer) {
+          /* Version mismatch → clear old cache, fall back to static JS files */
+          localStorage.removeItem(STORAGE_KEY);
+          console.info('[SITE_DATA] Data version changed (' + d.version + ' → ' + currentVer + '). Cache cleared, loading fresh data.');
+          return false;
+        }
+
         this.photos   = d.photos  || [];
         this.videos   = d.videos  || [];
         this.pdfs     = d.pdfs    || [];
@@ -34,9 +45,10 @@
       } catch (e) { return false; }
     },
 
-    /* Save current data to localStorage */
+    /* Save current data to localStorage (includes current version) */
     saveToStorage: function () {
       var payload = {
+        version  : (typeof SITE_VERSION !== 'undefined') ? SITE_VERSION.data : '1.0',
         photos   : this.photos,
         videos   : this.videos,
         pdfs     : this.pdfs,
@@ -146,7 +158,7 @@
   };
 
   /* Auto-restore on script load:
-     1. Try localStorage first (from Excel Manager)
+     1. Try localStorage first (version-checked — auto-clears if stale)
      2. Fall back to static data JS files (photos.js / videos.js / pdfs.js / audios.js) */
   if (!window.SITE_DATA.loadFromStorage()) {
     if (typeof PHOTOS_DATA !== 'undefined' && PHOTOS_DATA.length) {
