@@ -7,7 +7,6 @@
 
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="../data/version.js"></script>
   <script src="../data/photos.js"></script>
   <script src="../data/videos.js"></script>
@@ -158,6 +157,13 @@
     .status-bar.success { border-color: #2e7d32; background: #e8f5e9; color: #2e7d32; }
     .status-bar.error   { border-color: #c62828; background: #fde8e8; color: #c62828; }
     .status-bar.info    { border-color: var(--green); background: var(--cream); color: var(--green); }
+    .status-msg { flex: 1; }
+    .status-close {
+      margin-left: auto; background: none; border: none; cursor: pointer;
+      font-size: 1rem; line-height: 1; padding: 2px 6px; border-radius: 4px;
+      color: inherit; opacity: 0.6;
+    }
+    .status-close:hover { opacity: 1; background: rgba(0,0,0,0.08); }
 
     /* ---- Tip box ---- */
     .tip { background: rgba(26,107,46,0.06); border-left: 4px solid var(--green); padding: 9px 13px; border-radius: 0 var(--radius) var(--radius) 0; font-size: 0.81rem; color: var(--text-light); margin-bottom: 13px; line-height: 1.6; }
@@ -293,6 +299,7 @@
     <button class="btn btn-outline" id="btnLangTemplate">📋 Download Template</button>
     <div class="toolbar-sep"></div>
     <button class="btn btn-green" id="btnLangSave">💾 Save to Website</button>
+    <button class="btn btn-outline" id="btnLangAddRow">➕ Add Row</button>
     <button class="btn btn-red"   id="btnLangClearCache">🗑 Clear Cache</button>
     <div class="toolbar-sep"></div>
     <span id="langStatusPill" class="pill no-data">⚪ No file loaded</span>
@@ -377,16 +384,17 @@
 
     <!-- PDFs TAB -->
     <div class="tab-panel" id="tab-pdfs">
-      <div class="tip"><strong>PDFs:</strong> Place PDF files in the <code>pdfs/</code> folder, then set the PDF File path. Set <strong>Is Active = No</strong> to hide without deleting.</div>
+      <div class="tip"><strong>PDFs:</strong> Place PDF files in <code>pdfs/</code> and thumbnail images in <code>pdfs/images/</code>. Set <strong>Is Active = No</strong> to hide without deleting.</div>
       <div class="table-wrap">
-        <table id="pdfsTable" style="min-width:960px;">
+        <table id="pdfsTable" style="min-width:1100px;">
           <thead><tr>
             <th class="serial-th">S.No</th>
             <th style="min-width:180px">Name</th>
-            <th style="min-width:220px">Description</th>
+            <th style="min-width:160px">Author</th>
             <th style="min-width:110px">Category</th>
             <th style="min-width:200px">PDF File</th>
             <th style="min-width:80px">Pages</th>
+            <th style="min-width:200px">Thumbnail Image</th>
             <th class="active-th">Is Active</th>
             <th style="width:40px"></th>
           </tr></thead>
@@ -447,13 +455,14 @@
       <div class="table-wrap" style="margin-bottom:20px;">
         <table id="langPreviewTable" style="min-width:600px;">
           <thead><tr>
-            <th style="width:220px">Key</th>
-            <th>English</th>
-            <th>Tamil (தமிழ்)</th>
-            <th style="width:100px; text-align:center;">Is Active</th>
+            <th style="min-width:180px">Key</th>
+            <th style="min-width:200px">English</th>
+            <th style="min-width:200px">Tamil (தமிழ்)</th>
+            <th style="width:110px; text-align:center;">Is Active</th>
+            <th style="width:40px"></th>
           </tr></thead>
           <tbody id="langPreviewBody">
-            <tr class="empty-row"><td colspan="4" style="text-align:center;padding:36px;color:var(--text-light)">Loading default keys…</td></tr>
+            <tr class="empty-row"><td colspan="5" style="text-align:center;padding:36px;color:var(--text-light)">Loading default keys…</td></tr>
           </tbody>
         </table>
       </div>
@@ -607,12 +616,17 @@ function writeFileToDir(dirHandle, filename, content) {
   });
 }
 
-function showStatus(msg, type) {
+var _statusTimer;
+function showStatus(msg, type, sticky) {
+  clearTimeout(_statusTimer);
   var icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ';
+  var closeBtn = sticky ? '<button class="status-close" onclick="$(\'#statusBar\').fadeOut()">✕</button>' : '';
   $('#statusBar')
+    .stop(true, true)
     .removeClass('success error info').addClass(type || 'info')
-    .html(icon + ' ' + msg).show();
-  if (type !== 'error') setTimeout(function () { $('#statusBar').fadeOut(); }, 8000);
+    .html('<span class="status-msg">' + icon + ' ' + msg + '</span>' + closeBtn)
+    .show();
+  if (!sticky && type !== 'error') _statusTimer = setTimeout(function () { $('#statusBar').fadeOut(); }, 8000);
 }
 
 /* ============================================================
@@ -769,10 +783,11 @@ $(function () {
       var $tr = $('<tr>').append(
         $('<td class="serial-td">').text(i + 1),
         $('<td>').html(cell(r.name)),
-        $('<td class="desc-cell">').html(cell(r.description, '', 'textarea')),
+        $('<td>').html(cell(r.author)),
         $('<td>').html(catSelect(CAT.pdfs, r.category)),
         $('<td>').html(cell(r.file)),
         $('<td>').html(cell(r.pages)),
+        $('<td>').html(cell(r.thumbImage)),
         $('<td class="active-td">').html(activeSelect(r.isActive)),
         $('<td>').html(delBtn())
       );
@@ -812,7 +827,7 @@ $(function () {
   function readPdfs() {
     return $('#pdfsBody tr').map(function (i) {
       var $t = $(this).find('td');
-      return { serial: i+1, name: $t.eq(1).find('.editable').val().trim(), description: $t.eq(2).find('.editable').val().trim(), category: $t.eq(3).find('.editable').val(), file: $t.eq(4).find('.editable').val().trim(), pages: $t.eq(5).find('.editable').val().trim(), isActive: $t.eq(6).find('.editable').val() };
+      return { serial: i+1, name: $t.eq(1).find('.editable').val().trim(), author: $t.eq(2).find('.editable').val().trim(), category: $t.eq(3).find('.editable').val(), file: $t.eq(4).find('.editable').val().trim(), pages: $t.eq(5).find('.editable').val().trim(), thumbImage: $t.eq(6).find('.editable').val().trim(), isActive: $t.eq(7).find('.editable').val() };
     }).get();
   }
   function readAudios() {
@@ -839,7 +854,7 @@ $(function () {
       { pre: 'photosOutput', dl: 'btnDownloadPhotosJs', cp: 'btnCopyPhotosJs', fn: 'photos.js', js: buildDataJS('PHOTOS_DATA', 'data/photos.js — Photo Gallery Data', 'serial, name, description, category, image, isActive', photos) },
       { pre: 'videosOutput', dl: 'btnDownloadVideosJs', cp: 'btnCopyVideosJs', fn: 'videos.js', js: buildDataJS('VIDEOS_DATA', 'data/videos.js — Video Gallery Data', 'serial, name, description, category, youtubeUrl, duration, isActive', videos) },
       { pre: 'audiosOutput', dl: 'btnDownloadAudiosJs', cp: 'btnCopyAudiosJs', fn: 'audios.js', js: buildDataJS('AUDIOS_DATA', 'data/audios.js — Audio Gallery Data', 'serial, name, description, category, audioFile, duration, isActive', audios) },
-      { pre: 'pdfsOutput',   dl: 'btnDownloadPdfsJs',   cp: 'btnCopyPdfsJs',   fn: 'pdfs.js',   js: buildDataJS('PDFS_DATA',   'data/pdfs.js — PDF Downloads Data',   'serial, name, description, category, file, pages, isActive', pdfs) }
+      { pre: 'pdfsOutput',   dl: 'btnDownloadPdfsJs',   cp: 'btnCopyPdfsJs',   fn: 'pdfs.js',   js: buildDataJS('PDFS_DATA',   'data/pdfs.js — PDF Downloads Data',   'serial, name, author, category, file, pages, thumbImage, isActive', pdfs) }
     ];
     map.forEach(function (m) {
       $('#' + m.pre).text(m.js);
@@ -870,26 +885,28 @@ $(function () {
     var summary = 'Active: ' + ap + '/' + photos.length + ' photos, ' + av + '/' + videos.length + ' videos, ' + ad + '/' + pdfs.length + ' PDFs, ' + aa + '/' + audios.length + ' audios.';
 
     if (window.showDirectoryPicker) {
-      showStatus('ℹ Select the <strong>data/</strong> folder (yogiramsurathkumar/data/) to save JS files…', 'info');
+      showStatus('ℹ Select the <strong>root</strong> folder (where index.html lives) to save JS files…', 'info');
       window.showDirectoryPicker({ mode: 'readwrite' })
-        .then(function (dir) {
-          return Promise.all([
-            writeFileToDir(dir, 'version.js', buildVersionJS(newDataVer, langVer)),
-            writeFileToDir(dir, 'photos.js',  buildDataJS('PHOTOS_DATA', 'data/photos.js — Photo Gallery Data', 'serial, name, description, category, image, isActive', photos)),
-            writeFileToDir(dir, 'videos.js',  buildDataJS('VIDEOS_DATA', 'data/videos.js — Video Gallery Data', 'serial, name, description, category, youtubeUrl, duration, isActive', videos)),
-            writeFileToDir(dir, 'pdfs.js',    buildDataJS('PDFS_DATA',   'data/pdfs.js — PDF Downloads Data',   'serial, name, description, category, file, pages, isActive', pdfs)),
-            writeFileToDir(dir, 'audios.js',  buildDataJS('AUDIOS_DATA', 'data/audios.js — Audio Gallery Data', 'serial, name, description, category, audioFile, duration, isActive', audios))
-          ]).then(function () {
-            showStatus('✅ Saved! ' + summary + ' Version: <strong>' + newDataVer + '</strong> — old cache auto-clears on next page visit.', 'success');
+        .then(function (rootDir) {
+          return rootDir.getDirectoryHandle('data', { create: true }).then(function (dir) {
+            return Promise.all([
+              writeFileToDir(dir, 'version.js', buildVersionJS(newDataVer, langVer)),
+              writeFileToDir(dir, 'photos.js',  buildDataJS('PHOTOS_DATA', 'data/photos.js — Photo Gallery Data', 'serial, name, description, category, image, isActive', photos)),
+              writeFileToDir(dir, 'videos.js',  buildDataJS('VIDEOS_DATA', 'data/videos.js — Video Gallery Data', 'serial, name, description, category, youtubeUrl, duration, isActive', videos)),
+              writeFileToDir(dir, 'pdfs.js',    buildDataJS('PDFS_DATA',   'data/pdfs.js — PDF Downloads Data',   'serial, name, author, category, file, pages, thumbImage, isActive', pdfs)),
+              writeFileToDir(dir, 'audios.js',  buildDataJS('AUDIOS_DATA', 'data/audios.js — Audio Gallery Data', 'serial, name, description, category, audioFile, duration, isActive', audios))
+            ]).then(function () {
+              showStatus('✅ Saved! ' + summary + ' Version: <strong>' + newDataVer + '</strong> — old cache auto-clears on next page visit.', 'success', true);
+            });
           });
         })
         .catch(function (e) {
           showStatus(e.name === 'AbortError'
-            ? '✅ Saved to localStorage (v' + newDataVer + '). ' + summary + ' Select data/ folder to also update JS files.'
+            ? '✅ Saved to localStorage (v' + newDataVer + '). ' + summary + ' Select root folder to also update JS files.'
             : '✅ Saved to localStorage (v' + newDataVer + '). JS write error: ' + e.message, 'info');
         });
     } else {
-      showStatus('✅ Saved! ' + summary, 'success');
+      showStatus('✅ Saved! ' + summary, 'success', true);
     }
   });
 
@@ -919,7 +936,7 @@ $(function () {
         }
         if (wb.Sheets['PDFs']) {
           renderPdfs(XLSX.utils.sheet_to_json(wb.Sheets['PDFs'], {defval:''}).map(function(r,i){
-            return { serial: Number(r['Serial No'])||(i+1), name: String(r['Name']||''), description: String(r['Description']||''), category: String(r['Category']||'book'), file: String(r['PDF File']||''), pages: String(r['Pages']||''), isActive: parseActive(r['Is Active']) };
+            return { serial: Number(r['Serial No'])||(i+1), name: String(r['Name']||''), author: String(r['Author']||''), category: String(r['Category']||'book'), file: String(r['PDF File']||''), pages: String(r['Pages']||''), thumbImage: String(r['Thumbnail Image']||''), isActive: parseActive(r['Is Active']) };
           }).sort(sortBySerial));
         }
         refreshGalleryOutputs();
@@ -943,8 +960,8 @@ $(function () {
     var vWs = XLSX.utils.aoa_to_sheet(vD); vWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:46},{wch:12},{wch:10}];
     XLSX.utils.book_append_sheet(wb, vWs, 'Videos');
 
-    var dD = [['Serial No','Name','Description','Category','PDF File','Pages','Is Active']];
-    readPdfs().forEach(function(r){ dD.push([r.serial,r.name,r.description,r.category,r.file,r.pages,r.isActive||'yes']); });
+    var dD = [['Serial No','Name','Author','Category','PDF File','Pages','Thumbnail Image','Is Active']];
+    readPdfs().forEach(function(r){ dD.push([r.serial,r.name,r.author||'',r.category,r.file,r.pages,r.thumbImage||'',r.isActive||'yes']); });
     var dWs = XLSX.utils.aoa_to_sheet(dD); dWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:32},{wch:12},{wch:10}];
     XLSX.utils.book_append_sheet(wb, dWs, 'PDFs');
 
@@ -968,7 +985,7 @@ $(function () {
     vWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:46},{wch:12},{wch:10}];
     XLSX.utils.book_append_sheet(wb, vWs, 'Videos');
 
-    var dWs = XLSX.utils.aoa_to_sheet([['Serial No','Name','Description','Category','PDF File','Pages','Is Active']]);
+    var dWs = XLSX.utils.aoa_to_sheet([['Serial No','Name','Author','Category','PDF File','Pages','Thumbnail Image','Is Active']]);
     dWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:32},{wch:12},{wch:10}];
     XLSX.utils.book_append_sheet(wb, dWs, 'PDFs');
 
@@ -999,7 +1016,7 @@ $(function () {
       $('#audiosBody').append($('<tr>').append($('<td class="serial-td">').text(n), $('<td>').html(cell('')), $('<td class="desc-cell">').html(cell('','','textarea')), $('<td>').html(catSelect(CAT.audios,'discourse')), $('<td>').html(cell('audio/new.mp3')), $('<td>').html(cell('')), $('<td class="active-td">').html(activeSelect('yes')), $('<td>').html(delBtn())));
     } else if (tab === 'pdfs') {
       var n = $('#pdfsBody tr').length + 1;
-      $('#pdfsBody').append($('<tr>').append($('<td class="serial-td">').text(n), $('<td>').html(cell('')), $('<td class="desc-cell">').html(cell('','','textarea')), $('<td>').html(catSelect(CAT.pdfs,'book')), $('<td>').html(cell('pdfs/new.pdf')), $('<td>').html(cell('')), $('<td class="active-td">').html(activeSelect('yes')), $('<td>').html(delBtn())));
+      $('#pdfsBody').append($('<tr>').append($('<td class="serial-td">').text(n), $('<td>').html(cell('')), $('<td>').html(cell('')), $('<td>').html(catSelect(CAT.pdfs,'book')), $('<td>').html(cell('pdfs/new.pdf')), $('<td>').html(cell('')), $('<td>').html(cell('pdfs/images/new.jpg')), $('<td class="active-td">').html(activeSelect('yes')), $('<td>').html(delBtn())));
     }
     updateGalleryCounts();
   });
@@ -1011,7 +1028,58 @@ $(function () {
     $('#audiosCount').text($('#audiosBody tr').length);
   }
 
-  /* ── Generate Thumbnails ────────────────────────────────────
+  /* ── Shared File System helpers (used by both thumbnail generators) ── */
+
+  /* Navigate/create nested sub-folders */
+  function getDir(dir, parts) {
+    if (!parts.length) return Promise.resolve(dir);
+    return dir.getDirectoryHandle(parts[0], { create: true }).then(function (sub) {
+      return getDir(sub, parts.slice(1));
+    });
+  }
+
+  /* Resize image blob via Canvas → JPEG blob (cover crop to exact w×h) */
+  function resizeBlob(blob, maxW, maxH) {
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(blob);
+      var img = new Image();
+      img.onload = function () {
+        URL.revokeObjectURL(url);
+        var ratio = Math.min(maxW / img.width, maxH / img.height, 1);
+        var w = Math.round(img.width  * ratio);
+        var h = Math.round(img.height * ratio);
+        var canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        canvas.toBlob(function (b) { b ? resolve(b) : reject(new Error('Canvas toBlob failed')); }, 'image/jpeg', 0.82);
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('Image load failed')); };
+      img.src = url;
+    });
+  }
+
+  /* Write blob to a file via File System Access API */
+  function writeBlob(dirHandle, filename, blob) {
+    return dirHandle.getFileHandle(filename, { create: true }).then(function (fh) {
+      return fh.createWritable().then(function (w) {
+        return w.write(blob).then(function () { return w.close(); });
+      });
+    });
+  }
+
+  /* Read a local file by path parts — NO fetch, works on file:// */
+  function readFileFromDir(dir, parts) {
+    if (parts.length === 1) {
+      return dir.getFileHandle(parts[0]).then(function (fh) { return fh.getFile(); })
+        .then(function (f) { return f.arrayBuffer(); })
+        .then(function (buf) { return new Blob([buf]); });
+    }
+    return dir.getDirectoryHandle(parts[0]).then(function (sub) {
+      return readFileFromDir(sub, parts.slice(1));
+    });
+  }
+
+  /* ── Generate Photo Thumbnails ───────────────────────────────
      Reads each photo image, resizes via Canvas (400×300 max),
      saves JPEG to images/photos/thumbs/ via File System Access API  */
   $('#btnGenThumbs').on('click', function () {
@@ -1027,55 +1095,6 @@ $(function () {
 
     window.showDirectoryPicker({ mode: 'readwrite' }).then(function (rootDir) {
       showStatus('⏳ Generating thumbnails for ' + imgPaths.length + ' photo(s)…', 'info');
-
-      /* Helper: navigate to a sub-folder, creating it if needed */
-      function getDir(dir, parts) {
-        if (!parts.length) return Promise.resolve(dir);
-        return dir.getDirectoryHandle(parts[0], { create: true }).then(function (sub) {
-          return getDir(sub, parts.slice(1));
-        });
-      }
-
-      /* Helper: resize image blob via Canvas → return JPEG blob */
-      function resizeBlob(blob, maxW, maxH) {
-        return new Promise(function (resolve, reject) {
-          var url = URL.createObjectURL(blob);
-          var img = new Image();
-          img.onload = function () {
-            URL.revokeObjectURL(url);
-            var ratio = Math.min(maxW / img.width, maxH / img.height, 1);
-            var w = Math.round(img.width  * ratio);
-            var h = Math.round(img.height * ratio);
-            var canvas = document.createElement('canvas');
-            canvas.width = w; canvas.height = h;
-            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-            canvas.toBlob(function (b) { b ? resolve(b) : reject(new Error('Canvas toBlob failed')); }, 'image/jpeg', 0.82);
-          };
-          img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('Image load failed')); };
-          img.src = url;
-        });
-      }
-
-      /* Helper: write blob to a FileHandle */
-      function writeBlob(dirHandle, filename, blob) {
-        return dirHandle.getFileHandle(filename, { create: true }).then(function (fh) {
-          return fh.createWritable().then(function (w) {
-            return w.write(blob).then(function () { return w.close(); });
-          });
-        });
-      }
-
-      /* Helper: read a file from rootDir by path parts — NO fetch, works on file:// */
-      function readFileFromDir(dir, parts) {
-        if (parts.length === 1) {
-          return dir.getFileHandle(parts[0]).then(function (fh) { return fh.getFile(); })
-            .then(function (f) { return f.arrayBuffer(); })
-            .then(function (buf) { return new Blob([buf]); });
-        }
-        return dir.getDirectoryHandle(parts[0]).then(function (sub) {
-          return readFileFromDir(sub, parts.slice(1));
-        });
-      }
 
       var done = 0, failed = 0;
 
@@ -1110,9 +1129,9 @@ $(function () {
 
       return chain.then(function () {
         showStatus(
-          '✅ Thumbnails done! ' + done + ' generated' +
+          'Thumbnails done! ' + done + ' generated' +
           (failed  ? ', ' + failed  + ' failed (check console)' : '') +
-          '. Saved to images/photos/thumbs/', 'success'
+          '. Saved to images/photos/thumbs/', 'success', true
         );
       });
 
@@ -1122,15 +1141,13 @@ $(function () {
   });
 
   /* ── Generate PDF Thumbnails ─────────────────────────────────
-     Renders page 1 of each PDF via PDF.js (File System Access API),
-     saves JPEG to pdfs/thumbs/ — works on file:// without any server */
-  pdfjsLib.GlobalWorkerOptions.workerSrc =
-    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+     Reads each PDF's Thumbnail Image (from pdfs/images/), resizes to
+     360×480 JPEG and saves to pdfs/images/thumbs/ — same approach as photos */
 
   $('#btnGenPdfThumbs').on('click', function () {
-    var pdfs = readPdfs();
-    var pdfPaths = pdfs.map(function (r) { return r.file; }).filter(Boolean);
-    if (!pdfPaths.length) { showStatus('No PDFs found. Load or enter PDF data first.', 'error'); return; }
+    var pdfs       = readPdfs();
+    var imgEntries = pdfs.map(function (r) { return r.thumbImage; }).filter(Boolean);
+    if (!imgEntries.length) { showStatus('No Thumbnail Images found. Fill the "Thumbnail Image" column first.', 'error'); return; }
 
     if (!window.showDirectoryPicker) {
       showStatus('File System Access API not supported. Use Chrome or Edge.', 'error'); return;
@@ -1139,105 +1156,40 @@ $(function () {
     showStatus('⏳ Select your project root folder (where index.html lives)…', 'info');
 
     window.showDirectoryPicker({ mode: 'readwrite' }).then(function (rootDir) {
-      showStatus('⏳ Generating PDF thumbnails for ' + pdfPaths.length + ' PDF(s)…', 'info');
-
-      /* Navigate / create sub-folders */
-      function getDir(dir, parts) {
-        if (!parts.length) return Promise.resolve(dir);
-        return dir.getDirectoryHandle(parts[0], { create: true }).then(function (sub) {
-          return getDir(sub, parts.slice(1));
-        });
-      }
-
-      /* Read a local file via File System API (no fetch / no server needed) */
-      function readPdfFromDir(dir, parts) {
-        if (parts.length === 1) {
-          return dir.getFileHandle(parts[0]).then(function (fh) { return fh.getFile(); })
-            .then(function (f) { return f.arrayBuffer(); });
-        }
-        return dir.getDirectoryHandle(parts[0]).then(function (sub) {
-          return readPdfFromDir(sub, parts.slice(1));
-        });
-      }
-
-      /* Write blob to filesystem */
-      function writePdfThumb(dirHandle, filename, blob) {
-        return dirHandle.getFileHandle(filename, { create: true }).then(function (fh) {
-          return fh.createWritable().then(function (w) {
-            return w.write(blob).then(function () { return w.close(); });
-          });
-        });
-      }
-
-      /* Render PDF page 1 → fixed 360×480 JPEG (cover crop) */
-      var THUMB_W = 360, THUMB_H = 480;
-      function renderPdfPage(arrayBuffer) {
-        return pdfjsLib.getDocument({ data: arrayBuffer }).promise.then(function (pdf) {
-          return pdf.getPage(1).then(function (page) {
-            /* Scale to FILL 360×480 (cover — larger scale wins) */
-            var vp0   = page.getViewport({ scale: 1 });
-            var scale = Math.max(THUMB_W / vp0.width, THUMB_H / vp0.height);
-            var viewport = page.getViewport({ scale: scale });
-
-            /* Render to a temp canvas at the scaled size */
-            var tmp = document.createElement('canvas');
-            tmp.width  = Math.round(viewport.width);
-            tmp.height = Math.round(viewport.height);
-            return page.render({ canvasContext: tmp.getContext('2d'), viewport: viewport }).promise
-              .then(function () {
-                /* Crop-center onto the fixed 360×480 output canvas */
-                var out = document.createElement('canvas');
-                out.width = THUMB_W; out.height = THUMB_H;
-                var ctx = out.getContext('2d');
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, THUMB_W, THUMB_H);
-                var sx = Math.max(0, Math.round((tmp.width  - THUMB_W) / 2));
-                var sy = Math.max(0, Math.round((tmp.height - THUMB_H) / 2));
-                ctx.drawImage(tmp, sx, sy, THUMB_W, THUMB_H, 0, 0, THUMB_W, THUMB_H);
-                return new Promise(function (resolve, reject) {
-                  out.toBlob(
-                    function (b) { b ? resolve(b) : reject(new Error('toBlob failed')); },
-                    'image/jpeg', 0.85
-                  );
-                });
-              });
-          });
-        });
-      }
+      showStatus('⏳ Generating PDF thumbnails for ' + imgEntries.length + ' image(s)…', 'info');
 
       var done = 0, failed = 0;
       var chain = Promise.resolve();
 
-      pdfPaths.forEach(function (pdfPath) {
+      imgEntries.forEach(function (imgPath) {
         chain = chain.then(function () {
-          var parts        = pdfPath.replace(/\\/g, '/').split('/');
-          var thumbName    = parts[parts.length - 1].replace(/\.[^.]+$/, '.jpg');
-          var folders      = parts.slice(0, -1);             /* e.g. ['pdfs'] */
-          var thumbFolders = folders.concat(['thumbs']);      /* e.g. ['pdfs','thumbs'] */
+          var parts        = imgPath.replace(/\\/g, '/').split('/');
+          var filename     = parts[parts.length - 1];
+          var thumbFolders = parts.slice(0, -1).concat(['thumbs']); /* pdfs/images → pdfs/images/thumbs */
 
-          return readPdfFromDir(rootDir, parts)
-            .then(function (arrayBuffer) { return renderPdfPage(arrayBuffer); })
+          return readFileFromDir(rootDir, parts)
+            .then(function (blob) { return resizeBlob(blob, 360, 480); })
             .then(function (thumbBlob) {
               return getDir(rootDir, thumbFolders).then(function (thumbDir) {
-                return writePdfThumb(thumbDir, thumbName, thumbBlob);
+                return writeBlob(thumbDir, filename, thumbBlob);
               });
             })
             .then(function () {
               done++;
-              showStatus('⏳ Generated ' + done + ' / ' + pdfPaths.length + ' PDF thumbnails…', 'info');
+              showStatus('⏳ Generated ' + done + ' / ' + imgEntries.length + ' PDF thumbnails…', 'info');
             })
             .catch(function (err) {
               failed++;
-              console.warn('PDF thumb failed for ' + pdfPath + ':', err.message);
+              console.warn('PDF thumb failed for ' + imgPath + ':', err.message);
             });
         });
       });
 
       return chain.then(function () {
         showStatus(
-          '✅ PDF thumbnails done! ' + done + ' generated' +
+          'PDF thumbnails done! ' + done + ' generated' +
           (failed ? ', ' + failed + ' failed (check console)' : '') +
-          '. Saved to pdfs/thumbs/', 'success'
+          '. Saved to pdfs/images/thumbs/', 'success', true
         );
       });
 
@@ -1267,8 +1219,51 @@ function templateToRows() {
   });
 }
 
+function escHtml(v) { return $('<div>').text(String(v || '')).html(); }
+
+function langActiveSelect(val) {
+  var isNo = (String(val || '').toLowerCase().trim() === 'no');
+  return '<select class="editable active-select lang-active-select">' +
+    '<option value="yes"' + (!isNo ? ' selected' : '') + '>✅ Yes</option>' +
+    '<option value="no"'  + (isNo  ? ' selected' : '') + '>❌ No</option>' +
+    '</select>';
+}
+
+function makeLangRow(r) {
+  var isNo = (String(r.isActive || '').toLowerCase() === 'no');
+  var $tr = $('<tr>').append(
+    $('<td>').html('<input type="text" class="editable" value="' + escHtml(r.key) + '" />'),
+    $('<td>').html('<input type="text" class="editable" value="' + escHtml(r.en)  + '" />'),
+    $('<td class="ta-cell">').html('<input type="text" class="editable" value="' + escHtml(r.ta) + '" />'),
+    $('<td class="active-td">').html(langActiveSelect(r.isActive)),
+    $('<td>').html('<button class="del-row" title="Delete row">✕</button>')
+  );
+  if (isNo) $tr.addClass('row-inactive');
+  return $tr;
+}
+
+function readLangRows() {
+  return $('#langPreviewBody tr:not(.empty-row)').map(function () {
+    var $t = $(this).find('td');
+    return {
+      key:      $t.eq(0).find('input').val().trim(),
+      en:       $t.eq(1).find('input').val().trim(),
+      ta:       $t.eq(2).find('input').val().trim(),
+      isActive: $t.eq(3).find('select').val() || 'yes'
+    };
+  }).get().filter(function (r) { return r.key; });
+}
+
 function activeLangRows() {
-  return langRows.filter(function (r) { return r.isActive !== 'no'; });
+  return readLangRows().filter(function (r) { return r.isActive !== 'no'; });
+}
+
+function refreshLangOutputs() {
+  var all = readLangRows().length;
+  var active = activeLangRows().length;
+  $('#langPreviewTitle').text('Preview — ' + all + ' keys (' + active + ' active)');
+  $('#enOutput').text(generateJS('en', 'LANG_EN', 'English'));
+  $('#taOutput').text(generateJS('ta', 'LANG_TA', 'Tamil (தமிழ்)'));
 }
 
 function pad(s, n) { return s.length >= n ? s : s + ' '.repeat(n - s.length); }
@@ -1300,24 +1295,11 @@ function buildLangObject(lang) {
 function renderLangPreview() {
   var $body = $('#langPreviewBody').empty();
   if (!langRows.length) {
-    $body.append('<tr class="empty-row"><td colspan="4" style="text-align:center;padding:36px;color:var(--text-light)">No data</td></tr>');
+    $body.append('<tr class="empty-row"><td colspan="5" style="text-align:center;padding:36px;color:var(--text-light)">No data. Upload Excel or click ➕ Add Row.</td></tr>');
     return;
   }
-  langRows.forEach(function (r) {
-    var isNo = (r.isActive === 'no');
-    var $tr = $('<tr>').append(
-      $('<td>').text(r.key),
-      $('<td>').text(r.en),
-      $('<td class="ta-cell">').text(r.ta),
-      $('<td class="active-cell">').html(isNo ? '<span class="badge-no">❌ No</span>' : '<span class="badge-yes">✅ Yes</span>')
-    );
-    if (isNo) $tr.addClass('row-inactive');
-    $body.append($tr);
-  });
-  var activeCount = activeLangRows().length;
-  $('#langPreviewTitle').text('Preview — ' + langRows.length + ' keys (' + activeCount + ' active)');
-  $('#enOutput').text(generateJS('en', 'LANG_EN', 'English'));
-  $('#taOutput').text(generateJS('ta', 'LANG_TA', 'Tamil (தமிழ்)'));
+  langRows.forEach(function (r) { $body.append(makeLangRow(r)); });
+  refreshLangOutputs();
 }
 
 function parseLangWorkbook(wb) {
@@ -1336,13 +1318,12 @@ function parseLangWorkbook(wb) {
     var av = colAct >= 0 ? (data[i][colAct] + '').toLowerCase().trim() : 'yes';
     langRows.push({ key: key, en: (data[i][colEn]+'').trim(), ta: (data[i][colTa]+'').trim(), isActive: (av==='no'||av==='false'||av==='0') ? 'no' : 'yes' });
   }
-  $('#langStatusPill').removeClass('no-data').addClass('loaded').text('✅ ' + langRows.length + ' keys loaded (' + activeLangRows().length + ' active)');
   renderLangPreview();
+  $('#langStatusPill').removeClass('no-data').addClass('loaded').text('✅ ' + readLangRows().length + ' keys loaded (' + activeLangRows().length + ' active)');
 }
 
 /* 💾 Save to Website — Lang */
 $('#btnLangSave').on('click', function () {
-  if (!langRows.length) langRows = templateToRows();
   var activeCount = activeLangRows().length;
   var enJS = generateJS('en', 'LANG_EN', 'English');
   var taJS = generateJS('ta', 'LANG_TA', 'Tamil (தமிழ்)');
@@ -1353,26 +1334,28 @@ $('#btnLangSave').on('click', function () {
   $('#langStatusPill').removeClass('no-data').addClass('loaded').text('✅ Saved: ' + activeCount + ' active keys (v' + newLangVer + ')');
 
   if (window.showDirectoryPicker) {
-    showStatus('ℹ Select the <strong>data/</strong> folder (yogiramsurathkumar/data/) to save JS files…', 'info');
+    showStatus('ℹ Select the <strong>root</strong> folder (where index.html lives) to save JS files…', 'info');
     window.showDirectoryPicker({ mode: 'readwrite' })
-      .then(function (dir) {
-        return dir.getDirectoryHandle('lang', { create: false }).then(function (langDir) {
-          return Promise.all([
-            writeFileToDir(dir,     'version.js', buildVersionJS(dataVer, newLangVer)),
-            writeFileToDir(langDir, 'en.js', enJS),
-            writeFileToDir(langDir, 'ta.js', taJS)
-          ]).then(function () {
-            showStatus('✅ Saved! ' + activeCount + ' active keys → localStorage + version.js, en.js & ta.js written. Version: <strong>' + newLangVer + '</strong>', 'success');
+      .then(function (rootDir) {
+        return rootDir.getDirectoryHandle('data', { create: true }).then(function (dir) {
+          return dir.getDirectoryHandle('lang', { create: true }).then(function (langDir) {
+            return Promise.all([
+              writeFileToDir(dir,     'version.js', buildVersionJS(dataVer, newLangVer)),
+              writeFileToDir(langDir, 'en.js', enJS),
+              writeFileToDir(langDir, 'ta.js', taJS)
+            ]).then(function () {
+              showStatus('✅ Saved! ' + activeCount + ' active keys → localStorage + version.js, en.js & ta.js written. Version: <strong>' + newLangVer + '</strong>', 'success', true);
+            });
           });
         });
       })
       .catch(function (e) {
         showStatus(e.name === 'AbortError'
-          ? '✅ Saved to localStorage (v' + newLangVer + ', ' + activeCount + ' keys). Select data/ folder to also update JS files.'
+          ? '✅ Saved to localStorage (v' + newLangVer + ', ' + activeCount + ' keys). Select root folder to also update JS files.'
           : '✅ Saved to localStorage (v' + newLangVer + '). JS write error: ' + e.message, 'info');
       });
   } else {
-    showStatus('✅ Saved ' + activeCount + ' active language keys (v' + newLangVer + '). Language switcher uses these translations instantly.', 'success');
+    showStatus('✅ Saved ' + activeCount + ' active language keys (v' + newLangVer + '). Language switcher uses these translations instantly.', 'success', true);
   }
 });
 
@@ -1383,10 +1366,9 @@ $('#btnLangClearCache').on('click', function () {
   showStatus('Language cache cleared. Website will use built-in en.js / ta.js files.', 'info');
 });
 
-/* Download template Excel */
 /* Download Excel — current data */
 $('#btnLangDownload').on('click', function () {
-  if (!rows.length) rows = templateToRows();
+  var rows = readLangRows();
   var aoa = [['key','English','Tamil','is_active']];
   rows.forEach(function (r) { aoa.push([r.key, r.en, r.ta, r.isActive || 'yes']); });
   var ws = XLSX.utils.aoa_to_sheet(aoa);
@@ -1421,12 +1403,38 @@ function downloadText(content, filename) {
   a.href = URL.createObjectURL(new Blob([content], { type: 'text/javascript;charset=utf-8' }));
   a.download = filename; a.click();
 }
-$('#btnDownloadEn').on('click', function () { if (!langRows.length) langRows = templateToRows(); downloadText(generateJS('en','LANG_EN','English'), 'en.js'); });
-$('#btnDownloadTa').on('click', function () { if (!langRows.length) langRows = templateToRows(); downloadText(generateJS('ta','LANG_TA','Tamil (தமிழ்)'), 'ta.js'); });
+$('#btnDownloadEn').on('click', function () { downloadText(generateJS('en','LANG_EN','English'), 'en.js'); });
+$('#btnDownloadTa').on('click', function () { downloadText(generateJS('ta','LANG_TA','Tamil (தமிழ்)'), 'ta.js'); });
 
 /* Copy to clipboard */
 $('#btnCopyEn').on('click', function () { navigator.clipboard.writeText(generateJS('en','LANG_EN','English')).then(function(){ showStatus('en.js copied to clipboard!','success'); }); });
 $('#btnCopyTa').on('click', function () { navigator.clipboard.writeText(generateJS('ta','LANG_TA','Tamil (தமிழ்)')).then(function(){ showStatus('ta.js copied to clipboard!','success'); }); });
+
+/* ➕ Add Row — Lang */
+$('#btnLangAddRow').on('click', function () {
+  $('#langPreviewBody .empty-row').remove();
+  var n = $('#langPreviewBody tr').length + 1;
+  $('#langPreviewBody').append(makeLangRow({ key: 'new_key_' + n, en: '', ta: '', isActive: 'yes' }));
+  refreshLangOutputs();
+});
+
+/* ✕ Delete Row — Lang (delegated, only for lang table) */
+$('#langPreviewBody').on('click', '.del-row', function () {
+  if (confirm('Delete this row?')) {
+    $(this).closest('tr').remove();
+    if (!$('#langPreviewBody tr').length) {
+      $('#langPreviewBody').append('<tr class="empty-row"><td colspan="5" style="text-align:center;padding:36px;color:var(--text-light)">No data. Upload Excel or click ➕ Add Row.</td></tr>');
+    }
+    refreshLangOutputs();
+  }
+});
+
+/* Is Active change — row highlight */
+$('#langPreviewBody').on('change', '.lang-active-select', function () {
+  var $tr = $(this).closest('tr');
+  $(this).val() === 'no' ? $tr.addClass('row-inactive') : $tr.removeClass('row-inactive');
+  refreshLangOutputs();
+});
 
 /* Init lang on load */
 langRows = templateToRows();

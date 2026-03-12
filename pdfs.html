@@ -248,20 +248,20 @@ $(function () {
     appendBatch();
   }
 
-  /* 'pdfs/myfile.pdf' → 'pdfs/thumbs/myfile.jpg' */
-  function pdfThumbPath(filePath) {
-    if (!filePath) return '';
-    var parts    = filePath.replace(/\\/g, '/').split('/');
-    var filename = parts.pop().replace(/\.[^.]+$/, '.jpg');
+  /* 'pdfs/images/book.jpg' → 'pdfs/images/thumbs/book.jpg' */
+  function pdfThumbPath(imagePath) {
+    if (!imagePath) return '';
+    var parts    = imagePath.replace(/\\/g, '/').split('/');
+    var filename = parts.pop();
     return parts.join('/') + '/thumbs/' + filename;
   }
 
   function makeCard(p) {
     var serial = String(p.serial).padStart(2, '0');
     var icon   = catIcons[p.category] || '📄';
-    var thumb  = pdfThumbPath(p.file);
+    var thumb  = pdfThumbPath(p.thumbImage);
 
-    var $img = p.file
+    var $img = p.thumbImage
       ? $('<img>', { 'data-src': thumb, alt: p.name, style: 'width:100%;height:100%;object-fit:cover;display:block;' })
           .on('error', function () {
             var $i = $(this);
@@ -286,7 +286,7 @@ $(function () {
         '<h3 class="pdf-title"><span class="pdf-serial-inline">#' + serial + '</span> ' + p.name + '</h3>',
         '<p class="pdf-meta">📂 ' + (p.category || '') +
           (p.pages ? ' &nbsp;|&nbsp; 📄 ' + p.pages + ' pages' : '') + '</p>',
-        '<p style="font-size:0.84rem;color:var(--text-body);line-height:1.6;margin-bottom:12px;">' + p.description + '</p>',
+        (p.author ? '<p style="font-size:0.84rem;color:var(--text-body);line-height:1.6;margin-bottom:12px;">✍ ' + p.author + '</p>' : ''),
         $('<div class="pdf-btn-group">').append(
           $('<a>', { href: p.file, 'class': 'pdf-view', target: '_blank', text: t('btn_view') }),
           $('<a>', { href: p.file, 'class': 'pdf-download', download: '', text: t('btn_download') })
