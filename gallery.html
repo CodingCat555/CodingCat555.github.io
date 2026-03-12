@@ -79,7 +79,6 @@
     .gallery-item.share-open { overflow: visible; z-index: 200; position: relative; }
     .gallery-item.share-open > img,
     .gallery-item.share-open .gallery-overlay,
-    .gallery-item.share-open .gallery-zoom,
     .gallery-item.share-open .serial-badge { border-radius: var(--radius-lg); }
   </style>
 </head>
@@ -297,6 +296,16 @@ $(function () {
     appendBatch();
   }
 
+  /* ── Thumbnail path helper ─────────────────────────────────
+     'images/photos/photo1.jpg' → 'images/photos/thumbs/photo1.jpg'
+     Falls back to full image if thumb path is not available      */
+  function thumbPath(imgPath) {
+    if (!imgPath) return imgPath;
+    var parts = imgPath.split('/');
+    var filename = parts.pop();
+    return parts.join('/') + '/thumbs/' + filename;
+  }
+
   var SVG_SHARE = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>';
 
   function makeShareMenu(item) {
@@ -329,8 +338,17 @@ $(function () {
       'data-caption' : item.name
     }).append(
       '<span class="serial-badge">' + sn + '</span>',
-      $('<img>', { 'data-src': item.image, alt: item.name }).on('error', function () {
-        $(this).replaceWith(
+      $('<img>', { 'data-src': thumbPath(item.image), 'data-full': item.image, alt: item.name }).on('error', function () {
+        var $img = $(this);
+        var full = $img.data('full');
+        /* Step 1: thumb failed → try full image directly */
+        if (!$img.data('triedFull') && full) {
+          $img.data('triedFull', true);
+          this.src = full;
+          return;
+        }
+        /* Step 2: both thumb and full failed → show 🪔 placeholder */
+        $img.replaceWith(
           '<div class="gallery-placeholder">' +
             '<span class="ph-icon">🪔</span>' +
             '<span class="ph-text">' + sn + ' ' + item.name + '</span>' +
@@ -341,7 +359,6 @@ $(function () {
         '<span class="gallery-caption">' + item.name + '</span>' +
         '<span class="gallery-desc">' + item.description + '</span>' +
       '</div>',
-      '<div class="gallery-zoom">🔍</div>',
       makeShareMenu(item)
     );
   }

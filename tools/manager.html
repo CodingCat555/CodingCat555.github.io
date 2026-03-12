@@ -7,6 +7,7 @@
 
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="../data/version.js"></script>
   <script src="../data/photos.js"></script>
   <script src="../data/videos.js"></script>
@@ -276,6 +277,8 @@
     <button class="btn btn-green" id="btnGallerySave">💾 Save to Website</button>
     <div class="toolbar-sep"></div>
     <button class="btn btn-outline" id="btnAddRow">➕ Add Row</button>
+    <button class="btn btn-outline" id="btnGenThumbs">🖼 Generate Thumbnails</button>
+    <button class="btn btn-outline" id="btnGenPdfThumbs">📄 Generate PDF Thumbnails</button>
     <button class="btn btn-red" id="btnGalleryClearCache">🗑 Clear Cache</button>
     <div class="toolbar-sep"></div>
     <span class="pill no-data" id="galleryDataPill">⚠ No data cached</span>
@@ -1007,6 +1010,229 @@ $(function () {
     $('#pdfsCount').text($('#pdfsBody tr').length);
     $('#audiosCount').text($('#audiosBody tr').length);
   }
+
+  /* ── Generate Thumbnails ────────────────────────────────────
+     Reads each photo image, resizes via Canvas (400×300 max),
+     saves JPEG to images/photos/thumbs/ via File System Access API  */
+  $('#btnGenThumbs').on('click', function () {
+    var photos = readPhotos();
+    var imgPaths = photos.map(function (r) { return r.image; }).filter(Boolean);
+    if (!imgPaths.length) { showStatus('No photos found. Load or enter photo data first.', 'error'); return; }
+
+    if (!window.showDirectoryPicker) {
+      showStatus('File System Access API not supported. Use Chrome or Edge.', 'error'); return;
+    }
+
+    showStatus('⏳ Select your project root folder (where index.html lives)…', 'info');
+
+    window.showDirectoryPicker({ mode: 'readwrite' }).then(function (rootDir) {
+      showStatus('⏳ Generating thumbnails for ' + imgPaths.length + ' photo(s)…', 'info');
+
+      /* Helper: navigate to a sub-folder, creating it if needed */
+      function getDir(dir, parts) {
+        if (!parts.length) return Promise.resolve(dir);
+        return dir.getDirectoryHandle(parts[0], { create: true }).then(function (sub) {
+          return getDir(sub, parts.slice(1));
+        });
+      }
+
+      /* Helper: resize image blob via Canvas → return JPEG blob */
+      function resizeBlob(blob, maxW, maxH) {
+        return new Promise(function (resolve, reject) {
+          var url = URL.createObjectURL(blob);
+          var img = new Image();
+          img.onload = function () {
+            URL.revokeObjectURL(url);
+            var ratio = Math.min(maxW / img.width, maxH / img.height, 1);
+            var w = Math.round(img.width  * ratio);
+            var h = Math.round(img.height * ratio);
+            var canvas = document.createElement('canvas');
+            canvas.width = w; canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            canvas.toBlob(function (b) { b ? resolve(b) : reject(new Error('Canvas toBlob failed')); }, 'image/jpeg', 0.82);
+          };
+          img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('Image load failed')); };
+          img.src = url;
+        });
+      }
+
+      /* Helper: write blob to a FileHandle */
+      function writeBlob(dirHandle, filename, blob) {
+        return dirHandle.getFileHandle(filename, { create: true }).then(function (fh) {
+          return fh.createWritable().then(function (w) {
+            return w.write(blob).then(function () { return w.close(); });
+          });
+        });
+      }
+
+      /* Helper: read a file from rootDir by path parts — NO fetch, works on file:// */
+      function readFileFromDir(dir, parts) {
+        if (parts.length === 1) {
+          return dir.getFileHandle(parts[0]).then(function (fh) { return fh.getFile(); })
+            .then(function (f) { return f.arrayBuffer(); })
+            .then(function (buf) { return new Blob([buf]); });
+        }
+        return dir.getDirectoryHandle(parts[0]).then(function (sub) {
+          return readFileFromDir(sub, parts.slice(1));
+        });
+      }
+
+      var done = 0, failed = 0;
+
+      /* Process photos one by one */
+      var chain = Promise.resolve();
+      imgPaths.forEach(function (imgPath) {
+        chain = chain.then(function () {
+          /* imgPath like 'images/photos/photo1.jpg' */
+          var parts        = imgPath.replace(/\\/g, '/').split('/');
+          var filename     = parts[parts.length - 1];
+          var folders      = parts.slice(0, -1);        /* ['images','photos'] */
+          var thumbFolders = folders.concat(['thumbs']); /* ['images','photos','thumbs'] */
+
+          /* Read source image directly via File System API (works on file://) */
+          return readFileFromDir(rootDir, parts)
+            .then(function (blob) { return resizeBlob(blob, 400, 300); })
+            .then(function (thumbBlob) {
+              return getDir(rootDir, thumbFolders).then(function (thumbDir) {
+                return writeBlob(thumbDir, filename, thumbBlob);
+              });
+            })
+            .then(function () {
+              done++;
+              showStatus('⏳ Generated ' + done + ' / ' + imgPaths.length + ' thumbnails…', 'info');
+            })
+            .catch(function (err) {
+              failed++;
+              console.warn('Thumb failed for ' + imgPath + ':', err.message);
+            });
+        });
+      });
+
+      return chain.then(function () {
+        showStatus(
+          '✅ Thumbnails done! ' + done + ' generated' +
+          (failed  ? ', ' + failed  + ' failed (check console)' : '') +
+          '. Saved to images/photos/thumbs/', 'success'
+        );
+      });
+
+    }).catch(function (e) {
+      if (e.name !== 'AbortError') showStatus('Error: ' + e.message, 'error');
+    });
+  });
+
+  /* ── Generate PDF Thumbnails ─────────────────────────────────
+     Renders page 1 of each PDF via PDF.js (File System Access API),
+     saves JPEG to pdfs/thumbs/ — works on file:// without any server */
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+  $('#btnGenPdfThumbs').on('click', function () {
+    var pdfs = readPdfs();
+    var pdfPaths = pdfs.map(function (r) { return r.file; }).filter(Boolean);
+    if (!pdfPaths.length) { showStatus('No PDFs found. Load or enter PDF data first.', 'error'); return; }
+
+    if (!window.showDirectoryPicker) {
+      showStatus('File System Access API not supported. Use Chrome or Edge.', 'error'); return;
+    }
+
+    showStatus('⏳ Select your project root folder (where index.html lives)…', 'info');
+
+    window.showDirectoryPicker({ mode: 'readwrite' }).then(function (rootDir) {
+      showStatus('⏳ Generating PDF thumbnails for ' + pdfPaths.length + ' PDF(s)…', 'info');
+
+      /* Navigate / create sub-folders */
+      function getDir(dir, parts) {
+        if (!parts.length) return Promise.resolve(dir);
+        return dir.getDirectoryHandle(parts[0], { create: true }).then(function (sub) {
+          return getDir(sub, parts.slice(1));
+        });
+      }
+
+      /* Read a local file via File System API (no fetch / no server needed) */
+      function readPdfFromDir(dir, parts) {
+        if (parts.length === 1) {
+          return dir.getFileHandle(parts[0]).then(function (fh) { return fh.getFile(); })
+            .then(function (f) { return f.arrayBuffer(); });
+        }
+        return dir.getDirectoryHandle(parts[0]).then(function (sub) {
+          return readPdfFromDir(sub, parts.slice(1));
+        });
+      }
+
+      /* Write blob to filesystem */
+      function writePdfThumb(dirHandle, filename, blob) {
+        return dirHandle.getFileHandle(filename, { create: true }).then(function (fh) {
+          return fh.createWritable().then(function (w) {
+            return w.write(blob).then(function () { return w.close(); });
+          });
+        });
+      }
+
+      /* Render PDF page 1 → JPEG blob using PDF.js */
+      function renderPdfPage(arrayBuffer) {
+        return pdfjsLib.getDocument({ data: arrayBuffer }).promise.then(function (pdf) {
+          return pdf.getPage(1).then(function (page) {
+            /* Scale so longest edge ≤ 480px */
+            var vp0 = page.getViewport({ scale: 1 });
+            var scale = Math.min(480 / vp0.width, 640 / vp0.height, 1.5);
+            var viewport = page.getViewport({ scale: scale });
+            var canvas = document.createElement('canvas');
+            canvas.width  = Math.round(viewport.width);
+            canvas.height = Math.round(viewport.height);
+            var ctx = canvas.getContext('2d');
+            return page.render({ canvasContext: ctx, viewport: viewport }).promise.then(function () {
+              return new Promise(function (resolve, reject) {
+                canvas.toBlob(
+                  function (b) { b ? resolve(b) : reject(new Error('toBlob failed')); },
+                  'image/jpeg', 0.85
+                );
+              });
+            });
+          });
+        });
+      }
+
+      var done = 0, failed = 0;
+      var chain = Promise.resolve();
+
+      pdfPaths.forEach(function (pdfPath) {
+        chain = chain.then(function () {
+          var parts        = pdfPath.replace(/\\/g, '/').split('/');
+          var thumbName    = parts[parts.length - 1].replace(/\.[^.]+$/, '.jpg');
+          var folders      = parts.slice(0, -1);             /* e.g. ['pdfs'] */
+          var thumbFolders = folders.concat(['thumbs']);      /* e.g. ['pdfs','thumbs'] */
+
+          return readPdfFromDir(rootDir, parts)
+            .then(function (arrayBuffer) { return renderPdfPage(arrayBuffer); })
+            .then(function (thumbBlob) {
+              return getDir(rootDir, thumbFolders).then(function (thumbDir) {
+                return writePdfThumb(thumbDir, thumbName, thumbBlob);
+              });
+            })
+            .then(function () {
+              done++;
+              showStatus('⏳ Generated ' + done + ' / ' + pdfPaths.length + ' PDF thumbnails…', 'info');
+            })
+            .catch(function (err) {
+              failed++;
+              console.warn('PDF thumb failed for ' + pdfPath + ':', err.message);
+            });
+        });
+      });
+
+      return chain.then(function () {
+        showStatus(
+          '✅ PDF thumbnails done! ' + done + ' generated' +
+          (failed ? ', ' + failed + ' failed (check console)' : '') +
+          '. Saved to pdfs/thumbs/', 'success'
+        );
+      });
+
+    }).catch(function (e) {
+      if (e.name !== 'AbortError') showStatus('Error: ' + e.message, 'error');
+    });
+  });
 
   /* Clear gallery cache */
   $('#btnGalleryClearCache').on('click', function () {
