@@ -76,4 +76,22 @@
     inject();
   }
 
+  /* ── Nav Share Button ── */
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('#navShareBtn');
+    if (!btn) return;
+    var url  = window.location.href.split('?')[0];
+    var title = 'Yogi Ramsuratkumar';
+    var text  = 'Yogi Ramsuratkumar — A tribute website dedicated to the beloved saint of Tiruvannamalai';
+    if (navigator.share) {
+      navigator.share({ title: title, text: text, url: url }).catch(function () {});
+    } else {
+      /* Desktop fallback: copy URL */
+      navigator.clipboard.writeText(url).then(function () {
+        btn.textContent = '✓';
+        setTimeout(function () { btn.textContent = '📤'; }, 1800);
+      }).catch(function () {});
+    }
+  });
+
 })();

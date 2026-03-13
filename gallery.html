@@ -151,6 +151,9 @@
           <li><button class="lang-btn" data-lang="ta">தமிழ்</button></li>
         </ul>
       </li>
+      <li class="nav-item">
+        <button class="nav-link nav-share-btn" id="navShareBtn" title="Share this website"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share</button>
+      </li>
     </ul>
     <button class="hamburger" id="hamburger" aria-label="Toggle menu">
       <span></span><span></span><span></span>
@@ -319,18 +322,10 @@ $(function () {
   var isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
   function makeShareMenu(item) {
-    var text = encodeURIComponent('Yogi Ramsuratkumar — ' + item.name);
-    var pageUrl = encodeURIComponent(window.location.href.split('?')[0]);
-    var twUrl = 'https://twitter.com/intent/tweet?text=' + text + '&url=' + pageUrl;
-    var fbUrl = 'https://www.facebook.com/sharer/sharer.php?u=' + pageUrl;
     return '<div class="gallery-share" data-img="' + item.image + '" data-name="' + item.name.replace(/"/g,'&quot;') + '">' +
       '<button class="share-toggle" title="Share Photo">' + SVG_SHARE + '</button>' +
       '<div class="share-menu">' +
         '<button class="share-option share-native"><span class="sh-icon sh-native">📤</span> Share Photo</button>' +
-        '<div class="share-divider"></div>' +
-        (isMobile ? '<button class="share-option share-whatsapp"><span class="sh-icon sh-wa">&#128172;</span> Share via WhatsApp</button>' : '') +
-        '<a class="share-option" href="' + fbUrl + '" target="_blank" rel="noopener"><span class="sh-icon sh-fb">f</span> Facebook</a>' +
-        '<a class="share-option" href="' + twUrl + '" target="_blank" rel="noopener"><span class="sh-icon sh-tw">𝕏</span> Twitter / X</a>' +
         '<div class="share-divider"></div>' +
         '<button class="share-option share-download"><span class="sh-icon sh-dl">⬇</span> Download Photo</button>' +
       '</div>' +

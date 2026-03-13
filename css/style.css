@@ -107,6 +107,14 @@ h1, h2, h3, h4, h5, h6 { font-family: 'Cinzel', 'Georgia', serif; color: var(--t
 .dropdown li a:hover { color: var(--green); background: rgba(26, 107, 46, 0.07); }
 .dropdown li a::before { content: '🪔 '; font-size: 0.75rem; }
 
+/* Nav Share Button — styled as a nav-link */
+.nav-share-btn {
+  background: none; border: none; cursor: pointer;
+  display: flex; align-items: center; gap: 5px;
+  font-size: inherit; font-family: inherit; white-space: nowrap;
+  justify-content: flex-start !important;
+}
+
 /* Hamburger */
 .hamburger { display: none; flex-direction: column; cursor: pointer; padding: 5px; gap: 5px; background: none; border: none; z-index: 1002; }
 .hamburger span { display: block; width: 24px; height: 2.5px; background: var(--green); border-radius: 3px; transition: var(--transition); }
