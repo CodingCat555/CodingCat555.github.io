@@ -46,8 +46,9 @@
     @media (max-width: 640px) {
       .quotes-grid { grid-template-columns: 1fr; }
 
-      /* Image — smaller on mobile */
-      .quote-img-wrap { width: 100px; }
+      /* Keep horizontal layout on mobile */
+      .quote-card { flex-direction: row; }
+      .quote-img-wrap { width: 110px; min-height: 110px; }
       .quote-body { padding: 12px 14px; }
       .quote-text { font-size: 0.78rem; }
       .quote-ta   { font-size: 0.70rem; }
