@@ -12,6 +12,7 @@
   <script src="../data/videos.js"></script>
   <script src="../data/pdfs.js"></script>
   <script src="../data/audios.js"></script>
+  <script src="../data/quotes.js"></script>
   <script src="../data/data-loader.js"></script>
 
   <style>
@@ -142,6 +143,7 @@
     }
     .editable:focus { outline: none; border-color: var(--green); background: white; box-shadow: 0 0 0 3px rgba(26,107,46,0.1); }
     .desc-cell .editable { min-height: 50px; }
+    .q-textarea { min-height: 56px; resize: vertical; }
     select.editable { cursor: pointer; }
     .active-select { font-weight: 700; }
     .del-row { background: none; border: none; color: #c62828; cursor: pointer; font-size: 1rem; padding: 3px 5px; border-radius: 4px; }
@@ -240,7 +242,7 @@
 <div class="mode-bar">
   <label for="modeSelect">Manager Mode:</label>
   <select id="modeSelect">
-    <option value="gallery">🖼 Gallery Manager — Photos · Videos · Audios · PDFs</option>
+    <option value="gallery">🖼 Gallery Manager — Photos · Videos · Audios · PDFs · Quotes</option>
     <option value="lang">🌐 Language Manager — English &amp; Tamil Translations</option>
   </select>
   <span class="mode-desc" id="modeDesc">Upload Excel or edit rows → set Is Active → Save to Website</span>
@@ -285,6 +287,7 @@
     <button class="btn btn-outline" id="btnAddRow">➕ Add Row</button>
     <button class="btn btn-outline" id="btnGenThumbs">🖼 Generate Photo Thumbnails</button>
     <button class="btn btn-outline" id="btnGenPdfThumbs">📄 Generate PDF Thumbnails</button>
+    <button class="btn btn-outline" id="btnGenQuoteThumbs">✨ Generate Quote Thumbnails</button>
     <button class="btn btn-red" id="btnGalleryClearCache">🗑 Clear Cache</button>
     <div class="toolbar-sep"></div>
     <span class="pill no-data" id="galleryDataPill">⚠ No data cached</span>
@@ -304,6 +307,7 @@
     <div class="toolbar-sep"></div>
     <span id="langStatusPill" class="pill no-data">⚪ No file loaded</span>
   </div>
+
 </div>
 
 <!-- ===== GALLERY TABS ===== -->
@@ -312,6 +316,7 @@
   <button class="tab-btn" data-tab="videos">🎬 Videos <span class="tab-count" id="videosCount">0</span></button>
   <button class="tab-btn" data-tab="audios">🎵 Audios <span class="tab-count" id="audiosCount">0</span></button>
   <button class="tab-btn" data-tab="pdfs">📚 PDFs <span class="tab-count" id="pdfsCount">0</span></button>
+  <button class="tab-btn" data-tab="quotes">✨ Quotes <span class="tab-count" id="quotesCount">0</span></button>
 </div>
 
 <!-- ===== SHARED STATUS BAR ===== -->
@@ -404,10 +409,30 @@
       </div>
     </div>
 
+    <!-- QUOTES TAB -->
+    <div class="tab-panel" id="tab-quotes">
+      <div class="tip"><strong>Quotes:</strong> Add English &amp; Tamil text. If you have a quote image, place it in <code>quotes/images/</code> and set the Image path. Click <strong>✨ Generate Quote Thumbnails</strong> to auto-create resized thumbnails in <code>quotes/images/thumbs/</code>. Leave Image blank for a styled text card. Set <strong>Is Active = No</strong> to hide without deleting.</div>
+      <div class="table-wrap">
+        <table id="quotesTable" style="min-width:1000px;">
+          <thead><tr>
+            <th class="serial-th">S.No</th>
+            <th style="min-width:260px">English</th>
+            <th style="min-width:260px">Tamil (தமிழ்)</th>
+            <th style="min-width:160px">Source</th>
+            <th style="min-width:110px">Category</th>
+            <th style="min-width:200px">Image (optional)</th>
+            <th class="active-th">Is Active</th>
+            <th style="width:40px"></th>
+          </tr></thead>
+          <tbody id="quotesBody"></tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- Generated JS Files -->
     <div class="content" style="padding-top:18px; padding-bottom:4px;">
       <div class="section-title">Generated JS Files (active items only)</div>
-      <div class="output-grid" style="grid-template-columns:1fr 1fr 1fr 1fr;">
+      <div class="output-grid" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr;">
         <div class="output-card">
           <h3>📸 data/photos.js</h3>
           <pre id="photosOutput"></pre>
@@ -438,6 +463,14 @@
           <div class="output-actions">
             <button class="btn btn-green" id="btnDownloadPdfsJs">⬇ Download pdfs.js</button>
             <button class="btn btn-outline" id="btnCopyPdfsJs">📋 Copy</button>
+          </div>
+        </div>
+        <div class="output-card">
+          <h3>✨ data/quotes.js</h3>
+          <pre id="quotesOutput"></pre>
+          <div class="output-actions">
+            <button class="btn btn-green" id="btnDownloadQuotesJs">⬇ Download quotes.js</button>
+            <button class="btn btn-outline" id="btnCopyQuotesJs">📋 Copy</button>
           </div>
         </div>
       </div>
@@ -648,7 +681,7 @@ $('#modeSelect').on('change', function () {
     $('#galleryTabs').show();
     $('#galleryPanel').addClass('active'); $('#langPanel').removeClass('active');
     $('#headerTitle').text('🪔 Gallery Manager — Yogi Ramsuratkumar Website');
-    $('#headerSub').text('Edit Photos · Videos · Audios · PDFs → Set Is Active → Save to Website');
+    $('#headerSub').text('Edit Photos · Videos · Audios · PDFs · Quotes → Set Is Active → Save to Website');
   } else {
     $('#workflowGallery').hide(); $('#workflowLang').show();
     $('#galleryToolbar').hide(); $('#langToolbar').css('display', 'flex');
@@ -667,7 +700,8 @@ $(function () {
     photos: ['darshan','ashram','festival','early','devotees','blessings','bhajan','events','life'],
     videos: ['discourse','bhajan','documentary','interview','events','rare'],
     pdfs  : ['book','talk','song','magazine','photo'],
-    audios: ['discourse','bhajan','chant','talk','rare']
+    audios: ['discourse','bhajan','chant','talk','rare'],
+    quotes: ['general','grace','devotion','surrender','blessing','teachings']
   };
   var sortBySerial = function (a, b) { return (a.serial || 0) - (b.serial || 0); };
 
@@ -865,18 +899,19 @@ $(function () {
         navigator.clipboard.writeText(m.js).then(function () { showStatus(m.fn + ' copied to clipboard!', 'success'); });
       });
     });
+    renderQuotesOutputs();
   }
 
   /* 💾 Save to Website — Gallery */
   $('#btnGallerySave').on('click', function () {
-    var photos = readPhotos(), videos = readVideos(), pdfs = readPdfs(), audios = readAudios();
-    if (!photos.length && !videos.length && !pdfs.length && !audios.length) {
+    var photos = readPhotos(), videos = readVideos(), pdfs = readPdfs(), audios = readAudios(), quotes = readQuotes();
+    if (!photos.length && !videos.length && !pdfs.length && !audios.length && !quotes.length) {
       showStatus('No data to save. Upload an Excel file or add rows first.', 'error'); return;
     }
     var newDataVer = makeVersion();
     var langVer = (typeof SITE_VERSION !== 'undefined' && SITE_VERSION.lang) ? SITE_VERSION.lang : '1.0';
     if (typeof SITE_VERSION !== 'undefined') SITE_VERSION.data = newDataVer;
-    SITE_DATA.photos = photos; SITE_DATA.videos = videos; SITE_DATA.pdfs = pdfs; SITE_DATA.audios = audios;
+    SITE_DATA.photos = photos; SITE_DATA.videos = videos; SITE_DATA.pdfs = pdfs; SITE_DATA.audios = audios; SITE_DATA.quotes = quotes;
     SITE_DATA.saveToStorage();
     updateGalleryPill();
 
@@ -884,7 +919,8 @@ $(function () {
     var av = videos.filter(function(r){ return r.isActive !== 'no'; }).length;
     var ad = pdfs.filter(function(r){ return r.isActive !== 'no'; }).length;
     var aa = audios.filter(function(r){ return r.isActive !== 'no'; }).length;
-    var summary = 'Active: ' + ap + '/' + photos.length + ' photos, ' + av + '/' + videos.length + ' videos, ' + ad + '/' + pdfs.length + ' PDFs, ' + aa + '/' + audios.length + ' audios.';
+    var aq = quotes.filter(function(r){ return r.isActive !== 'no'; }).length;
+    var summary = 'Active: ' + ap + '/' + photos.length + ' photos, ' + av + '/' + videos.length + ' videos, ' + ad + '/' + pdfs.length + ' PDFs, ' + aa + '/' + audios.length + ' audios, ' + aq + '/' + quotes.length + ' quotes.';
 
     if (window.showDirectoryPicker) {
       showStatus('ℹ Select the <strong>root</strong> folder (where index.html lives) to save JS files…', 'info');
@@ -896,7 +932,8 @@ $(function () {
               writeFileToDir(dir, 'photos.js',  buildDataJS('PHOTOS_DATA', 'data/photos.js — Photo Gallery Data', 'serial, name, description, category, image, isActive', photos)),
               writeFileToDir(dir, 'videos.js',  buildDataJS('VIDEOS_DATA', 'data/videos.js — Video Gallery Data', 'serial, name, description, category, youtubeUrl, duration, isActive', videos)),
               writeFileToDir(dir, 'pdfs.js',    buildDataJS('PDFS_DATA',   'data/pdfs.js — PDF Downloads Data',   'serial, name, author, category, file, pages, fileSize, thumbImage, isActive', pdfs)),
-              writeFileToDir(dir, 'audios.js',  buildDataJS('AUDIOS_DATA', 'data/audios.js — Audio Gallery Data', 'serial, name, description, category, audioFile, duration, isActive', audios))
+              writeFileToDir(dir, 'audios.js',  buildDataJS('AUDIOS_DATA', 'data/audios.js — Audio Gallery Data', 'serial, name, description, category, audioFile, duration, isActive', audios)),
+              writeFileToDir(dir, 'quotes.js',  buildQuotesJS(quotes.filter(function(r){ return r.isActive !== 'no'; })))
             ]).then(function () {
               showStatus('Saved! ' + summary + ' Version: <strong>' + newDataVer + '</strong> — old cache auto-clears on next page visit.', 'success', true);
             });
@@ -904,8 +941,8 @@ $(function () {
         })
         .catch(function (e) {
           showStatus(e.name === 'AbortError'
-            ? '✅ Saved to localStorage (v' + newDataVer + '). ' + summary + ' Select root folder to also update JS files.'
-            : '✅ Saved to localStorage (v' + newDataVer + '). JS write error: ' + e.message, 'info');
+            ? 'Saved to localStorage (v' + newDataVer + '). ' + summary + ' Select root folder to also update JS files.'
+            : 'Saved to localStorage (v' + newDataVer + '). JS write error: ' + e.message, 'info');
         });
     } else {
       showStatus('Saved! ' + summary, 'success', true);
@@ -941,6 +978,11 @@ $(function () {
             return { serial: Number(r['Serial No'])||(i+1), name: String(r['Name']||''), author: String(r['Author']||''), category: String(r['Category']||'book'), file: String(r['PDF File']||''), pages: String(r['Pages']||''), fileSize: String(r['File Size']||''), thumbImage: String(r['Thumbnail Image']||''), isActive: parseActive(r['Is Active']) };
           }).sort(sortBySerial));
         }
+        if (wb.Sheets['Quotes']) {
+          renderQuotes(XLSX.utils.sheet_to_json(wb.Sheets['Quotes'], {defval:''}).map(function(r,i){
+            return { serial: Number(r['Serial No'])||(i+1), en: String(r['English']||''), ta: String(r['Tamil']||''), source: String(r['Source']||''), category: String(r['Category']||'general').toLowerCase(), image: String(r['Image']||''), isActive: parseActive(r['Is Active']) };
+          }).sort(sortBySerial));
+        }
         refreshGalleryOutputs();
         showStatus('Excel uploaded! Review the data below, then click 💾 Save to Website.', 'success');
       } catch (err) { showStatus('Error reading Excel: ' + err.message, 'error'); }
@@ -972,6 +1014,11 @@ $(function () {
     var aWs = XLSX.utils.aoa_to_sheet(aD); aWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:40},{wch:12},{wch:10}];
     XLSX.utils.book_append_sheet(wb, aWs, 'Audios');
 
+    var qD = [['Serial No','English','Tamil','Source','Category','Image','Is Active']];
+    readQuotes().forEach(function(r){ qD.push([r.serial,r.en,r.ta,r.source,r.category,r.image,r.isActive||'yes']); });
+    var qWs = XLSX.utils.aoa_to_sheet(qD); qWs['!cols'] = [{wch:9},{wch:48},{wch:48},{wch:32},{wch:14},{wch:32},{wch:10}];
+    XLSX.utils.book_append_sheet(wb, qWs, 'Quotes');
+
     XLSX.writeFile(wb, 'gallery-manager.xlsx');
     showStatus('Downloaded gallery-manager.xlsx — edit and Upload Excel to reload.', 'success');
   });
@@ -995,13 +1042,28 @@ $(function () {
     aWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:40},{wch:12},{wch:10}];
     XLSX.utils.book_append_sheet(wb, aWs, 'Audios');
 
+    var qWs = XLSX.utils.aoa_to_sheet([
+      ['Serial No','English','Tamil','Source','Category','Image','Is Active'],
+      [1,'He who surrenders to Father is always free.','தந்தையிடம் சரணடைபவன் எப்போதும் சுதந்திரமாக இருப்பான்.','Yogi Ramsuratkumar','grace','','yes'],
+      [2,"My Father's name is enough for everything.",'என் தந்தையின் பெயர் அனைத்திற்கும் போதுமானது.','Yogi Ramsuratkumar','devotion','','yes']
+    ]);
+    qWs['!cols'] = [{wch:9},{wch:48},{wch:48},{wch:32},{wch:14},{wch:32},{wch:10}];
+    XLSX.utils.book_append_sheet(wb, qWs, 'Quotes');
+
     XLSX.writeFile(wb, 'gallery-template.xlsx');
     showStatus('Downloaded gallery-template.xlsx — fill in your data and Upload Excel.', 'success');
   });
 
   /* Delete row */
   $(document).on('click', '.del-row', function () {
-    if (confirm('Delete this row?')) { $(this).closest('tr').remove(); updateGalleryCounts(); }
+    var isQuote = $(this).closest('tbody').is('#quotesBody');
+    if (!confirm(isQuote ? 'Delete this quote?' : 'Delete this row?')) return;
+    $(this).closest('tr').remove();
+    if (isQuote && !$('#quotesBody tr:not(.empty-row)').length) {
+      $('#quotesBody').append('<tr class="empty-row"><td colspan="8" style="text-align:center;padding:36px;color:var(--text-light)">No quotes. Click ➕ Add Row or Upload Excel.</td></tr>');
+    }
+    updateGalleryCounts();
+    if (isQuote) renderQuotesOutputs();
   });
 
   /* Add row */
@@ -1019,6 +1081,11 @@ $(function () {
     } else if (tab === 'pdfs') {
       var n = $('#pdfsBody tr').length + 1;
       $('#pdfsBody').append($('<tr>').append($('<td class="serial-td">').text(n), $('<td>').html(cell('')), $('<td>').html(cell('')), $('<td>').html(catSelect(CAT.pdfs,'book')), $('<td>').html(cell('pdfs/new.pdf')), $('<td>').html(cell('')), $('<td>').html(cell('')), $('<td>').html(cell('pdfs/images/new.jpg')), $('<td class="active-td">').html(activeSelect('yes')), $('<td>').html(delBtn())));
+    } else if (tab === 'quotes') {
+      $('#quotesBody .empty-row').remove();
+      var n = $('#quotesBody tr').length + 1;
+      $('#quotesBody').append(makeQuoteRow({ serial: n, en: '', ta: '', source: 'Yogi Ramsuratkumar', category: 'general', image: '', isActive: 'yes' }));
+      renderQuotesOutputs();
     }
     updateGalleryCounts();
   });
@@ -1028,6 +1095,7 @@ $(function () {
     $('#videosCount').text($('#videosBody tr').length);
     $('#pdfsCount').text($('#pdfsBody tr').length);
     $('#audiosCount').text($('#audiosBody tr').length);
+    $('#quotesCount').text($('#quotesBody tr:not(.empty-row)').length);
   }
 
   /* ── Shared File System helpers (used by both thumbnail generators) ── */
@@ -1200,6 +1268,63 @@ $(function () {
     });
   });
 
+  /* ── Generate Quote Thumbnails ──────────────────────────────
+     Reads each quote's Image path, resizes to 360×480 JPEG and saves
+     to [same-folder]/thumbs/ via File System Access API */
+  $('#btnGenQuoteThumbs').on('click', function () {
+    var quotes   = readQuotes();
+    var imgPaths = quotes.map(function (r) { return r.image; }).filter(Boolean);
+    if (!imgPaths.length) { showStatus('No quote images found. Fill the "Image" column first.', 'error'); return; }
+
+    if (!window.showDirectoryPicker) {
+      showStatus('File System Access API not supported. Use Chrome or Edge.', 'error'); return;
+    }
+
+    showStatus('⏳ Select your project root folder (where index.html lives)…', 'info');
+
+    window.showDirectoryPicker({ mode: 'readwrite' }).then(function (rootDir) {
+      showStatus('⏳ Generating quote thumbnails for ' + imgPaths.length + ' image(s)…', 'info');
+
+      var done = 0, failed = 0;
+      var chain = Promise.resolve();
+
+      imgPaths.forEach(function (imgPath) {
+        chain = chain.then(function () {
+          var parts        = imgPath.replace(/\\/g, '/').split('/');
+          var filename     = parts[parts.length - 1];
+          var thumbFolders = parts.slice(0, -1).concat(['thumbs']); /* quotes/images → quotes/images/thumbs */
+
+          return readFileFromDir(rootDir, parts)
+            .then(function (blob) { return resizeBlob(blob, 360, 480); })
+            .then(function (thumbBlob) {
+              return getDir(rootDir, thumbFolders).then(function (thumbDir) {
+                return writeBlob(thumbDir, filename, thumbBlob);
+              });
+            })
+            .then(function () {
+              done++;
+              showStatus('⏳ Generated ' + done + ' / ' + imgPaths.length + ' quote thumbnails…', 'info');
+            })
+            .catch(function (err) {
+              failed++;
+              console.warn('Quote thumb failed for ' + imgPath + ':', err.message);
+            });
+        });
+      });
+
+      return chain.then(function () {
+        showStatus(
+          'Quote thumbnails done! ' + done + ' generated' +
+          (failed ? ', ' + failed + ' failed (check console)' : '') +
+          '. Saved to quotes/images/thumbs/', 'success', true
+        );
+      });
+
+    }).catch(function (e) {
+      if (e.name !== 'AbortError') showStatus('Error: ' + e.message, 'error');
+    });
+  });
+
   /* Clear gallery cache */
   $('#btnGalleryClearCache').on('click', function () {
     if (!confirm('Clear all cached gallery data from browser storage?\nPages will fall back to static JS data files.')) return;
@@ -1207,6 +1332,81 @@ $(function () {
     updateGalleryPill();
     showStatus('Gallery cache cleared. Pages will load from static JS files until you save again.', 'info');
   });
+
+  /* ── Quotes helpers ── */
+  function makeQuoteRow(r) {
+    var $tr = $('<tr>').append(
+      $('<td class="serial-td">').text(r.serial || ''),
+      $('<td>').html(cell(r.en || '', 'q-textarea', 'textarea')),
+      $('<td>').html(cell(r.ta || '', 'q-textarea ta-cell', 'textarea')),
+      $('<td>').html(cell(r.source || '')),
+      $('<td>').html(catSelect(CAT.quotes, r.category || 'general')),
+      $('<td>').html('<input type="text" class="editable" value="' + $('<div>').text(r.image || '').html() + '" placeholder="images/quotes/q1.jpg" />'),
+      $('<td class="active-td">').html(activeSelect(r.isActive)),
+      $('<td>').html(delBtn())
+    );
+    markRowActive($tr, r.isActive);
+    return $tr;
+  }
+
+  function readQuotes() {
+    return $('#quotesBody tr:not(.empty-row)').map(function (i) {
+      var $t = $(this).find('td');
+      return {
+        serial:   i + 1,
+        en:       $t.eq(1).find('textarea').val().trim(),
+        ta:       $t.eq(2).find('textarea').val().trim(),
+        source:   $t.eq(3).find('input').val().trim(),
+        category: $t.eq(4).find('select').val(),
+        image:    $t.eq(5).find('input').val().trim(),
+        isActive: $t.eq(6).find('select').val()
+      };
+    }).get().filter(function (r) { return r.en || r.ta; });
+  }
+
+  function renderQuotes(data) {
+    var $body = $('#quotesBody').empty();
+    if (!data || !data.length) {
+      $body.append('<tr class="empty-row"><td colspan="8" style="text-align:center;padding:36px;color:var(--text-light)">No quotes. Click ➕ Add Row or Upload Excel.</td></tr>');
+      updateGalleryCounts();
+      return;
+    }
+    data.forEach(function (r) { $body.append(makeQuoteRow(r)); });
+    updateGalleryCounts();
+    renderQuotesOutputs();
+  }
+
+  function renderQuotesOutputs() {
+    var quotes = readQuotes();
+    var js = buildQuotesJS(quotes.filter(function (r) { return r.isActive !== 'no'; }));
+    $('#quotesOutput').text(js);
+    $('#btnDownloadQuotesJs').off('click').on('click', function () { downloadText(js, 'quotes.js'); });
+    $('#btnCopyQuotesJs').off('click').on('click', function () {
+      navigator.clipboard.writeText(js).then(function () { showStatus('quotes.js copied!', 'success'); });
+    });
+  }
+
+  function buildQuotesJS(quotes) {
+    return '/* ============================================================\n' +
+      '   data/quotes.js — Quotes Gallery Data\n' +
+      '   Edit using tools/manager.html → Gallery Manager\n' +
+      '   Fields: serial, en, ta, source, category, image, isActive\n' +
+      '   ============================================================ */\n\n' +
+      'var QUOTES_DATA = ' + JSON.stringify(quotes, null, 2) + ';\n';
+  }
+
+  /* ── Quotes body events ── */
+  $('#quotesBody').on('input change', 'textarea, input, select', function () {
+    renderQuotesOutputs();
+    updateGalleryCounts();
+  });
+
+  /* ── Load existing quotes on start ── */
+  (function () {
+    var initQ = (SITE_DATA.active ? SITE_DATA.active(SITE_DATA.quotes) : SITE_DATA.quotes) || [];
+    renderQuotes(initQ);
+  })();
+
 });
 
 /* ============================================================
@@ -1353,8 +1553,8 @@ $('#btnLangSave').on('click', function () {
       })
       .catch(function (e) {
         showStatus(e.name === 'AbortError'
-          ? '✅ Saved to localStorage (v' + newLangVer + ', ' + activeCount + ' keys). Select root folder to also update JS files.'
-          : '✅ Saved to localStorage (v' + newLangVer + '). JS write error: ' + e.message, 'info');
+          ? 'Saved to localStorage (v' + newLangVer + ', ' + activeCount + ' keys). Select root folder to also update JS files.'
+          : 'Saved to localStorage (v' + newLangVer + '). JS write error: ' + e.message, 'info');
       });
   } else {
     showStatus('Saved ' + activeCount + ' active language keys (v' + newLangVer + '). Language switcher uses these translations instantly.', 'success', true);

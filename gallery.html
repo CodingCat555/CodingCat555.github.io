@@ -14,6 +14,7 @@
   <script src="data/pdfs.js"></script>
   <script src="data/audios.js"></script>
   <script src="data/version.js"></script>
+  <script src="js/footer.js"></script>
   <!-- Central data loader (localStorage › falls back to data JS files) -->
   <script src="data/data-loader.js"></script>
   <style>
@@ -80,6 +81,30 @@
     .gallery-item.share-open > img,
     .gallery-item.share-open .gallery-overlay,
     .gallery-item.share-open .serial-badge { border-radius: var(--radius-lg); }
+
+    /* ── Card wrapper: photo frame style ── */
+    .gallery-card-wrap {
+      display: flex; flex-direction: column;
+      background: white;
+      border-radius: calc(var(--radius-lg) + 5px);
+      padding: 5px 5px 10px;
+      border: 1.5px solid rgba(26,107,46,0.15);
+      box-shadow: 0 3px 14px rgba(0,0,0,0.10);
+      transition: box-shadow 0.22s, border-color 0.22s, transform 0.22s;
+    }
+    .gallery-card-wrap:hover {
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      border-color: var(--gold);
+    }
+    /* Remove double shadow from inner card */
+    .gallery-card-wrap .gallery-item { box-shadow: none; }
+    .gallery-name {
+      padding: 8px 8px 2px;
+      font-size: 0.78rem; font-weight: 600;
+      color: var(--text);
+      text-align: center;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
   </style>
 </head>
 <body>
@@ -111,6 +136,7 @@
           <li><a href="videos.html" data-i18n="nav_gallery_videos">Video Gallery</a></li>
           <li><a href="audio.html" data-i18n="nav_gallery_audios">Audio Gallery</a></li>
           <li><a href="pdfs.html" data-i18n="nav_gallery_pdfs">PDF Downloads</a></li>
+          <li><a href="quotes.html">✨ Quotes</a></li>
         </ul>
       </li>
       <li class="nav-item"><a href="contact.html" class="nav-link" data-i18n="nav_contact">Contact</a></li>
@@ -185,37 +211,7 @@
 </div>
 
 <!-- ===== FOOTER ===== -->
-<footer class="footer">
-  <div class="container">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <h3>🪔 Yogi Ramsuratkumar</h3>
-        <p>A tribute website dedicated to the beloved saint of Tiruvannamalai (1918–2001).</p>
-        <p class="footer-chant">"Yogi Ramsuratkumar — Jaya Guru Raya"</p>
-      </div>
-      <div class="footer-col"><h4>Quick Links</h4><ul>
-        <li><a href="index.html">Home</a></li>
-        <li><a href="about.html">About</a></li>
-        <li><a href="gallery.html">Photo Gallery</a></li>
-        <li><a href="videos.html">Video Gallery</a></li>
-        <li><a href="audio.html">Audio Gallery</a></li>
-        <li><a href="pdfs.html">PDF Downloads</a></li>
-        <li><a href="contact.html">Contact</a></li>
-      </ul></div>
-      <div class="footer-col"><h4>Gallery</h4><ul>
-        <li><a href="gallery.html">Photos</a></li>
-        <li><a href="videos.html">Videos</a></li>
-        <li><a href="pdfs.html">PDFs</a></li>
-      </ul></div>
-      <div class="footer-col"><h4>Content</h4><ul>
-        <li><a href="tools/excel-manager.html">Excel Manager</a></li>
-      </ul></div>
-    </div>
-    <div class="footer-bottom">
-      <p>© 2025 Yogi Ramsuratkumar Ashram, Tiruvannamalai, Tamil Nadu, India</p>
-    </div>
-  </div>
-</footer>
+<footer class="footer"></footer>
 
 <button class="scroll-top" id="scrollTop">↑</button>
 <script src="js/main.js"></script>
@@ -331,7 +327,7 @@ $(function () {
 
   function makeItem(item) {
     var sn = '#' + String(item.serial).padStart(2, '0');
-    return $('<div>', {
+    var $card = $('<div>', {
       'class': 'gallery-item fade-in',
       'data-category': item.category,
       'data-img'     : item.image,
@@ -360,6 +356,11 @@ $(function () {
         '<span class="gallery-desc">' + item.description + '</span>' +
       '</div>',
       makeShareMenu(item)
+    );
+    /* Wrap card + name label below it */
+    return $('<div class="gallery-card-wrap">').append(
+      $card,
+      '<p class="gallery-name">' + item.name + '</p>'
     );
   }
 

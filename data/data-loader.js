@@ -16,6 +16,7 @@
     videos : [],
     pdfs   : [],
     audios : [],
+    quotes : [],
     loaded : false,
     loadedAt: null,
 
@@ -39,6 +40,7 @@
         this.videos   = d.videos  || [];
         this.pdfs     = d.pdfs    || [];
         this.audios   = d.audios  || [];
+        this.quotes   = d.quotes  || [];
         this.loaded   = true;
         this.loadedAt = d.loadedAt || null;
         return true;
@@ -53,6 +55,7 @@
         videos   : this.videos,
         pdfs     : this.pdfs,
         audios   : this.audios,
+        quotes   : this.quotes,
         loadedAt : new Date().toLocaleString()
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
@@ -140,7 +143,7 @@
     /* Clear all cached data */
     clear: function () {
       localStorage.removeItem(STORAGE_KEY);
-      this.photos = []; this.videos = []; this.pdfs = []; this.audios = [];
+      this.photos = []; this.videos = []; this.pdfs = []; this.audios = []; this.quotes = [];
       this.loaded = false; this.loadedAt = null;
     },
 
@@ -173,8 +176,12 @@
     if (typeof AUDIOS_DATA !== 'undefined' && AUDIOS_DATA.length) {
       window.SITE_DATA.audios = AUDIOS_DATA;
     }
+    if (typeof QUOTES_DATA !== 'undefined' && QUOTES_DATA.length) {
+      window.SITE_DATA.quotes = QUOTES_DATA;
+    }
     if (window.SITE_DATA.photos.length || window.SITE_DATA.videos.length ||
-        window.SITE_DATA.pdfs.length   || window.SITE_DATA.audios.length) {
+        window.SITE_DATA.pdfs.length   || window.SITE_DATA.audios.length ||
+        window.SITE_DATA.quotes.length) {
       window.SITE_DATA.loaded = true;
     }
   }

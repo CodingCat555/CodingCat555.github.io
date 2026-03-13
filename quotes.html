@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quotes — Yogi Ramsuratkumar</title>
+  <meta name="description" content="Sacred words and divine quotes of Sri Yogi Ramsuratkumar." />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <!-- Static data files -->
+  <script src="data/photos.js"></script>
+  <script src="data/videos.js"></script>
+  <script src="data/pdfs.js"></script>
+  <script src="data/audios.js"></script>
+  <script src="data/quotes.js"></script>
+  <script src="data/version.js"></script>
+  <script src="js/footer.js"></script>
+  <script src="data/data-loader.js"></script>
+  <style>
+    /* ── Lazy shimmer (scoped to quote cards only) ── */
+    .quote-card img[data-src] {
+      background: linear-gradient(90deg,#e0f0e5 25%,#c8e6cd 50%,#e0f0e5 75%);
+      background-size: 200% 100%; animation: shimmer 1.2s infinite;
+    }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+    /* ── Search bar ── */
+    .quotes-search {
+      max-width: 480px; margin: 0 auto 20px;
+      display: flex; border: 2px solid var(--border); border-radius: 50px;
+      overflow: hidden; background: white; box-shadow: var(--shadow);
+    }
+    .quotes-search input  { flex:1; padding:11px 20px; border:none; outline:none; font-size:0.92rem; font-family:inherit; background:transparent; color:var(--text-dark); }
+    .quotes-search button { padding:11px 18px; background:var(--green); color:white; border:none; cursor:pointer; font-size:1rem; transition:var(--transition); }
+    .quotes-search button:hover { background:var(--green-dark); }
+
+    /* ── Category pills ── */
+    .quotes-filters { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:28px; }
+
+    /* ── Quotes grid — 3 columns ── */
+    .quotes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+    @media (max-width: 900px) { .quotes-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .quotes-grid { grid-template-columns: 1fr; } }
+
+    /* ── Quote card ── */
+    .quote-card {
+      position: relative;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      aspect-ratio: 4 / 3;
+      background: #111;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+      cursor: default;
+    }
+    .quote-card:hover { transform: scale(1.02); box-shadow: var(--shadow-hover); }
+
+    /* Image fills entire card */
+    .quote-card img {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100%; height: 100%;
+      object-fit: contain;
+      object-position: center center;
+      transition: transform 0.5s ease;
+      display: block;
+    }
+    .quote-card:hover img { transform: scale(1.06); }
+
+    /* Dark gradient overlay — always visible */
+    .quote-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background:
+        linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0.15) 100%),
+        rgba(0,0,0,0.10);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 14px 14px 16px;
+    }
+
+    /* Text-only card: solid green gradient background */
+    .quote-card-text {
+      background: linear-gradient(135deg,#1a6b2e 0%,#0f4520 100%);
+    }
+    .quote-card-text .quote-overlay {
+      background: none;
+      justify-content: center;
+      padding: 20px;
+      text-align: center;
+    }
+    .quote-card-text .quote-overlay::before {
+      content: '❝';
+      display: block;
+      font-size: 4rem;
+      line-height: 1;
+      color: rgba(255,255,255,0.15);
+      font-family: Georgia, serif;
+      margin-bottom: 8px;
+      flex-shrink: 0;
+    }
+
+    /* Quote text styles */
+    .quote-text {
+      color: #fff;
+      font-size: 0.84rem;
+      line-height: 1.55;
+      font-weight: 500;
+      margin: 0 0 5px;
+    }
+    .quote-ta {
+      color: rgba(255,255,255,0.75);
+      font-size: 0.76rem;
+      line-height: 1.45;
+      margin: 0 0 7px;
+      font-style: italic;
+    }
+    .quote-source {
+      font-size: 0.70rem;
+      color: var(--gold);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      display: block;
+    }
+
+    /* ── Fade-in ── */
+    .fade-in { animation: fadeUp 0.36s ease both; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ── Misc ── */
+    .gallery-counter { text-align:center; font-size:0.82rem; color:var(--text-light); margin-bottom:18px; }
+    .gallery-loading  { text-align:center; color:var(--text-light); padding:48px; font-size:1rem; grid-column:1/-1; }
+    .no-data-msg { text-align:center; padding:48px 20px; grid-column:1/-1; color:var(--text-light); }
+    .no-data-msg .nd-icon { font-size:2.8rem; display:block; margin-bottom:12px; }
+  </style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="header" id="header">
+  <nav class="nav-wrapper">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-icon">🪔</div>
+      <div class="nav-logo-text">
+        <span class="nav-logo-name">Yogi Ramsuratkumar</span>
+        <span class="nav-logo-subtitle">Tiruvannamalai · 1918–2001</span>
+      </div>
+    </a>
+    <ul class="nav-menu" id="navMenu">
+      <li class="nav-item"><a href="index.html" class="nav-link" data-i18n="nav_home">Home</a></li>
+      <li class="nav-item">
+        <a href="about.html" class="nav-link"><span data-i18n="nav_about">About</span> <span class="arrow">▾</span></a>
+        <ul class="dropdown">
+          <li><a href="about.html#life" data-i18n="nav_about_life">Life &amp; Journey</a></li>
+          <li><a href="about.html#teachings" data-i18n="nav_about_teachings">Teachings</a></li>
+          <li><a href="about.html#timeline" data-i18n="nav_about_timeline">Timeline</a></li>
+        </ul>
+      </li>
+      <li class="nav-item">
+        <a href="gallery.html" class="nav-link active"><span data-i18n="nav_gallery">Gallery</span> <span class="arrow">▾</span></a>
+        <ul class="dropdown">
+          <li><a href="gallery.html" data-i18n="nav_gallery_photos">Photo Gallery</a></li>
+          <li><a href="videos.html" data-i18n="nav_gallery_videos">Video Gallery</a></li>
+          <li><a href="audio.html" data-i18n="nav_gallery_audios">Audio Gallery</a></li>
+          <li><a href="pdfs.html" data-i18n="nav_gallery_pdfs">PDF Downloads</a></li>
+          <li><a href="quotes.html">✨ Quotes</a></li>
+        </ul>
+      </li>
+      <li class="nav-item"><a href="contact.html" class="nav-link" data-i18n="nav_contact">Contact</a></li>
+      <li class="nav-item">
+        <a href="javascript:void(0)" class="nav-link">🌐 <span id="langNavLabel">EN</span> <span class="arrow">▾</span></a>
+        <ul class="dropdown">
+          <li><a href="javascript:void(0)" onclick="setLang('en')">🇬🇧 English</a></li>
+          <li><a href="javascript:void(0)" onclick="setLang('ta')">🇮🇳 தமிழ்</a></li>
+        </ul>
+      </li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+</header>
+
+<!-- ===== PAGE HEADER ===== -->
+<div class="page-header">
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="index.html">Home</a><span>›</span>
+      <a href="gallery.html">Gallery</a><span>›</span><span>Quotes</span>
+    </nav>
+    <h1>✨ <span data-i18n="quotes_title">Quotes</span></h1>
+    <p data-i18n="quotes_subtitle">Sacred words of Sri Yogi Ramsuratkumar</p>
+  </div>
+</div>
+
+<!-- ===== GALLERY SECTION ===== -->
+<section class="gallery-section" style="padding: 36px 0 60px;">
+  <div class="container">
+
+    <!-- Search -->
+    <div class="quotes-search">
+      <input type="text" id="quoteSearch" placeholder="Search quotes…" autocomplete="off" />
+      <button>🔍</button>
+    </div>
+
+    <!-- Category filters -->
+    <div class="quotes-filters" id="categoryPills"></div>
+
+    <!-- Counter -->
+    <p class="gallery-counter" id="quoteCounter"></p>
+
+    <!-- Grid -->
+    <div class="quotes-grid" id="quotesGrid">
+      <div class="gallery-loading">Loading quotes…</div>
+    </div>
+
+    <!-- Infinite scroll -->
+    <div id="sentinel" style="height:2px;"></div>
+    <div id="loadingMore" style="display:none;text-align:center;padding:18px 0;color:var(--text-light);font-size:0.9rem;">⏳ Loading more…</div>
+
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer"></footer>
+
+<button class="scroll-top" id="scrollTop" aria-label="Scroll to top">↑</button>
+
+<script src="js/main.js"></script>
+<script src="data/version.js"></script>
+<script src="js/footer.js"></script>
+<script src="data/lang/en.js"></script>
+<script src="data/lang/ta.js"></script>
+<script src="data/lang-loader.js"></script>
+<script>
+$(function () {
+
+  var BATCH = 12;
+  var allSorted       = [];
+  var currentFiltered = [];
+  var loadedCount     = 0;
+  var currentCat      = 'all';
+  var searchQuery     = '';
+
+  /* Gradient backgrounds for text-only cards */
+  var GRADIENTS = [
+    'linear-gradient(135deg,#1a6b2e 0%,#0f4520 100%)',
+    'linear-gradient(135deg,#2d9148 0%,#1a6b2e 100%)',
+    'linear-gradient(135deg,#0f4520 0%,#2d9148 100%)',
+    'linear-gradient(135deg,#1b5e20 0%,#2e7d32 100%)',
+    'linear-gradient(135deg,#2c5f2e 0%,#1a6b2e 100%)',
+    'linear-gradient(135deg,#0d4a23 0%,#1a6b2e 100%)',
+  ];
+
+  function curLang() {
+    return (typeof window.currentLang !== 'undefined' ? window.currentLang : 'en') || 'en';
+  }
+
+  /* Thumbnail path: quotes/images/x.jpg → quotes/images/thumbs/x.jpg */
+  function quoteThumbPath(imgPath) {
+    if (!imgPath) return imgPath;
+    var parts    = imgPath.replace(/\\/g, '/').split('/');
+    var filename = parts.pop();
+    return parts.join('/') + '/thumbs/' + filename;
+  }
+
+  /* ── Lazy image observer ── */
+  var lazyObserver = 'IntersectionObserver' in window
+    ? new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (!e.isIntersecting) return;
+          var img = e.target;
+          var src = img.getAttribute('data-src');
+          if (src) { img.src = src; img.removeAttribute('data-src'); }
+          lazyObserver.unobserve(img);
+        });
+      }, { rootMargin: '300px' })
+    : null;
+
+  /* ── Infinite scroll observer ── */
+  var sentinelObserver = 'IntersectionObserver' in window
+    ? new IntersectionObserver(function (entries) {
+        if (entries[0].isIntersecting && loadedCount < currentFiltered.length) appendBatch();
+      }, { rootMargin: '300px' })
+    : null;
+  if (sentinelObserver) sentinelObserver.observe(document.getElementById('sentinel'));
+
+  /* ── Build one quote card ── */
+  function makeCard(q, idx) {
+    var lang    = curLang();
+    var text    = (lang === 'ta' && q.ta) ? q.ta : q.en;
+    var altText = (lang === 'ta' && q.en) ? q.en : (q.ta || '');
+    var source  = q.source ? '— ' + q.source : '';
+
+    var $card = $('<div>', {
+      class: 'quote-card fade-in',
+      'data-cat': q.category || '',
+      'data-en': q.en, 'data-ta': q.ta || '', 'data-source': q.source || ''
+    });
+
+    /* Quote text content (shared) */
+    var $content = $('<div class="quote-overlay">').append(
+      $('<p class="quote-text">').text(text),
+      altText ? $('<p class="quote-ta">').text(altText) : null,
+      $('<span class="quote-source">').text(source)
+    );
+
+    if (q.image) {
+      /* Image card: photo fills card, text overlaid */
+      var thumb = quoteThumbPath(q.image);
+      var $img  = $('<img>', { alt: q.source || 'Quote', 'data-full': q.image });
+      $img.attr('data-src', thumb);
+      $img.on('error', function () {
+        if (this.src !== q.image) { this.src = q.image; }
+      });
+
+      $card.append($img, $content);
+
+      if (lazyObserver) { lazyObserver.observe($img[0]); }
+      else { $img[0].src = thumb; }
+
+    } else {
+      /* Text card: green gradient background */
+      $card.addClass('quote-card-text')
+           .css('background', GRADIENTS[idx % GRADIENTS.length])
+           .append($content);
+    }
+
+    return $card;
+  }
+
+  /* ── Render a batch ── */
+  function appendBatch() {
+    var batch = currentFiltered.slice(loadedCount, loadedCount + BATCH);
+    if (!batch.length && loadedCount === 0) {
+      $('#quotesGrid').html('<div class="no-data-msg"><span class="nd-icon">✨</span><p>No quotes found.</p></div>');
+      $('#quoteCounter').text(''); $('#loadingMore').hide(); return;
+    }
+    if (!batch.length) { $('#loadingMore').hide(); return; }
+    $('#loadingMore').show();
+    var startIdx = loadedCount;
+    $.each(batch, function (i, q) { $('#quotesGrid').append(makeCard(q, startIdx + i)); });
+    loadedCount += batch.length;
+    $('#quoteCounter').text('Showing ' + loadedCount + ' of ' + currentFiltered.length + ' quotes');
+    $('#loadingMore').hide();
+    if (loadedCount >= currentFiltered.length) $('#sentinel').hide();
+    else $('#sentinel').show();
+  }
+
+  /* ── Apply filters ── */
+  function applyFilter() {
+    var q = searchQuery.toLowerCase();
+    currentFiltered = allSorted.filter(function (item) {
+      var matchCat    = (currentCat === 'all') || (item.category === currentCat);
+      var matchSearch = !q || (item.en + ' ' + (item.ta || '') + ' ' + (item.source || '')).toLowerCase().indexOf(q) !== -1;
+      return matchCat && matchSearch;
+    });
+    loadedCount = 0;
+    $('#quotesGrid').empty();
+    $('#sentinel').show();
+    appendBatch();
+  }
+
+  /* ── Build category filter pills ── */
+  function buildPills(quotes) {
+    var cats = ['all'];
+    $.each(quotes, function (_, q) {
+      if (q.category && cats.indexOf(q.category) === -1) cats.push(q.category);
+    });
+    var $pills = $('#categoryPills').empty();
+    if (cats.length <= 1) { $pills.hide(); return; }
+    $pills.show();
+    $.each(cats, function (_, c) {
+      var label = c === 'all' ? 'All' : c;
+      $('<button class="filter-btn">').text(label)
+        .toggleClass('active', c === currentCat)
+        .attr('data-cat', c)
+        .appendTo($pills);
+    });
+  }
+
+  /* Category pill click */
+  $(document).on('click', '#categoryPills .filter-btn', function () {
+    currentCat = $(this).data('cat');
+    $('#categoryPills .filter-btn').removeClass('active');
+    $(this).addClass('active');
+    applyFilter();
+  });
+
+  /* Search */
+  $('#quoteSearch').on('input', function () {
+    searchQuery = $(this).val().trim();
+    applyFilter();
+  });
+
+  /* ── Update card texts on lang change ── */
+  function refreshCardLang() {
+    var lang = curLang();
+    $('#quotesGrid .quote-card').each(function () {
+      var $c  = $(this);
+      var en  = $c.data('en')     || '';
+      var ta  = $c.data('ta')     || '';
+      var src = $c.data('source') || '';
+      var main = (lang === 'ta' && ta) ? ta : en;
+      var alt  = (lang === 'ta' && en) ? en : ta;
+      $c.find('.quote-text').text(main);
+      $c.find('.quote-ta').text(alt || '');
+      $c.find('.quote-source').text(src ? '— ' + src : '');
+    });
+  }
+
+  document.addEventListener('langChanged', refreshCardLang);
+  window.addEventListener('langChanged',  refreshCardLang);
+
+  /* ── Init ── */
+  function init() {
+    var quotes = window.SITE_DATA.active(window.SITE_DATA.quotes);
+    allSorted = quotes;
+    if (!allSorted.length) {
+      $('#quotesGrid').html('<div class="no-data-msg"><span class="nd-icon">✨</span><p>No quotes yet. Add quotes in the manager.</p></div>');
+      $('#categoryPills').hide();
+      return;
+    }
+    buildPills(allSorted);
+    applyFilter();
+  }
+
+  init();
+});
+</script>
+</body>
+</html>
