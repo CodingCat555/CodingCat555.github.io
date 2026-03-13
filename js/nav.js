@@ -26,11 +26,11 @@
           '</ul>' +
         '</li>' +
         '<li class="nav-item">' +
-          '<a href="gallery.html" class="nav-link"><span data-i18n="nav_gallery">Gallery</span> <span class="arrow">▾</span></a>' +
+          '<a href="photos.html" class="nav-link"><span data-i18n="nav_gallery">Gallery</span> <span class="arrow">▾</span></a>' +
           '<ul class="dropdown">' +
-            '<li><a href="gallery.html" data-i18n="nav_gallery_photos">Photo Gallery</a></li>' +
+            '<li><a href="photos.html" data-i18n="nav_gallery_photos">Photo Gallery</a></li>' +
             '<li><a href="videos.html" data-i18n="nav_gallery_videos">Video Gallery</a></li>' +
-            '<li><a href="audio.html" data-i18n="nav_gallery_audios">Audio Gallery</a></li>' +
+            '<li><a href="audios.html" data-i18n="nav_gallery_audios">Audio Gallery</a></li>' +
             '<li><a href="pdfs.html" data-i18n="nav_gallery_pdfs">PDF Downloads</a></li>' +
             '<li><a href="quotes.html">✨ Quotes</a></li>' +
           '</ul>' +

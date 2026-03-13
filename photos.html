@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Photo Gallery — Yogi Ramsuratkumar</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- SheetJS (reads Excel) + jQuery -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <!-- Static data files -->
+  <script src="data/photos.js"></script>
+  <script src="data/videos.js"></script>
+  <script src="data/pdfs.js"></script>
+  <script src="data/audios.js"></script>
+  <script src="data/version.js"></script>
+  <script src="js/footer.js"></script>
+  <!-- Central data loader (localStorage › falls back to data JS files) -->
+  <script src="data/data-loader.js"></script>
+  <style>
+    .no-data-msg {
+      text-align: center; padding: 48px 20px; grid-column: 1/-1;
+      color: var(--text-light);
+    }
+    .no-data-msg .nd-icon { font-size: 2.8rem; display: block; margin-bottom: 12px; }
+    .no-data-msg p { font-size: 0.95rem; }
+    /* Lazy image placeholder shimmer */
+    img[data-src] {
+      background: linear-gradient(90deg, #e0f0e5 25%, #c8e6cd 50%, #e0f0e5 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.2s infinite;
+      min-height: 160px; display: block; width: 100%;
+    }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .gallery-loading { text-align:center; color:var(--text-light); padding:48px; font-size:1rem; grid-column:1/-1; }
+    .gallery-counter { text-align:center; font-size:0.82rem; color:var(--text-light); margin-bottom:18px; }
+    .gallery-desc { display:block; font-size:0.75rem; color:rgba(255,255,255,0.72); margin-top:3px; line-height:1.4; }
+    .gallery-search {
+      max-width: 480px; margin: 0 auto 20px;
+      display: flex; border: 2px solid var(--border); border-radius: 50px;
+      overflow: hidden; background: white; box-shadow: var(--shadow);
+    }
+    .gallery-search input { flex:1; padding:11px 20px; border:none; outline:none; font-size:0.92rem; font-family:inherit; background:transparent; color:var(--text-dark); }
+    .gallery-search button { padding:11px 18px; background:var(--green); color:white; border:none; cursor:pointer; font-size:1rem; transition:var(--transition); }
+    .gallery-search button:hover { background:var(--green-dark); }
+
+    /* ── Share button ── */
+    .gallery-share { position:absolute; top:11px; right:11px; z-index:10; }
+    .share-toggle {
+      width:34px; height:34px; border-radius:50%; border:none; cursor:pointer;
+      background:rgba(15,69,32,0.88); color:#FFD700; font-size:1rem;
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:0 2px 10px rgba(0,0,0,0.22); transition:all 0.2s;
+      opacity:1;
+    }
+    .share-toggle:hover { background:var(--green); color:#FFD700; transform:scale(1.12); }
+    .share-menu {
+      position:absolute; top:38px; right:0; background:white;
+      border-radius:8px; box-shadow:0 4px 20px rgba(0,0,0,0.18);
+      border:1px solid #000;
+      padding:4px; min-width:145px; display:none; z-index:99;
+    }
+    .share-menu.open { display:block; }
+    .share-option {
+      display:flex; align-items:center; gap:7px;
+      padding:5px 9px; border-radius:6px; cursor:pointer;
+      font-size:0.79rem; font-weight:600; color:#333;
+      text-decoration:none; transition:background 0.15s;
+      border:none; background:none; width:100%; text-align:left;
+    }
+    .share-option:hover { background:#f4f4f4; }
+    .share-option .sh-icon { width:18px; height:18px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; flex-shrink:0; }
+    .sh-native { background:var(--green); color:white; }
+    .sh-fb     { background:#1877f2; color:white; }
+    .sh-wa     { background:#25d366; color:white; }
+    .sh-tw     { background:#000;    color:white; }
+    .sh-dl     { background:#e67e22; color:white; }
+    .sh-copy   { background:#6c757d; color:white; }
+    .share-divider { height:1px; background:#eee; margin:3px 0; }
+
+    /* ── Card wrapper: photo frame style ── */
+    .gallery-card-wrap {
+      display: flex; flex-direction: column;
+      background: white;
+      border-radius: calc(var(--radius-lg) + 5px);
+      padding: 5px 5px 10px;
+      border: 1px solid rgba(26,107,46,0.40);
+      box-shadow: 0 3px 14px rgba(0,0,0,0.10);
+      transition: box-shadow 0.22s, border-color 0.22s, transform 0.22s;
+      position: relative; /* share menu positioned inside wrap */
+    }
+    .gallery-card-wrap:hover {
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      border-color: var(--gold);
+    }
+    /* Remove double shadow from inner card */
+    .gallery-card-wrap .gallery-item { box-shadow: none; }
+    /* share-open on wrap — elevate above sibling cards */
+    .gallery-card-wrap.share-open { z-index: 200; }
+    /* Each card sizes to its own content — no forced row-height stretching */
+    .gallery-grid { align-items: start; }
+    .gallery-name {
+      padding: 8px 8px 2px;
+      font-size: 0.78rem; font-weight: 600;
+      color: var(--text);
+      text-align: center;
+      line-height: 1.45;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="header" id="header"></header>
+<div class="menu-overlay" id="menuOverlay"></div>
+
+<!-- ===== PAGE HEADER ===== -->
+<div class="page-header">
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="index.html">Home</a><span>›</span>
+      <a href="photos.html">Gallery</a><span>›</span><span>Photos</span>
+    </nav>
+    <h1>🖼 <span data-i18n="gallery_page_title">Photo Gallery</span></h1>
+  </div>
+</div>
+
+<!-- ===== GALLERY ===== -->
+<section class="gallery-section">
+  <div class="container">
+
+    <!-- ── Search ── -->
+    <div class="gallery-search" id="gallerySearchBox" style="display:none;">
+      <input type="text" id="gallerySearch" placeholder="Search photos by name or description…" data-i18n-ph="search_photos_ph" aria-label="Search photos" />
+      <button id="gallerySearchBtn">🔍</button>
+    </div>
+
+    <!-- ── Category Filters ── -->
+    <div class="gallery-filters" id="galleryFilters" style="display:none;">
+      <button class="filter-btn active" data-filter="all">All Photos</button>
+    </div>
+
+    <p class="gallery-counter" id="galleryCounter"></p>
+
+    <!-- ── Gallery Grid ── -->
+    <div class="gallery-grid" id="galleryContainer">
+      <div class="gallery-loading" id="galleryPlaceholder">
+        📊 Load <strong>content-manager.xlsx</strong> using the bar above to display photos.
+      </div>
+    </div>
+    <!-- Infinite scroll sentinel -->
+    <div id="sentinel" style="height:2px;display:none;"></div>
+    <div id="loadingMore" data-i18n="loading_more_photos" style="display:none;text-align:center;padding:18px 0;color:var(--text-light);font-size:0.9rem;grid-column:1/-1;">⏳ Loading more photos…</div>
+
+  </div>
+</section>
+
+<!-- ===== LIGHTBOX ===== -->
+<div class="lightbox" id="lightbox">
+  <div class="lb-overlay" id="lbOverlay"></div>
+  <div class="lb-body">
+    <img id="lbImg" src="" alt="Gallery Image" />
+    <p class="lb-caption" id="lbCaption"></p>
+    <span class="lb-counter" id="lbCounter"></span>
+  </div>
+  <button class="lb-close" id="lbClose">&times;</button>
+  <button class="lb-btn lb-prev" id="lbPrev">&#10094;</button>
+  <button class="lb-btn lb-next" id="lbNext">&#10095;</button>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer"></footer>
+
+<button class="scroll-top" id="scrollTop">↑</button>
+<script src="js/nav.js"></script>
+<script src="js/main.js"></script>
+<script>
+$(function () {
+
+  var BATCH           = 12;   /* 3 cols × 4 rows on desktop */
+  var allSorted       = [];
+  var currentFiltered = [];
+  var loadedCount     = 0;
+  var scrollObserver  = null;
+  var imgObserver     = null;
+
+  /* ── Lazy image loader ── */
+  function getImgObserver() {
+    if (imgObserver) return imgObserver;
+    if (!('IntersectionObserver' in window)) return null;
+    imgObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        var img = entry.target;
+        var src = img.getAttribute('data-src');
+        if (!src) return;
+        img.src = src;
+        img.removeAttribute('data-src');
+        imgObserver.unobserve(img);
+      });
+    }, { rootMargin: '400px' });
+    return imgObserver;
+  }
+
+  function observeImages($scope) {
+    var obs = getImgObserver();
+    $scope.find('img[data-src]').each(function () {
+      if (obs) { obs.observe(this); }
+      else { $(this).attr('src', $(this).attr('data-src')).removeAttr('data-src'); }
+    });
+  }
+
+  function resetImgObserver() {
+    if (imgObserver) { imgObserver.disconnect(); imgObserver = null; }
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     Gallery — Infinite Scroll
+  ══════════════════════════════════════════════════════════ */
+  function noDataMsg() {
+    return '<div class="no-data-msg"><span class="nd-icon">🖼</span><p>' + t('no_photos') + '</p></div>';
+  }
+
+  function clearGallery() {
+    if (scrollObserver) { scrollObserver.disconnect(); scrollObserver = null; }
+    resetImgObserver();
+    $('#gallerySearchBox, #galleryFilters, #sentinel, #loadingMore').hide();
+    $('#galleryContainer').html(noDataMsg());
+    $('#galleryCounter').text('');
+    allSorted = []; currentFiltered = []; loadedCount = 0;
+  }
+
+  function buildAndRender() {
+    allSorted = SITE_DATA.active(SITE_DATA.photos);
+
+    var cats = [];
+    allSorted.forEach(function (p) {
+      if (p.category && $.inArray(p.category, cats) === -1) cats.push(p.category);
+    });
+    var $filters = $('#galleryFilters').show().empty()
+      .append('<button class="filter-btn active" data-filter="all">' + t('filter_all_photos') + '</button>');
+    cats.forEach(function (c) {
+      $filters.append('<button class="filter-btn" data-filter="' + c + '">' +
+        c.charAt(0).toUpperCase() + c.slice(1) + '</button>');
+    });
+
+    $('#gallerySearchBox').show();
+    currentFiltered = allSorted;
+    loadedCount = 0;
+    $('#galleryContainer').empty();
+    appendBatch();
+  }
+
+  /* ── Thumbnail path helper ─────────────────────────────────
+     'photos/images/photo1.jpg' → 'photos/images/thumbs/photo1.jpg'
+     Falls back to full image if thumb path is not available      */
+  function thumbPath(imgPath) {
+    if (!imgPath) return imgPath;
+    var parts = imgPath.split('/');
+    var filename = parts.pop();
+    return parts.join('/') + '/thumbs/' + filename;
+  }
+
+  /* Return the display name based on current language, fallback to item.name */
+  function getPhotoName(item) {
+    var lang = localStorage.getItem('yrk_lang') || 'en';
+    if (lang === 'ta' && item.name_ta) return item.name_ta;
+    if (lang === 'en' && item.name_en) return item.name_en;
+    return item.name;
+  }
+
+  var SVG_SHARE = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>';
+
+  var isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  function makeShareMenu(item) {
+    return '<div class="gallery-share" data-img="' + item.image + '" data-name="' + item.name.replace(/"/g,'&quot;') + '">' +
+      '<button class="share-toggle" title="Share Photo">' + SVG_SHARE + '</button>' +
+      '<div class="share-menu">' +
+        '<button class="share-option share-native"><span class="sh-icon sh-native">📤</span> Share Photo</button>' +
+        '<div class="share-divider"></div>' +
+        '<button class="share-option share-download"><span class="sh-icon sh-dl">⬇</span> Download Photo</button>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function makeItem(item) {
+    var sn = '#' + String(item.serial).padStart(2, '0');
+    var displayName = getPhotoName(item);
+    var $card = $('<div>', {
+      'class': 'gallery-item fade-in',
+      'data-category': item.category,
+      'data-img'     : item.image,
+      'data-caption' : displayName
+    }).append(
+      '<span class="serial-badge">' + sn + '</span>',
+      $('<img>', { 'data-src': thumbPath(item.image), 'data-full': item.image, alt: item.name }).on('error', function () {
+        var $img = $(this);
+        var full = $img.data('full');
+        /* Step 1: thumb failed → try full image directly */
+        if (!$img.data('triedFull') && full) {
+          $img.data('triedFull', true);
+          this.src = full;
+          return;
+        }
+        /* Step 2: both thumb and full failed → show 🪔 placeholder */
+        $img.replaceWith(
+          '<div class="gallery-placeholder">' +
+            '<span class="ph-icon">🪔</span>' +
+            '<span class="ph-text">' + sn + ' ' + displayName + '</span>' +
+          '</div>'
+        );
+      }),
+      '<div class="gallery-overlay">' +
+        '<span class="gallery-caption">' + displayName + '</span>' +
+        '<span class="gallery-desc">' + item.description + '</span>' +
+      '</div>',
+    );
+    /* Wrap card + name label below it; share menu sits on wrap (not inside card) so overflow:hidden on card is preserved */
+    return $('<div class="gallery-card-wrap">').append(
+      $card,
+      makeShareMenu(item),
+      '<p class="gallery-name">' + displayName + '</p>'
+    );
+  }
+
+  function appendBatch() {
+    var batch = currentFiltered.slice(loadedCount, loadedCount + BATCH);
+    if (!batch.length && loadedCount === 0) {
+      $('#galleryContainer').html('<p class="gallery-loading">' + t('no_photos') + '</p>');
+      $('#galleryCounter').text(''); $('#sentinel').hide(); return;
+    }
+    var $container = $('#galleryContainer');
+    $.each(batch, function (i, item) { $container.append(makeItem(item)); });
+    observeImages($container);
+    loadedCount += batch.length;
+    updateCounter();
+
+    if (loadedCount < currentFiltered.length) {
+      $('#sentinel').show(); setupObserver();
+    } else {
+      $('#sentinel').hide();
+      if (scrollObserver) { scrollObserver.disconnect(); scrollObserver = null; }
+    }
+    if (typeof window.initGallery === 'function') window.initGallery();
+  }
+
+  function updateCounter() {
+    var total = currentFiltered.length;
+    $('#galleryCounter').text(t('showing') + ' ' + Math.min(loadedCount, total) + ' ' + t('of') + ' ' + total + ' ' + t('label_photos'));
+  }
+
+  function setupObserver() {
+    if (scrollObserver) scrollObserver.disconnect();
+    scrollObserver = new IntersectionObserver(function (entries) {
+      if (!entries[0].isIntersecting) return;
+      $('#loadingMore').show();
+      setTimeout(function () { appendBatch(); $('#loadingMore').hide(); }, 250);
+    }, { rootMargin: '300px' });
+    scrollObserver.observe(document.getElementById('sentinel'));
+  }
+
+  /* ── Combined filter + search ── */
+  function applyFilter() {
+    var f = $('.filter-btn.active').data('filter') || 'all';
+    var q = $('#gallerySearch').val().toLowerCase().trim();
+    currentFiltered = allSorted.filter(function (p) {
+      return (f === 'all' || p.category === f) &&
+        (!q || (p.name || '').toLowerCase().indexOf(q) !== -1 ||
+               (p.description || '').toLowerCase().indexOf(q) !== -1);
+    });
+    loadedCount = 0;
+    $('#galleryContainer').empty();
+    if (scrollObserver) { scrollObserver.disconnect(); scrollObserver = null; }
+    resetImgObserver();
+    appendBatch();
+  }
+
+  /* ── Share helpers ── */
+  function getShareData($wrap) {
+    return { img: $wrap.data('img'), name: $wrap.data('name') };
+  }
+
+  function fetchImageFile(imgSrc, name) {
+    return fetch(imgSrc)
+      .then(function (r) { return r.blob(); })
+      .then(function (blob) {
+        var ext = (blob.type.split('/')[1] || 'jpg').split('+')[0];
+        return new File([blob], 'yogi-ramsuratkumar-' + name.replace(/\s+/g,'-') + '.' + ext, { type: blob.type });
+      });
+  }
+
+  /* Toggle share menu */
+  function closeAllShareMenus() {
+    $('.share-menu').removeClass('open');
+    $('.gallery-card-wrap.share-open').removeClass('share-open');
+  }
+
+  $(document).on('click', '.share-toggle', function (e) {
+    e.stopPropagation();
+    var $menu = $(this).next('.share-menu');
+    var $wrap = $(this).closest('.gallery-card-wrap');
+    var isOpen = $menu.hasClass('open');
+    closeAllShareMenus();
+    if (!isOpen) {
+      $menu.addClass('open');
+      $wrap.addClass('share-open');
+    }
+  });
+
+  /* 📤 Share Photo — Web Share API with actual image file */
+  $(document).on('click', '.share-native', function (e) {
+    e.stopPropagation();
+    closeAllShareMenus();
+    var d = getShareData($(this).closest('.gallery-share'));
+    var $icon = $(this).find('.sh-icon');
+    $icon.text('⏳');
+    fetchImageFile(d.img, d.name).then(function (file) {
+      var shareData = { title: 'Yogi Ramsuratkumar — ' + d.name, files: [file] };
+      if (navigator.canShare && navigator.canShare(shareData)) {
+        return navigator.share(shareData);
+      } else if (navigator.share) {
+        return navigator.share({ title: 'Yogi Ramsuratkumar — ' + d.name, url: window.location.href });
+      } else {
+        /* Desktop fallback: download the image */
+        var a = document.createElement('a');
+        a.href = d.img; a.download = file.name; a.click();
+      }
+    }).catch(function (err) {
+      if (err.name !== 'AbortError') console.warn('Share failed:', err);
+    }).finally(function () { $icon.text('📤'); });
+  });
+
+  /* 💬 WhatsApp — mobile only, share actual photo via native OS share sheet */
+  $(document).on('click', '.share-whatsapp', function (e) {
+    e.stopPropagation();
+    closeAllShareMenus();
+    var d = getShareData($(this).closest('.gallery-share'));
+    var $icon = $(this).find('.sh-icon');
+    $icon.text('⏳');
+    fetchImageFile(d.img, d.name).then(function (file) {
+      var shareData = { title: 'Yogi Ramsuratkumar — ' + d.name, files: [file] };
+      if (navigator.canShare && navigator.canShare(shareData)) {
+        return navigator.share(shareData);
+      }
+      /* Fallback: share without file */
+      if (navigator.share) {
+        return navigator.share({ title: 'Yogi Ramsuratkumar — ' + d.name, url: window.location.href.split('?')[0] });
+      }
+    }).catch(function (err) {
+      if (err.name !== 'AbortError') console.warn('WhatsApp share failed:', err);
+    }).finally(function () { $icon.html('&#128172;'); });
+  });
+
+  /* ⬇ Download Photo */
+  $(document).on('click', '.share-download', function (e) {
+    e.stopPropagation();
+    closeAllShareMenus();
+    var d = getShareData($(this).closest('.gallery-share'));
+    var a = document.createElement('a');
+    a.href = d.img;
+    a.download = 'yogi-ramsuratkumar-' + d.name.replace(/\s+/g,'-') + '.jpg';
+    a.click();
+  });
+
+  /* 🔗 Copy Link */
+  $(document).on('click', '.share-copy', function (e) {
+    e.stopPropagation();
+    var url = window.location.href.split('?')[0];
+    navigator.clipboard.writeText(url).then(function () {
+      var $icon = $(e.currentTarget).find('.sh-icon');
+      $icon.text('✓');
+      setTimeout(function () { $icon.html('&#128279;'); }, 1800);
+    });
+    closeAllShareMenus();
+  });
+
+  $(document).on('click', function () { closeAllShareMenus(); });
+  $(document).on('click', '.share-menu', function (e) { e.stopPropagation(); });
+
+  $(document).on('click', '.filter-btn', function () {
+    $('.filter-btn').removeClass('active'); $(this).addClass('active'); applyFilter();
+  });
+  $(document).on('input keyup', '#gallerySearch', function (e) {
+    if (e.key === 'Escape') $(this).val(''); applyFilter();
+  });
+  $(document).on('click', '#gallerySearchBtn', function () { applyFilter(); });
+
+  /* ── Init ── */
+  if (SITE_DATA.loaded && SITE_DATA.photos.length) {
+    buildAndRender();
+  } else {
+    $('#galleryContainer').html(noDataMsg());
+  }
+
+
+});
+</script>
+<script src="data/lang/en.js"></script>
+<script src="data/lang/ta.js"></script>
+<script src="data/lang-loader.js"></script>
+<script>
+/* Patch applyLang AFTER lang-loader has defined it — refresh gallery photo names on lang switch */
+(function () {
+  var _orig = window.applyLang;
+  window.applyLang = function (scope) {
+    if (_orig) _orig(scope);
+    var lang = localStorage.getItem('yrk_lang') || 'en';
+    var photos = (typeof PHOTOS_DATA !== 'undefined') ? PHOTOS_DATA : [];
+    document.querySelectorAll('#galleryContainer .gallery-card-wrap').forEach(function (wrap) {
+      var card = wrap.querySelector('.gallery-item');
+      if (!card) return;
+      var imgPath = card.getAttribute('data-img');
+      var item = photos.find(function (p) { return p.image === imgPath; });
+      if (!item) return;
+      var name = (lang === 'ta' && item.name_ta) ? item.name_ta
+               : (lang === 'en' && item.name_en) ? item.name_en
+               : item.name;
+      var nameEl = wrap.querySelector('.gallery-name');
+      if (nameEl) nameEl.textContent = name;
+      card.setAttribute('data-caption', name);
+      var caption = card.querySelector('.gallery-caption');
+      if (caption) caption.textContent = name;
+    });
+  };
+})();
+</script>
+</body>
+</html>

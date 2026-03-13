@@ -83,6 +83,22 @@
     .btn-red    { background: #c62828; color: white; }
     .btn-red:hover    { background: #a31515; }
     .toolbar-sep { width: 1px; height: 32px; background: var(--border); margin: 0 4px; }
+    /* Sheet multiselect dropdown */
+    .sheet-select-wrap { position: relative; }
+    .sheet-dropdown {
+      display: none; position: absolute; top: calc(100% + 6px); left: 0;
+      background: white; border: 1px solid var(--border); border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12); padding: 6px 4px;
+      min-width: 150px; z-index: 999;
+    }
+    .sheet-dropdown.open { display: block; }
+    .sheet-dropdown label {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 12px; font-size: 0.85rem; cursor: pointer;
+      border-radius: 5px; white-space: nowrap;
+    }
+    .sheet-dropdown label:hover { background: #f0faf3; }
+    .sheet-dropdown input[type="checkbox"] { accent-color: var(--green); width: 15px; height: 15px; cursor: pointer; }
     #galleryUploadInput, #langUploadInput { position:absolute; opacity:0; width:0; height:0; overflow:hidden; }
 
     /* ---- Pills ---- */
@@ -282,15 +298,25 @@
     <button class="btn btn-outline" id="btnGalleryDownloadExcel">📊 Download Excel</button>
     <button class="btn btn-outline" id="btnGalleryTemplate">📋 Download Template</button>
     <div class="toolbar-sep"></div>
+    <!-- Sheet selector multiselect -->
+    <div class="sheet-select-wrap" id="sheetSelectWrap">
+      <button class="btn btn-outline" id="sheetSelectToggle" type="button">📋 Sheets <span id="sheetSelectCount">5</span> ▾</button>
+      <div class="sheet-dropdown" id="sheetDropdown">
+        <label><input type="checkbox" class="sheet-chk" value="photos"  checked> 🖼 Photos</label>
+        <label><input type="checkbox" class="sheet-chk" value="videos"  checked> 🎬 Videos</label>
+        <label><input type="checkbox" class="sheet-chk" value="audios"  checked> 🎵 Audios</label>
+        <label><input type="checkbox" class="sheet-chk" value="pdfs"    checked> 📄 PDFs</label>
+        <label><input type="checkbox" class="sheet-chk" value="quotes"  checked> ✨ Quotes</label>
+      </div>
+    </div>
     <button class="btn btn-green" id="btnGallerySave">💾 Save to Website</button>
-    <div class="toolbar-sep"></div>
-    <button class="btn btn-outline" id="btnAddRow">➕ Add Row</button>
-    <button class="btn btn-outline" id="btnGenThumbs">🖼 Generate Photo Thumbnails</button>
-    <button class="btn btn-outline" id="btnGenPdfThumbs">📄 Generate PDF Thumbnails</button>
-    <button class="btn btn-outline" id="btnGenQuoteThumbs">✨ Generate Quote Thumbnails</button>
     <button class="btn btn-red" id="btnGalleryClearCache">🗑 Clear Cache</button>
-    <div class="toolbar-sep"></div>
-    <span class="pill no-data" id="galleryDataPill">⚠ No data cached</span>
+    <div style="width:100%; display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:6px;">
+      <button class="btn btn-outline" id="btnGenThumbs">🖼 Generate Photo Thumbnails</button>
+      <button class="btn btn-outline" id="btnGenPdfThumbs">📄 Generate PDF Thumbnails</button>
+      <button class="btn btn-outline" id="btnGenQuoteThumbs">✨ Generate Quote Thumbnails</button>
+      <span class="pill no-data" id="galleryDataPill">⚠ No data cached</span>
+    </div>
   </div>
 
   <!-- Lang toolbar -->
@@ -302,7 +328,6 @@
     <button class="btn btn-outline" id="btnLangTemplate">📋 Download Template</button>
     <div class="toolbar-sep"></div>
     <button class="btn btn-green" id="btnLangSave">💾 Save to Website</button>
-    <button class="btn btn-outline" id="btnLangAddRow">➕ Add Row</button>
     <button class="btn btn-red"   id="btnLangClearCache">🗑 Clear Cache</button>
     <div class="toolbar-sep"></div>
     <span id="langStatusPill" class="pill no-data">⚪ No file loaded</span>
@@ -330,7 +355,7 @@
 
     <!-- PHOTOS TAB -->
     <div class="tab-panel active" id="tab-photos">
-      <div class="tip"><strong>Photos:</strong> Add photo files to <code>images/photos/</code> folder, then set the Image File path here. Set <strong>Is Active = No</strong> to hide a photo without deleting it.</div>
+      <div class="tip"><strong>Photos:</strong> Add photo files to <code>photos/images/</code> folder, then set the Image File path here. Set <strong>Is Active = No</strong> to hide a photo without deleting it.</div>
       <div class="table-wrap">
         <table id="photosTable" style="min-width:1100px;">
           <thead><tr>
@@ -906,8 +931,31 @@ $(function () {
     renderQuotesOutputs();
   }
 
+  /* Sheet multiselect dropdown toggle */
+  $('#sheetSelectToggle').on('click', function (e) {
+    e.stopPropagation();
+    $('#sheetDropdown').toggleClass('open');
+  });
+  $(document).on('click', function (e) {
+    if (!$(e.target).closest('#sheetSelectWrap').length) $('#sheetDropdown').removeClass('open');
+  });
+  $(document).on('change', '.sheet-chk', function () {
+    var n = $('.sheet-chk:checked').length;
+    $('#sheetSelectCount').text(n);
+  });
+
+  /* Helper — get selected sheet names */
+  function getSelectedSheets() {
+    var sel = [];
+    $('.sheet-chk:checked').each(function () { sel.push($(this).val()); });
+    return sel;
+  }
+
   /* 💾 Save to Website — Gallery */
   $('#btnGallerySave').on('click', function () {
+    var sel = getSelectedSheets();
+    if (!sel.length) { showStatus('Please select at least one sheet to save.', 'error'); return; }
+
     var photos = readPhotos(), videos = readVideos(), pdfs = readPdfs(), audios = readAudios(), quotes = readQuotes();
     if (!photos.length && !videos.length && !pdfs.length && !audios.length && !quotes.length) {
       showStatus('No data to save. Upload an Excel file or add rows first.', 'error'); return;
@@ -919,26 +967,26 @@ $(function () {
     SITE_DATA.saveToStorage();
     updateGalleryPill();
 
-    var ap = photos.filter(function(r){ return r.isActive !== 'no'; }).length;
-    var av = videos.filter(function(r){ return r.isActive !== 'no'; }).length;
-    var ad = pdfs.filter(function(r){ return r.isActive !== 'no'; }).length;
-    var aa = audios.filter(function(r){ return r.isActive !== 'no'; }).length;
-    var aq = quotes.filter(function(r){ return r.isActive !== 'no'; }).length;
-    var summary = 'Active: ' + ap + '/' + photos.length + ' photos, ' + av + '/' + videos.length + ' videos, ' + ad + '/' + pdfs.length + ' PDFs, ' + aa + '/' + audios.length + ' audios, ' + aq + '/' + quotes.length + ' quotes.';
+    var summaryParts = [];
+    if (sel.indexOf('photos') > -1) summaryParts.push(photos.filter(function(r){ return r.isActive !== 'no'; }).length + '/' + photos.length + ' photos');
+    if (sel.indexOf('videos') > -1) summaryParts.push(videos.filter(function(r){ return r.isActive !== 'no'; }).length + '/' + videos.length + ' videos');
+    if (sel.indexOf('pdfs')   > -1) summaryParts.push(pdfs.filter(function(r){ return r.isActive !== 'no'; }).length   + '/' + pdfs.length   + ' PDFs');
+    if (sel.indexOf('audios') > -1) summaryParts.push(audios.filter(function(r){ return r.isActive !== 'no'; }).length + '/' + audios.length + ' audios');
+    if (sel.indexOf('quotes') > -1) summaryParts.push(quotes.filter(function(r){ return r.isActive !== 'no'; }).length + '/' + quotes.length + ' quotes');
+    var summary = 'Active: ' + summaryParts.join(', ') + '.';
 
     if (window.showDirectoryPicker) {
       showStatus('ℹ Select the <strong>root</strong> folder (where index.html lives) to save JS files…', 'info');
       window.showDirectoryPicker({ mode: 'readwrite' })
         .then(function (rootDir) {
           return rootDir.getDirectoryHandle('data', { create: true }).then(function (dir) {
-            return Promise.all([
-              writeFileToDir(dir, 'version.js', buildVersionJS(newDataVer, langVer)),
-              writeFileToDir(dir, 'photos.js',  buildDataJS('PHOTOS_DATA', 'data/photos.js — Photo Gallery Data', 'serial, name, name_ta, name_en, description, category, image, isActive', photos)),
-              writeFileToDir(dir, 'videos.js',  buildDataJS('VIDEOS_DATA', 'data/videos.js — Video Gallery Data', 'serial, name, description, category, youtubeUrl, duration, isActive', videos)),
-              writeFileToDir(dir, 'pdfs.js',    buildDataJS('PDFS_DATA',   'data/pdfs.js — PDF Downloads Data',   'serial, name, author, category, file, pages, fileSize, thumbImage, isActive', pdfs)),
-              writeFileToDir(dir, 'audios.js',  buildDataJS('AUDIOS_DATA', 'data/audios.js — Audio Gallery Data', 'serial, name, description, category, audioFile, duration, isActive', audios)),
-              writeFileToDir(dir, 'quotes.js',  buildQuotesJS(quotes.filter(function(r){ return r.isActive !== 'no'; })))
-            ]).then(function () {
+            var writes = [writeFileToDir(dir, 'version.js', buildVersionJS(newDataVer, langVer))];
+            if (sel.indexOf('photos') > -1) writes.push(writeFileToDir(dir, 'photos.js', buildDataJS('PHOTOS_DATA', 'data/photos.js — Photo Gallery Data', 'serial, name, name_ta, name_en, description, category, image, isActive', photos)));
+            if (sel.indexOf('videos') > -1) writes.push(writeFileToDir(dir, 'videos.js', buildDataJS('VIDEOS_DATA', 'data/videos.js — Video Gallery Data', 'serial, name, description, category, youtubeUrl, duration, isActive', videos)));
+            if (sel.indexOf('pdfs')   > -1) writes.push(writeFileToDir(dir, 'pdfs.js',   buildDataJS('PDFS_DATA',   'data/pdfs.js — PDF Downloads Data',   'serial, name, author, category, file, pages, fileSize, thumbImage, isActive', pdfs)));
+            if (sel.indexOf('audios') > -1) writes.push(writeFileToDir(dir, 'audios.js', buildDataJS('AUDIOS_DATA', 'data/audios.js — Audio Gallery Data', 'serial, name, description, category, audioFile, duration, isActive', audios)));
+            if (sel.indexOf('quotes') > -1) writes.push(writeFileToDir(dir, 'quotes.js', buildQuotesJS(quotes.filter(function(r){ return r.isActive !== 'no'; }))));
+            return Promise.all(writes).then(function () {
               showStatus('Saved! ' + summary + ' Version: <strong>' + newDataVer + '</strong> — old cache auto-clears on next page visit.', 'success', true);
             });
           });
@@ -1075,7 +1123,7 @@ $(function () {
     var tab = $('.tab-btn.active').data('tab');
     if (tab === 'photos') {
       var n = $('#photosBody tr').length + 1;
-      $('#photosBody').append($('<tr>').append($('<td class="serial-td">').text(n), $('<td>').html(cell('')), $('<td>').html(cell('')), $('<td>').html(cell('')), $('<td class="desc-cell">').html(cell('','','textarea')), $('<td>').html(catSelect(CAT.photos,'darshan')), $('<td>').html(cell('images/photos/new.jpg')), $('<td class="active-td">').html(activeSelect('yes')), $('<td>').html(delBtn())));
+      $('#photosBody').append($('<tr>').append($('<td class="serial-td">').text(n), $('<td>').html(cell('')), $('<td>').html(cell('')), $('<td>').html(cell('')), $('<td class="desc-cell">').html(cell('','','textarea')), $('<td>').html(catSelect(CAT.photos,'darshan')), $('<td>').html(cell('photos/images/new.jpg')), $('<td class="active-td">').html(activeSelect('yes')), $('<td>').html(delBtn())));
     } else if (tab === 'videos') {
       var n = $('#videosBody tr').length + 1;
       $('#videosBody').append($('<tr>').append($('<td class="serial-td">').text(n), $('<td>').html(cell('')), $('<td class="desc-cell">').html(cell('','','textarea')), $('<td>').html(catSelect(CAT.videos,'discourse')), $('<td>').html(cell('https://www.youtube.com/watch?v=VIDEO_ID')), $('<td>').html(cell('')), $('<td class="active-td">').html(activeSelect('yes')), $('<td>').html(delBtn())));
@@ -1155,7 +1203,7 @@ $(function () {
 
   /* ── Generate Photo Thumbnails ───────────────────────────────
      Reads each photo image, resizes via Canvas (400×300 max),
-     saves JPEG to images/photos/thumbs/ via File System Access API  */
+     saves JPEG to photos/images/thumbs/ via File System Access API  */
   $('#btnGenThumbs').on('click', function () {
     var photos = readPhotos();
     var imgPaths = photos.map(function (r) { return r.image; }).filter(Boolean);

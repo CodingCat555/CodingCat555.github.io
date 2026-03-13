@@ -35,7 +35,7 @@
     .quotes-search button:hover { background:var(--green-dark); }
 
     /* ── Category pills ── */
-    .quotes-filters { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:28px; }
+    .quotes-filters { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:10px; }
 
     /* ── Quotes grid — 3 columns ── */
     .quotes-grid {
@@ -129,6 +129,45 @@
       display: block;
     }
 
+    /* ── Serial badge ── */
+    .quote-serial {
+      position: absolute; top: 6px; left: 6px; z-index: 10;
+      background: rgba(15,69,32,0.88); color: #FFD700;
+      font-size: 0.7rem; font-weight: 700; padding: 3px 9px;
+      border-radius: 50px; letter-spacing: 0.06em;
+      backdrop-filter: blur(4px); border: 1px solid rgba(255,215,0,0.3);
+      pointer-events: none;
+    }
+    /* ── Share button ── */
+    .quote-share { position: absolute; top: 6px; right: 6px; z-index: 10; }
+    .quote-share .share-toggle {
+      width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer;
+      background: rgba(15,69,32,0.88); color: #FFD700; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.22); transition: all 0.2s;
+    }
+    .quote-share .share-toggle:hover { background: var(--green); transform: scale(1.12); }
+    .quote-share .share-menu {
+      position: absolute; top: 38px; right: 0; background: white;
+      border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+      border: 1px solid #000; padding: 4px; min-width: 145px;
+      display: none; z-index: 99;
+    }
+    .quote-share .share-menu.open { display: block; }
+    .quote-share .share-option {
+      display: flex; align-items: center; gap: 7px;
+      padding: 5px 9px; border-radius: 6px; cursor: pointer;
+      font-size: 0.79rem; font-weight: 600; color: #333;
+      border: none; background: none; width: 100%; text-align: left; transition: background 0.15s;
+    }
+    .quote-share .share-option:hover { background: #f4f4f4; }
+    .quote-share .sh-icon { width: 18px; height: 18px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0; }
+    .quote-share .sh-native { background: var(--green); color: white; }
+    .quote-share .sh-dl     { background: #e67e22; color: white; }
+    .quote-share .share-divider { height: 1px; background: #eee; margin: 3px 0; }
+    /* open state — elevate card */
+    .quote-card.share-open { z-index: 200; }
+
     /* ── Fade-in ── */
     .fade-in { animation: fadeUp 0.36s ease both; }
     @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
@@ -150,7 +189,7 @@
   <div class="container">
     <nav class="breadcrumb">
       <a href="index.html">Home</a><span>›</span>
-      <a href="gallery.html">Gallery</a><span>›</span><span>Quotes</span>
+      <a href="photos.html">Gallery</a><span>›</span><span>Quotes</span>
     </nav>
     <h1>✨ <span data-i18n="quotes_title">Quotes</span></h1>
     <p data-i18n="quotes_subtitle">Sacred words of Sri Yogi Ramsuratkumar</p>
@@ -251,17 +290,32 @@ $(function () {
   if (sentinelObserver) sentinelObserver.observe(document.getElementById('sentinel'));
 
   /* ── Build one quote card ── */
+  function makeShareMenu(imgPath, name) {
+    return $('<div class="quote-share">').append(
+      $('<button class="share-toggle" title="Share">').html('<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>'),
+      $('<div class="share-menu">').append(
+        $('<button class="share-option share-native">').attr('data-img', imgPath).attr('data-name', name).append('<span class="sh-icon sh-native">📤</span> Share Photo'),
+        '<div class="share-divider"></div>',
+        $('<button class="share-option share-download">').attr('data-img', imgPath).attr('data-name', name).append('<span class="sh-icon sh-dl">⬇</span> Download Photo')
+      )
+    );
+  }
+
   function makeCard(q, idx) {
     var lang    = curLang();
     var text    = (lang === 'ta' && q.ta) ? q.ta : q.en;
     var altText = (lang === 'ta' && q.en) ? q.en : (q.ta || '');
     var source  = q.source ? '— ' + q.source : '';
+    var sn      = '#' + String(q.serial || (idx + 1)).padStart(2, '0');
 
     var $card = $('<div>', {
       class: 'quote-card fade-in',
       'data-cat': q.category || '',
       'data-en': q.en, 'data-ta': q.ta || '', 'data-source': q.source || ''
     });
+
+    /* Serial badge */
+    $card.append('<span class="quote-serial">' + sn + '</span>');
 
     /* Quote text content (shared) */
     var $content = $('<div class="quote-overlay">').append(
@@ -279,7 +333,7 @@ $(function () {
         if (this.src !== q.image) { this.src = q.image; }
       });
 
-      $card.append($img, $content);
+      $card.append($img, $content, makeShareMenu(q.image, q.source || 'Quote'));
 
       if (lazyObserver) { lazyObserver.observe($img[0]); }
       else { $img[0].src = thumb; }
@@ -293,6 +347,67 @@ $(function () {
 
     return $card;
   }
+
+  /* ── Quote share handlers ── */
+  function fetchImageFile(imgPath, name) {
+    return fetch(imgPath).then(function (r) { return r.blob(); }).then(function (blob) {
+      var ext  = imgPath.split('.').pop().split('?')[0] || 'jpg';
+      var fname = (name || 'quote').replace(/[^a-z0-9]/gi, '_').toLowerCase() + '.' + ext;
+      return new File([blob], fname, { type: blob.type || 'image/jpeg' });
+    });
+  }
+
+  function closeQuoteShareMenus() {
+    $('.quote-share .share-menu').removeClass('open');
+    $('.quote-card.share-open').removeClass('share-open');
+  }
+
+  $(document).on('click', '.quote-share .share-toggle', function (e) {
+    e.stopPropagation();
+    var $menu = $(this).next('.share-menu');
+    var $card = $(this).closest('.quote-card');
+    var isOpen = $menu.hasClass('open');
+    closeQuoteShareMenus();
+    if (!isOpen) { $menu.addClass('open'); $card.addClass('share-open'); }
+  });
+
+  $(document).on('click', '.quote-share .share-native', function (e) {
+    e.stopPropagation(); closeQuoteShareMenus();
+    var img  = $(this).data('img');
+    var name = $(this).data('name');
+    var $icon = $(this).find('.sh-icon');
+    $icon.text('⏳');
+    fetchImageFile(img, name).then(function (file) {
+      var sd = { title: 'Yogi Ramsuratkumar — ' + name, files: [file] };
+      if (navigator.canShare && navigator.canShare(sd)) return navigator.share(sd);
+      if (navigator.share) return navigator.share({ title: sd.title, url: window.location.href });
+      var a = document.createElement('a'); a.href = img; a.download = file.name; a.click();
+    }).catch(function (err) {
+      if (err.name !== 'AbortError') console.warn('Share failed:', err);
+    }).finally(function () { $icon.text('📤'); });
+  });
+
+  $(document).on('click', '.quote-share .share-download', function (e) {
+    e.stopPropagation(); closeQuoteShareMenus();
+    var img  = $(this).data('img');
+    var name = $(this).data('name');
+    var $icon = $(this).find('.sh-icon');
+    $icon.text('⏳');
+    fetchImageFile(img, name).then(function (file) {
+      var url = URL.createObjectURL(file);
+      var a = document.createElement('a');
+      a.href = url; a.download = file.name;
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    }).catch(function () {
+      var a = document.createElement('a'); a.href = img; a.download = img.split('/').pop(); a.click();
+    }).finally(function () { $icon.text('⬇'); });
+  });
+
+  $(document).on('click', function (e) {
+    if (!$(e.target).closest('.quote-share').length) closeQuoteShareMenus();
+  });
 
   /* ── Render a batch ── */
   function appendBatch() {
