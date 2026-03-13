@@ -1,14 +1,16 @@
 /* ============================================================
    data/photos.js — Photo Gallery Data
    Edit using tools/manager.html → Gallery Manager
-   Fields: serial, name, description, category, image, isActive
+   Fields: serial, name, name_ta, name_en, description, category, image, isActive
    isActive: "yes" = show | "no" = hide without deleting
    ============================================================ */
 
 var PHOTOS_DATA = [
   {
     "serial": 1,
-    "name": "Swamiji in Morning Darshan Swamiji in Morning Darshan Swamiji in Morning Darshan Swamiji in Morning Darshan",
+    "name": "Swamiji in Morning Darshan",
+    "name_ta": "காலை தரிசனத்தில் சுவாமிஜி. காலை தரிசனத்தில் சுவாமிஜி. காலை தரிசனத்தில் சுவாமிஜி. காலை தரிசனத்தில் சுவாமிஜி",
+    "name_en": "Swamiji in Morning Darshan Swamiji in Morning Darshan Swamiji in Morning Darshan Swamiji in Morning Darshan Swamiji in Morning Darshan",
     "description": "A divine photograph of Swamiji during morning darshan hours at the ashram, radiating infinite compassion.",
     "category": "darshan",
     "image": "images/gallery/YRSK1.jpg",
@@ -17,6 +19,8 @@ var PHOTOS_DATA = [
   {
     "serial": 2,
     "name": "Evening Darshan at the Ashram",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji blessing devotees during the evening darshan sessions with His divine grace.",
     "category": "darshan",
     "image": "images/gallery/darshan-2.jpg",
@@ -25,6 +29,8 @@ var PHOTOS_DATA = [
   {
     "serial": 3,
     "name": "Swamiji's Divine Gaze",
+    "name_ta": "",
+    "name_en": "",
     "description": "A rare close-up capturing Swamiji's compassionate gaze filled with divine love and boundless grace.",
     "category": "darshan",
     "image": "images/gallery/darshan-3.jpg",
@@ -33,6 +39,8 @@ var PHOTOS_DATA = [
   {
     "serial": 4,
     "name": "Blessed Moment of Grace",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji in a moment of deep spiritual grace radiating divine peace to all those around Him.",
     "category": "darshan",
     "image": "images/gallery/darshan-4.jpg",
@@ -41,6 +49,8 @@ var PHOTOS_DATA = [
   {
     "serial": 5,
     "name": "Ashram — Main Hall",
+    "name_ta": "",
+    "name_en": "",
     "description": "The grand main hall of the Yogi Ramsuratkumar Ashram in Tiruvannamalai, Tamil Nadu.",
     "category": "ashram",
     "image": "images/gallery/ashram-1.jpg",
@@ -49,6 +59,8 @@ var PHOTOS_DATA = [
   {
     "serial": 6,
     "name": "Samadhi Mandir — Sacred Shrine",
+    "name_ta": "",
+    "name_en": "",
     "description": "The sacred Samadhi Mandir where Swamiji's mortal remains rest in eternal divine peace.",
     "category": "ashram",
     "image": "images/gallery/ashram-2.jpg",
@@ -57,6 +69,8 @@ var PHOTOS_DATA = [
   {
     "serial": 7,
     "name": "Ashram Garden and Grounds",
+    "name_ta": "",
+    "name_en": "",
     "description": "Beautiful garden and lush green grounds of the ashram premises at Tiruvannamalai.",
     "category": "ashram",
     "image": "images/gallery/ashram-3.jpg",
@@ -65,6 +79,8 @@ var PHOTOS_DATA = [
   {
     "serial": 8,
     "name": "Annual Birthday Celebration",
+    "name_ta": "",
+    "name_en": "",
     "description": "Thousands of devotees gathered for Swamiji's Jayanti birthday celebration at the ashram.",
     "category": "festival",
     "image": "images/gallery/festival-1.jpg",
@@ -73,6 +89,8 @@ var PHOTOS_DATA = [
   {
     "serial": 9,
     "name": "Puja Ceremony at the Ashram",
+    "name_ta": "",
+    "name_en": "",
     "description": "Sacred puja ceremony conducted with full Vedic rituals at the Yogi Ramsuratkumar Ashram.",
     "category": "festival",
     "image": "images/gallery/festival-2.jpg",
@@ -81,6 +99,8 @@ var PHOTOS_DATA = [
   {
     "serial": 10,
     "name": "Thousands Gather for His Jayanti",
+    "name_ta": "",
+    "name_en": "",
     "description": "Massive gathering of devotees from across the world for the grand annual Jayanti festival.",
     "category": "festival",
     "image": "images/gallery/festival-3.jpg",
@@ -89,6 +109,8 @@ var PHOTOS_DATA = [
   {
     "serial": 11,
     "name": "Young Swamiji — Early Years",
+    "name_ta": "",
+    "name_en": "",
     "description": "A rare and precious photograph of Swamiji from His early spiritual years of wandering.",
     "category": "early",
     "image": "images/gallery/early-1.jpg",
@@ -97,6 +119,8 @@ var PHOTOS_DATA = [
   {
     "serial": 12,
     "name": "Wandering Yogi of Tiruvannamalai",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji during His wandering years on the sacred streets of Tiruvannamalai as a divine beggar.",
     "category": "early",
     "image": "images/gallery/early-2.jpg",
@@ -105,6 +129,8 @@ var PHOTOS_DATA = [
   {
     "serial": 13,
     "name": "Swamiji Blessing Devotees",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji extending His divine blessings to a group of devoted seekers who came for darshan.",
     "category": "devotees",
     "image": "images/gallery/devotees-1.jpg",
@@ -113,6 +139,8 @@ var PHOTOS_DATA = [
   {
     "serial": 14,
     "name": "International Devotees Gathering",
+    "name_ta": "",
+    "name_en": "",
     "description": "Devotees from different countries gathered at the ashram to receive Swamiji's divine grace.",
     "category": "devotees",
     "image": "images/gallery/devotees-2.jpg",
@@ -121,6 +149,8 @@ var PHOTOS_DATA = [
   {
     "serial": 15,
     "name": "Swamiji in Satsang",
+    "name_ta": "",
+    "name_en": "",
     "description": "An intimate satsang session with Swamiji and a small group of His close and devoted disciples.",
     "category": "devotees",
     "image": "images/gallery/devotees-3.jpg",
@@ -129,6 +159,8 @@ var PHOTOS_DATA = [
   {
     "serial": 16,
     "name": "Group Photo with Devotees",
+    "name_ta": "",
+    "name_en": "",
     "description": "Group photograph of Swamiji with His devoted disciples and visitors at the Tiruvannamalai ashram.",
     "category": "devotees",
     "image": "images/gallery/devotees-4.jpg",
@@ -137,6 +169,8 @@ var PHOTOS_DATA = [
   {
     "serial": 17,
     "name": "Swamiji in Morning Darshan",
+    "name_ta": "",
+    "name_en": "",
     "description": "A divine photograph of Swamiji during morning darshan hours at the ashram, radiating infinite compassion.",
     "category": "darshan",
     "image": "images/gallery/darshan-1.jpg",
@@ -145,6 +179,8 @@ var PHOTOS_DATA = [
   {
     "serial": 18,
     "name": "Evening Darshan at the Ashram",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji blessing devotees during the evening darshan sessions with His divine grace.",
     "category": "darshan",
     "image": "images/gallery/darshan-2.jpg",
@@ -153,6 +189,8 @@ var PHOTOS_DATA = [
   {
     "serial": 19,
     "name": "Swamiji's Divine Gaze",
+    "name_ta": "",
+    "name_en": "",
     "description": "A rare close-up capturing Swamiji's compassionate gaze filled with divine love and boundless grace.",
     "category": "darshan",
     "image": "images/gallery/darshan-3.jpg",
@@ -161,6 +199,8 @@ var PHOTOS_DATA = [
   {
     "serial": 20,
     "name": "Blessed Moment of Grace",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji in a moment of deep spiritual grace radiating divine peace to all those around Him.",
     "category": "darshan",
     "image": "images/gallery/darshan-4.jpg",
@@ -169,6 +209,8 @@ var PHOTOS_DATA = [
   {
     "serial": 21,
     "name": "Ashram — Main Hall",
+    "name_ta": "",
+    "name_en": "",
     "description": "The grand main hall of the Yogi Ramsuratkumar Ashram in Tiruvannamalai, Tamil Nadu.",
     "category": "ashram",
     "image": "images/gallery/ashram-1.jpg",
@@ -177,6 +219,8 @@ var PHOTOS_DATA = [
   {
     "serial": 22,
     "name": "Samadhi Mandir — Sacred Shrine",
+    "name_ta": "",
+    "name_en": "",
     "description": "The sacred Samadhi Mandir where Swamiji's mortal remains rest in eternal divine peace.",
     "category": "ashram",
     "image": "images/gallery/ashram-2.jpg",
@@ -185,6 +229,8 @@ var PHOTOS_DATA = [
   {
     "serial": 23,
     "name": "Ashram Garden and Grounds",
+    "name_ta": "",
+    "name_en": "",
     "description": "Beautiful garden and lush green grounds of the ashram premises at Tiruvannamalai.",
     "category": "ashram",
     "image": "images/gallery/ashram-3.jpg",
@@ -193,6 +239,8 @@ var PHOTOS_DATA = [
   {
     "serial": 24,
     "name": "Annual Birthday Celebration",
+    "name_ta": "",
+    "name_en": "",
     "description": "Thousands of devotees gathered for Swamiji's Jayanti birthday celebration at the ashram.",
     "category": "festival",
     "image": "images/gallery/festival-1.jpg",
@@ -201,6 +249,8 @@ var PHOTOS_DATA = [
   {
     "serial": 25,
     "name": "Puja Ceremony at the Ashram",
+    "name_ta": "",
+    "name_en": "",
     "description": "Sacred puja ceremony conducted with full Vedic rituals at the Yogi Ramsuratkumar Ashram.",
     "category": "festival",
     "image": "images/gallery/festival-2.jpg",
@@ -209,6 +259,8 @@ var PHOTOS_DATA = [
   {
     "serial": 26,
     "name": "Thousands Gather for His Jayanti",
+    "name_ta": "",
+    "name_en": "",
     "description": "Massive gathering of devotees from across the world for the grand annual Jayanti festival.",
     "category": "festival",
     "image": "images/gallery/festival-3.jpg",
@@ -217,6 +269,8 @@ var PHOTOS_DATA = [
   {
     "serial": 27,
     "name": "Young Swamiji — Early Years",
+    "name_ta": "",
+    "name_en": "",
     "description": "A rare and precious photograph of Swamiji from His early spiritual years of wandering.",
     "category": "early",
     "image": "images/gallery/early-1.jpg",
@@ -225,6 +279,8 @@ var PHOTOS_DATA = [
   {
     "serial": 28,
     "name": "Wandering Yogi of Tiruvannamalai",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji during His wandering years on the sacred streets of Tiruvannamalai as a divine beggar.",
     "category": "early",
     "image": "images/gallery/early-2.jpg",
@@ -233,6 +289,8 @@ var PHOTOS_DATA = [
   {
     "serial": 29,
     "name": "Swamiji Blessing Devotees",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji extending His divine blessings to a group of devoted seekers who came for darshan.",
     "category": "devotees",
     "image": "images/gallery/devotees-1.jpg",
@@ -241,6 +299,8 @@ var PHOTOS_DATA = [
   {
     "serial": 30,
     "name": "International Devotees Gathering",
+    "name_ta": "",
+    "name_en": "",
     "description": "Devotees from different countries gathered at the ashram to receive Swamiji's divine grace.",
     "category": "devotees",
     "image": "images/gallery/devotees-2.jpg",
@@ -249,6 +309,8 @@ var PHOTOS_DATA = [
   {
     "serial": 31,
     "name": "Swamiji in Satsang",
+    "name_ta": "",
+    "name_en": "",
     "description": "An intimate satsang session with Swamiji and a small group of His close and devoted disciples.",
     "category": "devotees",
     "image": "images/gallery/devotees-3.jpg",
@@ -257,6 +319,8 @@ var PHOTOS_DATA = [
   {
     "serial": 32,
     "name": "Group Photo with Devotees",
+    "name_ta": "",
+    "name_en": "",
     "description": "Group photograph of Swamiji with His devoted disciples and visitors at the Tiruvannamalai ashram.",
     "category": "devotees",
     "image": "images/gallery/devotees-4.jpg",
@@ -265,6 +329,8 @@ var PHOTOS_DATA = [
   {
     "serial": 33,
     "name": "Swamiji in Morning Darshan",
+    "name_ta": "",
+    "name_en": "",
     "description": "A divine photograph of Swamiji during morning darshan hours at the ashram, radiating infinite compassion.",
     "category": "darshan",
     "image": "images/gallery/darshan-1.jpg",
@@ -273,6 +339,8 @@ var PHOTOS_DATA = [
   {
     "serial": 34,
     "name": "Evening Darshan at the Ashram",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji blessing devotees during the evening darshan sessions with His divine grace.",
     "category": "darshan",
     "image": "images/gallery/darshan-2.jpg",
@@ -281,6 +349,8 @@ var PHOTOS_DATA = [
   {
     "serial": 35,
     "name": "Swamiji's Divine Gaze",
+    "name_ta": "",
+    "name_en": "",
     "description": "A rare close-up capturing Swamiji's compassionate gaze filled with divine love and boundless grace.",
     "category": "darshan",
     "image": "images/gallery/darshan-3.jpg",
@@ -289,6 +359,8 @@ var PHOTOS_DATA = [
   {
     "serial": 36,
     "name": "Blessed Moment of Grace",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji in a moment of deep spiritual grace radiating divine peace to all those around Him.",
     "category": "darshan",
     "image": "images/gallery/darshan-4.jpg",
@@ -297,6 +369,8 @@ var PHOTOS_DATA = [
   {
     "serial": 37,
     "name": "Ashram — Main Hall",
+    "name_ta": "",
+    "name_en": "",
     "description": "The grand main hall of the Yogi Ramsuratkumar Ashram in Tiruvannamalai, Tamil Nadu.",
     "category": "ashram",
     "image": "images/gallery/ashram-1.jpg",
@@ -305,6 +379,8 @@ var PHOTOS_DATA = [
   {
     "serial": 38,
     "name": "Samadhi Mandir — Sacred Shrine",
+    "name_ta": "",
+    "name_en": "",
     "description": "The sacred Samadhi Mandir where Swamiji's mortal remains rest in eternal divine peace.",
     "category": "ashram",
     "image": "images/gallery/ashram-2.jpg",
@@ -313,6 +389,8 @@ var PHOTOS_DATA = [
   {
     "serial": 39,
     "name": "Ashram Garden and Grounds",
+    "name_ta": "",
+    "name_en": "",
     "description": "Beautiful garden and lush green grounds of the ashram premises at Tiruvannamalai.",
     "category": "ashram",
     "image": "images/gallery/ashram-3.jpg",
@@ -321,6 +399,8 @@ var PHOTOS_DATA = [
   {
     "serial": 40,
     "name": "Annual Birthday Celebration",
+    "name_ta": "",
+    "name_en": "",
     "description": "Thousands of devotees gathered for Swamiji's Jayanti birthday celebration at the ashram.",
     "category": "festival",
     "image": "images/gallery/festival-1.jpg",
@@ -329,6 +409,8 @@ var PHOTOS_DATA = [
   {
     "serial": 41,
     "name": "Puja Ceremony at the Ashram",
+    "name_ta": "",
+    "name_en": "",
     "description": "Sacred puja ceremony conducted with full Vedic rituals at the Yogi Ramsuratkumar Ashram.",
     "category": "festival",
     "image": "images/gallery/festival-2.jpg",
@@ -337,6 +419,8 @@ var PHOTOS_DATA = [
   {
     "serial": 42,
     "name": "Thousands Gather for His Jayanti",
+    "name_ta": "",
+    "name_en": "",
     "description": "Massive gathering of devotees from across the world for the grand annual Jayanti festival.",
     "category": "festival",
     "image": "images/gallery/festival-3.jpg",
@@ -345,6 +429,8 @@ var PHOTOS_DATA = [
   {
     "serial": 43,
     "name": "Young Swamiji — Early Years",
+    "name_ta": "",
+    "name_en": "",
     "description": "A rare and precious photograph of Swamiji from His early spiritual years of wandering.",
     "category": "early",
     "image": "images/gallery/early-1.jpg",
@@ -353,6 +439,8 @@ var PHOTOS_DATA = [
   {
     "serial": 44,
     "name": "Wandering Yogi of Tiruvannamalai",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji during His wandering years on the sacred streets of Tiruvannamalai as a divine beggar.",
     "category": "early",
     "image": "images/gallery/early-2.jpg",
@@ -361,6 +449,8 @@ var PHOTOS_DATA = [
   {
     "serial": 45,
     "name": "Swamiji Blessing Devotees",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji extending His divine blessings to a group of devoted seekers who came for darshan.",
     "category": "devotees",
     "image": "images/gallery/devotees-1.jpg",
@@ -369,6 +459,8 @@ var PHOTOS_DATA = [
   {
     "serial": 46,
     "name": "International Devotees Gathering",
+    "name_ta": "",
+    "name_en": "",
     "description": "Devotees from different countries gathered at the ashram to receive Swamiji's divine grace.",
     "category": "devotees",
     "image": "images/gallery/devotees-2.jpg",
@@ -377,6 +469,8 @@ var PHOTOS_DATA = [
   {
     "serial": 47,
     "name": "Swamiji in Satsang",
+    "name_ta": "",
+    "name_en": "",
     "description": "An intimate satsang session with Swamiji and a small group of His close and devoted disciples.",
     "category": "devotees",
     "image": "images/gallery/devotees-3.jpg",
@@ -385,6 +479,8 @@ var PHOTOS_DATA = [
   {
     "serial": 48,
     "name": "Group Photo with Devotees",
+    "name_ta": "",
+    "name_en": "",
     "description": "Group photograph of Swamiji with His devoted disciples and visitors at the Tiruvannamalai ashram.",
     "category": "devotees",
     "image": "images/gallery/devotees-4.jpg",
@@ -393,6 +489,8 @@ var PHOTOS_DATA = [
   {
     "serial": 49,
     "name": "Swamiji in Morning Darshan",
+    "name_ta": "",
+    "name_en": "",
     "description": "A divine photograph of Swamiji during morning darshan hours at the ashram, radiating infinite compassion.",
     "category": "darshan",
     "image": "images/gallery/darshan-1.jpg",
@@ -401,6 +499,8 @@ var PHOTOS_DATA = [
   {
     "serial": 50,
     "name": "Evening Darshan at the Ashram",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji blessing devotees during the evening darshan sessions with His divine grace.",
     "category": "darshan",
     "image": "images/gallery/darshan-2.jpg",
@@ -409,6 +509,8 @@ var PHOTOS_DATA = [
   {
     "serial": 51,
     "name": "Swamiji's Divine Gaze",
+    "name_ta": "",
+    "name_en": "",
     "description": "A rare close-up capturing Swamiji's compassionate gaze filled with divine love and boundless grace.",
     "category": "darshan",
     "image": "images/gallery/darshan-3.jpg",
@@ -417,6 +519,8 @@ var PHOTOS_DATA = [
   {
     "serial": 52,
     "name": "Blessed Moment of Grace",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji in a moment of deep spiritual grace radiating divine peace to all those around Him.",
     "category": "darshan",
     "image": "images/gallery/darshan-4.jpg",
@@ -425,6 +529,8 @@ var PHOTOS_DATA = [
   {
     "serial": 53,
     "name": "Ashram — Main Hall",
+    "name_ta": "",
+    "name_en": "",
     "description": "The grand main hall of the Yogi Ramsuratkumar Ashram in Tiruvannamalai, Tamil Nadu.",
     "category": "ashram",
     "image": "images/gallery/ashram-1.jpg",
@@ -433,6 +539,8 @@ var PHOTOS_DATA = [
   {
     "serial": 54,
     "name": "Samadhi Mandir — Sacred Shrine",
+    "name_ta": "",
+    "name_en": "",
     "description": "The sacred Samadhi Mandir where Swamiji's mortal remains rest in eternal divine peace.",
     "category": "ashram",
     "image": "images/gallery/ashram-2.jpg",
@@ -441,6 +549,8 @@ var PHOTOS_DATA = [
   {
     "serial": 55,
     "name": "Ashram Garden and Grounds",
+    "name_ta": "",
+    "name_en": "",
     "description": "Beautiful garden and lush green grounds of the ashram premises at Tiruvannamalai.",
     "category": "ashram",
     "image": "images/gallery/ashram-3.jpg",
@@ -449,6 +559,8 @@ var PHOTOS_DATA = [
   {
     "serial": 56,
     "name": "Annual Birthday Celebration",
+    "name_ta": "",
+    "name_en": "",
     "description": "Thousands of devotees gathered for Swamiji's Jayanti birthday celebration at the ashram.",
     "category": "festival",
     "image": "images/gallery/festival-1.jpg",
@@ -457,6 +569,8 @@ var PHOTOS_DATA = [
   {
     "serial": 57,
     "name": "Puja Ceremony at the Ashram",
+    "name_ta": "",
+    "name_en": "",
     "description": "Sacred puja ceremony conducted with full Vedic rituals at the Yogi Ramsuratkumar Ashram.",
     "category": "festival",
     "image": "images/gallery/festival-2.jpg",
@@ -465,6 +579,8 @@ var PHOTOS_DATA = [
   {
     "serial": 58,
     "name": "Thousands Gather for His Jayanti",
+    "name_ta": "",
+    "name_en": "",
     "description": "Massive gathering of devotees from across the world for the grand annual Jayanti festival.",
     "category": "festival",
     "image": "images/gallery/festival-3.jpg",
@@ -473,6 +589,8 @@ var PHOTOS_DATA = [
   {
     "serial": 59,
     "name": "Young Swamiji — Early Years",
+    "name_ta": "",
+    "name_en": "",
     "description": "A rare and precious photograph of Swamiji from His early spiritual years of wandering.",
     "category": "early",
     "image": "images/gallery/early-1.jpg",
@@ -481,6 +599,8 @@ var PHOTOS_DATA = [
   {
     "serial": 60,
     "name": "Wandering Yogi of Tiruvannamalai",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji during His wandering years on the sacred streets of Tiruvannamalai as a divine beggar.",
     "category": "early",
     "image": "images/gallery/early-2.jpg",
@@ -489,6 +609,8 @@ var PHOTOS_DATA = [
   {
     "serial": 61,
     "name": "Swamiji Blessing Devotees",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji extending His divine blessings to a group of devoted seekers who came for darshan.",
     "category": "devotees",
     "image": "images/gallery/devotees-1.jpg",
@@ -497,6 +619,8 @@ var PHOTOS_DATA = [
   {
     "serial": 62,
     "name": "International Devotees Gathering",
+    "name_ta": "",
+    "name_en": "",
     "description": "Devotees from different countries gathered at the ashram to receive Swamiji's divine grace.",
     "category": "devotees",
     "image": "images/gallery/devotees-2.jpg",
@@ -505,6 +629,8 @@ var PHOTOS_DATA = [
   {
     "serial": 63,
     "name": "Swamiji in Satsang",
+    "name_ta": "",
+    "name_en": "",
     "description": "An intimate satsang session with Swamiji and a small group of His close and devoted disciples.",
     "category": "devotees",
     "image": "images/gallery/devotees-3.jpg",
@@ -513,6 +639,8 @@ var PHOTOS_DATA = [
   {
     "serial": 64,
     "name": "Group Photo with Devotees",
+    "name_ta": "",
+    "name_en": "",
     "description": "Group photograph of Swamiji with His devoted disciples and visitors at the Tiruvannamalai ashram.",
     "category": "devotees",
     "image": "images/gallery/devotees-4.jpg",
@@ -521,6 +649,8 @@ var PHOTOS_DATA = [
   {
     "serial": 65,
     "name": "Swamiji in Morning Darshan",
+    "name_ta": "",
+    "name_en": "",
     "description": "A divine photograph of Swamiji during morning darshan hours at the ashram, radiating infinite compassion.",
     "category": "darshan",
     "image": "images/gallery/darshan-1.jpg",
@@ -529,6 +659,8 @@ var PHOTOS_DATA = [
   {
     "serial": 66,
     "name": "Evening Darshan at the Ashram",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji blessing devotees during the evening darshan sessions with His divine grace.",
     "category": "darshan",
     "image": "images/gallery/darshan-2.jpg",
@@ -537,6 +669,8 @@ var PHOTOS_DATA = [
   {
     "serial": 67,
     "name": "Swamiji's Divine Gaze",
+    "name_ta": "",
+    "name_en": "",
     "description": "A rare close-up capturing Swamiji's compassionate gaze filled with divine love and boundless grace.",
     "category": "darshan",
     "image": "images/gallery/darshan-3.jpg",
@@ -545,6 +679,8 @@ var PHOTOS_DATA = [
   {
     "serial": 68,
     "name": "Blessed Moment of Grace",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji in a moment of deep spiritual grace radiating divine peace to all those around Him.",
     "category": "darshan",
     "image": "images/gallery/darshan-4.jpg",
@@ -553,6 +689,8 @@ var PHOTOS_DATA = [
   {
     "serial": 69,
     "name": "Ashram — Main Hall",
+    "name_ta": "",
+    "name_en": "",
     "description": "The grand main hall of the Yogi Ramsuratkumar Ashram in Tiruvannamalai, Tamil Nadu.",
     "category": "ashram",
     "image": "images/gallery/ashram-1.jpg",
@@ -561,6 +699,8 @@ var PHOTOS_DATA = [
   {
     "serial": 70,
     "name": "Samadhi Mandir — Sacred Shrine",
+    "name_ta": "",
+    "name_en": "",
     "description": "The sacred Samadhi Mandir where Swamiji's mortal remains rest in eternal divine peace.",
     "category": "ashram",
     "image": "images/gallery/ashram-2.jpg",
@@ -569,6 +709,8 @@ var PHOTOS_DATA = [
   {
     "serial": 71,
     "name": "Ashram Garden and Grounds",
+    "name_ta": "",
+    "name_en": "",
     "description": "Beautiful garden and lush green grounds of the ashram premises at Tiruvannamalai.",
     "category": "ashram",
     "image": "images/gallery/ashram-3.jpg",
@@ -577,6 +719,8 @@ var PHOTOS_DATA = [
   {
     "serial": 72,
     "name": "Annual Birthday Celebration",
+    "name_ta": "",
+    "name_en": "",
     "description": "Thousands of devotees gathered for Swamiji's Jayanti birthday celebration at the ashram.",
     "category": "festival",
     "image": "images/gallery/festival-1.jpg",
@@ -585,6 +729,8 @@ var PHOTOS_DATA = [
   {
     "serial": 73,
     "name": "Puja Ceremony at the Ashram",
+    "name_ta": "",
+    "name_en": "",
     "description": "Sacred puja ceremony conducted with full Vedic rituals at the Yogi Ramsuratkumar Ashram.",
     "category": "festival",
     "image": "images/gallery/festival-2.jpg",
@@ -593,6 +739,8 @@ var PHOTOS_DATA = [
   {
     "serial": 74,
     "name": "Thousands Gather for His Jayanti",
+    "name_ta": "",
+    "name_en": "",
     "description": "Massive gathering of devotees from across the world for the grand annual Jayanti festival.",
     "category": "festival",
     "image": "images/gallery/festival-3.jpg",
@@ -601,6 +749,8 @@ var PHOTOS_DATA = [
   {
     "serial": 75,
     "name": "Young Swamiji — Early Years",
+    "name_ta": "",
+    "name_en": "",
     "description": "A rare and precious photograph of Swamiji from His early spiritual years of wandering.",
     "category": "early",
     "image": "images/gallery/early-1.jpg",
@@ -609,6 +759,8 @@ var PHOTOS_DATA = [
   {
     "serial": 76,
     "name": "Wandering Yogi of Tiruvannamalai",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji during His wandering years on the sacred streets of Tiruvannamalai as a divine beggar.",
     "category": "early",
     "image": "images/gallery/early-2.jpg",
@@ -617,6 +769,8 @@ var PHOTOS_DATA = [
   {
     "serial": 77,
     "name": "Swamiji Blessing Devotees",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji extending His divine blessings to a group of devoted seekers who came for darshan.",
     "category": "devotees",
     "image": "images/gallery/devotees-1.jpg",
@@ -625,6 +779,8 @@ var PHOTOS_DATA = [
   {
     "serial": 78,
     "name": "International Devotees Gathering",
+    "name_ta": "",
+    "name_en": "",
     "description": "Devotees from different countries gathered at the ashram to receive Swamiji's divine grace.",
     "category": "devotees",
     "image": "images/gallery/devotees-2.jpg",
@@ -633,6 +789,8 @@ var PHOTOS_DATA = [
   {
     "serial": 79,
     "name": "Swamiji in Satsang",
+    "name_ta": "",
+    "name_en": "",
     "description": "An intimate satsang session with Swamiji and a small group of His close and devoted disciples.",
     "category": "devotees",
     "image": "images/gallery/devotees-3.jpg",
@@ -641,6 +799,8 @@ var PHOTOS_DATA = [
   {
     "serial": 80,
     "name": "Group Photo with Devotees",
+    "name_ta": "",
+    "name_en": "",
     "description": "Group photograph of Swamiji with His devoted disciples and visitors at the Tiruvannamalai ashram.",
     "category": "devotees",
     "image": "images/gallery/devotees-4.jpg",
@@ -649,6 +809,8 @@ var PHOTOS_DATA = [
   {
     "serial": 81,
     "name": "Swamiji in Morning Darshan",
+    "name_ta": "",
+    "name_en": "",
     "description": "A divine photograph of Swamiji during morning darshan hours at the ashram, radiating infinite compassion.",
     "category": "darshan",
     "image": "images/gallery/darshan-1.jpg",
@@ -657,6 +819,8 @@ var PHOTOS_DATA = [
   {
     "serial": 82,
     "name": "Evening Darshan at the Ashram",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji blessing devotees during the evening darshan sessions with His divine grace.",
     "category": "darshan",
     "image": "images/gallery/darshan-2.jpg",
@@ -665,6 +829,8 @@ var PHOTOS_DATA = [
   {
     "serial": 83,
     "name": "Swamiji's Divine Gaze",
+    "name_ta": "",
+    "name_en": "",
     "description": "A rare close-up capturing Swamiji's compassionate gaze filled with divine love and boundless grace.",
     "category": "darshan",
     "image": "images/gallery/darshan-3.jpg",
@@ -673,6 +839,8 @@ var PHOTOS_DATA = [
   {
     "serial": 84,
     "name": "Blessed Moment of Grace",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji in a moment of deep spiritual grace radiating divine peace to all those around Him.",
     "category": "darshan",
     "image": "images/gallery/darshan-4.jpg",
@@ -681,6 +849,8 @@ var PHOTOS_DATA = [
   {
     "serial": 85,
     "name": "Ashram — Main Hall",
+    "name_ta": "",
+    "name_en": "",
     "description": "The grand main hall of the Yogi Ramsuratkumar Ashram in Tiruvannamalai, Tamil Nadu.",
     "category": "ashram",
     "image": "images/gallery/ashram-1.jpg",
@@ -689,6 +859,8 @@ var PHOTOS_DATA = [
   {
     "serial": 86,
     "name": "Samadhi Mandir — Sacred Shrine",
+    "name_ta": "",
+    "name_en": "",
     "description": "The sacred Samadhi Mandir where Swamiji's mortal remains rest in eternal divine peace.",
     "category": "ashram",
     "image": "images/gallery/ashram-2.jpg",
@@ -697,6 +869,8 @@ var PHOTOS_DATA = [
   {
     "serial": 87,
     "name": "Ashram Garden and Grounds",
+    "name_ta": "",
+    "name_en": "",
     "description": "Beautiful garden and lush green grounds of the ashram premises at Tiruvannamalai.",
     "category": "ashram",
     "image": "images/gallery/ashram-3.jpg",
@@ -705,6 +879,8 @@ var PHOTOS_DATA = [
   {
     "serial": 88,
     "name": "Annual Birthday Celebration",
+    "name_ta": "",
+    "name_en": "",
     "description": "Thousands of devotees gathered for Swamiji's Jayanti birthday celebration at the ashram.",
     "category": "festival",
     "image": "images/gallery/festival-1.jpg",
@@ -713,6 +889,8 @@ var PHOTOS_DATA = [
   {
     "serial": 89,
     "name": "Puja Ceremony at the Ashram",
+    "name_ta": "",
+    "name_en": "",
     "description": "Sacred puja ceremony conducted with full Vedic rituals at the Yogi Ramsuratkumar Ashram.",
     "category": "festival",
     "image": "images/gallery/festival-2.jpg",
@@ -721,6 +899,8 @@ var PHOTOS_DATA = [
   {
     "serial": 90,
     "name": "Thousands Gather for His Jayanti",
+    "name_ta": "",
+    "name_en": "",
     "description": "Massive gathering of devotees from across the world for the grand annual Jayanti festival.",
     "category": "festival",
     "image": "images/gallery/festival-3.jpg",
@@ -729,6 +909,8 @@ var PHOTOS_DATA = [
   {
     "serial": 91,
     "name": "Young Swamiji — Early Years",
+    "name_ta": "",
+    "name_en": "",
     "description": "A rare and precious photograph of Swamiji from His early spiritual years of wandering.",
     "category": "early",
     "image": "images/gallery/early-1.jpg",
@@ -737,6 +919,8 @@ var PHOTOS_DATA = [
   {
     "serial": 92,
     "name": "Wandering Yogi of Tiruvannamalai",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji during His wandering years on the sacred streets of Tiruvannamalai as a divine beggar.",
     "category": "early",
     "image": "images/gallery/early-2.jpg",
@@ -745,6 +929,8 @@ var PHOTOS_DATA = [
   {
     "serial": 93,
     "name": "Swamiji Blessing Devotees",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji extending His divine blessings to a group of devoted seekers who came for darshan.",
     "category": "devotees",
     "image": "images/gallery/devotees-1.jpg",
@@ -753,6 +939,8 @@ var PHOTOS_DATA = [
   {
     "serial": 94,
     "name": "International Devotees Gathering",
+    "name_ta": "",
+    "name_en": "",
     "description": "Devotees from different countries gathered at the ashram to receive Swamiji's divine grace.",
     "category": "devotees",
     "image": "images/gallery/devotees-2.jpg",
@@ -761,6 +949,8 @@ var PHOTOS_DATA = [
   {
     "serial": 95,
     "name": "Swamiji in Satsang",
+    "name_ta": "",
+    "name_en": "",
     "description": "An intimate satsang session with Swamiji and a small group of His close and devoted disciples.",
     "category": "devotees",
     "image": "images/gallery/devotees-3.jpg",
@@ -769,6 +959,8 @@ var PHOTOS_DATA = [
   {
     "serial": 96,
     "name": "Group Photo with Devotees",
+    "name_ta": "",
+    "name_en": "",
     "description": "Group photograph of Swamiji with His devoted disciples and visitors at the Tiruvannamalai ashram.",
     "category": "devotees",
     "image": "images/gallery/devotees-4.jpg",
@@ -777,6 +969,8 @@ var PHOTOS_DATA = [
   {
     "serial": 97,
     "name": "Swamiji in Morning Darshan",
+    "name_ta": "",
+    "name_en": "",
     "description": "A divine photograph of Swamiji during morning darshan hours at the ashram, radiating infinite compassion.",
     "category": "darshan",
     "image": "images/gallery/darshan-1.jpg",
@@ -785,6 +979,8 @@ var PHOTOS_DATA = [
   {
     "serial": 98,
     "name": "Evening Darshan at the Ashram",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji blessing devotees during the evening darshan sessions with His divine grace.",
     "category": "darshan",
     "image": "images/gallery/darshan-2.jpg",
@@ -793,6 +989,8 @@ var PHOTOS_DATA = [
   {
     "serial": 99,
     "name": "Swamiji's Divine Gaze",
+    "name_ta": "",
+    "name_en": "",
     "description": "A rare close-up capturing Swamiji's compassionate gaze filled with divine love and boundless grace.",
     "category": "darshan",
     "image": "images/gallery/darshan-3.jpg",
@@ -801,6 +999,8 @@ var PHOTOS_DATA = [
   {
     "serial": 100,
     "name": "Blessed Moment of Grace",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji in a moment of deep spiritual grace radiating divine peace to all those around Him.",
     "category": "darshan",
     "image": "images/gallery/darshan-4.jpg",
@@ -809,6 +1009,8 @@ var PHOTOS_DATA = [
   {
     "serial": 101,
     "name": "Ashram — Main Hall",
+    "name_ta": "",
+    "name_en": "",
     "description": "The grand main hall of the Yogi Ramsuratkumar Ashram in Tiruvannamalai, Tamil Nadu.",
     "category": "ashram",
     "image": "images/gallery/ashram-1.jpg",
@@ -817,6 +1019,8 @@ var PHOTOS_DATA = [
   {
     "serial": 102,
     "name": "Samadhi Mandir — Sacred Shrine",
+    "name_ta": "",
+    "name_en": "",
     "description": "The sacred Samadhi Mandir where Swamiji's mortal remains rest in eternal divine peace.",
     "category": "ashram",
     "image": "images/gallery/ashram-2.jpg",
@@ -825,6 +1029,8 @@ var PHOTOS_DATA = [
   {
     "serial": 103,
     "name": "Ashram Garden and Grounds",
+    "name_ta": "",
+    "name_en": "",
     "description": "Beautiful garden and lush green grounds of the ashram premises at Tiruvannamalai.",
     "category": "ashram",
     "image": "images/gallery/ashram-3.jpg",
@@ -833,6 +1039,8 @@ var PHOTOS_DATA = [
   {
     "serial": 104,
     "name": "Annual Birthday Celebration",
+    "name_ta": "",
+    "name_en": "",
     "description": "Thousands of devotees gathered for Swamiji's Jayanti birthday celebration at the ashram.",
     "category": "festival",
     "image": "images/gallery/festival-1.jpg",
@@ -841,6 +1049,8 @@ var PHOTOS_DATA = [
   {
     "serial": 105,
     "name": "Puja Ceremony at the Ashram",
+    "name_ta": "",
+    "name_en": "",
     "description": "Sacred puja ceremony conducted with full Vedic rituals at the Yogi Ramsuratkumar Ashram.",
     "category": "festival",
     "image": "images/gallery/festival-2.jpg",
@@ -849,6 +1059,8 @@ var PHOTOS_DATA = [
   {
     "serial": 106,
     "name": "Thousands Gather for His Jayanti",
+    "name_ta": "",
+    "name_en": "",
     "description": "Massive gathering of devotees from across the world for the grand annual Jayanti festival.",
     "category": "festival",
     "image": "images/gallery/festival-3.jpg",
@@ -857,6 +1069,8 @@ var PHOTOS_DATA = [
   {
     "serial": 107,
     "name": "Young Swamiji — Early Years",
+    "name_ta": "",
+    "name_en": "",
     "description": "A rare and precious photograph of Swamiji from His early spiritual years of wandering.",
     "category": "early",
     "image": "images/gallery/early-1.jpg",
@@ -865,6 +1079,8 @@ var PHOTOS_DATA = [
   {
     "serial": 108,
     "name": "Wandering Yogi of Tiruvannamalai",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji during His wandering years on the sacred streets of Tiruvannamalai as a divine beggar.",
     "category": "early",
     "image": "images/gallery/early-2.jpg",
@@ -873,6 +1089,8 @@ var PHOTOS_DATA = [
   {
     "serial": 109,
     "name": "Swamiji Blessing Devotees",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji extending His divine blessings to a group of devoted seekers who came for darshan.",
     "category": "devotees",
     "image": "images/gallery/devotees-1.jpg",
@@ -881,6 +1099,8 @@ var PHOTOS_DATA = [
   {
     "serial": 110,
     "name": "International Devotees Gathering",
+    "name_ta": "",
+    "name_en": "",
     "description": "Devotees from different countries gathered at the ashram to receive Swamiji's divine grace.",
     "category": "devotees",
     "image": "images/gallery/devotees-2.jpg",
@@ -889,6 +1109,8 @@ var PHOTOS_DATA = [
   {
     "serial": 111,
     "name": "Swamiji in Satsang",
+    "name_ta": "",
+    "name_en": "",
     "description": "An intimate satsang session with Swamiji and a small group of His close and devoted disciples.",
     "category": "devotees",
     "image": "images/gallery/devotees-3.jpg",
@@ -897,6 +1119,8 @@ var PHOTOS_DATA = [
   {
     "serial": 112,
     "name": "Group Photo with Devotees",
+    "name_ta": "",
+    "name_en": "",
     "description": "Group photograph of Swamiji with His devoted disciples and visitors at the Tiruvannamalai ashram.",
     "category": "devotees",
     "image": "images/gallery/devotees-4.jpg",
@@ -905,6 +1129,8 @@ var PHOTOS_DATA = [
   {
     "serial": 113,
     "name": "Swamiji in Morning Darshan",
+    "name_ta": "",
+    "name_en": "",
     "description": "A divine photograph of Swamiji during morning darshan hours at the ashram, radiating infinite compassion.",
     "category": "darshan",
     "image": "images/gallery/darshan-1.jpg",
@@ -913,6 +1139,8 @@ var PHOTOS_DATA = [
   {
     "serial": 114,
     "name": "Evening Darshan at the Ashram",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji blessing devotees during the evening darshan sessions with His divine grace.",
     "category": "darshan",
     "image": "images/gallery/darshan-2.jpg",
@@ -921,6 +1149,8 @@ var PHOTOS_DATA = [
   {
     "serial": 115,
     "name": "Swamiji's Divine Gaze",
+    "name_ta": "",
+    "name_en": "",
     "description": "A rare close-up capturing Swamiji's compassionate gaze filled with divine love and boundless grace.",
     "category": "darshan",
     "image": "images/gallery/darshan-3.jpg",
@@ -929,6 +1159,8 @@ var PHOTOS_DATA = [
   {
     "serial": 116,
     "name": "Blessed Moment of Grace",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji in a moment of deep spiritual grace radiating divine peace to all those around Him.",
     "category": "darshan",
     "image": "images/gallery/darshan-4.jpg",
@@ -937,6 +1169,8 @@ var PHOTOS_DATA = [
   {
     "serial": 117,
     "name": "Ashram — Main Hall",
+    "name_ta": "",
+    "name_en": "",
     "description": "The grand main hall of the Yogi Ramsuratkumar Ashram in Tiruvannamalai, Tamil Nadu.",
     "category": "ashram",
     "image": "images/gallery/ashram-1.jpg",
@@ -945,6 +1179,8 @@ var PHOTOS_DATA = [
   {
     "serial": 118,
     "name": "Samadhi Mandir — Sacred Shrine",
+    "name_ta": "",
+    "name_en": "",
     "description": "The sacred Samadhi Mandir where Swamiji's mortal remains rest in eternal divine peace.",
     "category": "ashram",
     "image": "images/gallery/ashram-2.jpg",
@@ -953,6 +1189,8 @@ var PHOTOS_DATA = [
   {
     "serial": 119,
     "name": "Ashram Garden and Grounds",
+    "name_ta": "",
+    "name_en": "",
     "description": "Beautiful garden and lush green grounds of the ashram premises at Tiruvannamalai.",
     "category": "ashram",
     "image": "images/gallery/ashram-3.jpg",
@@ -961,6 +1199,8 @@ var PHOTOS_DATA = [
   {
     "serial": 120,
     "name": "Annual Birthday Celebration",
+    "name_ta": "",
+    "name_en": "",
     "description": "Thousands of devotees gathered for Swamiji's Jayanti birthday celebration at the ashram.",
     "category": "festival",
     "image": "images/gallery/festival-1.jpg",
@@ -969,6 +1209,8 @@ var PHOTOS_DATA = [
   {
     "serial": 121,
     "name": "Puja Ceremony at the Ashram",
+    "name_ta": "",
+    "name_en": "",
     "description": "Sacred puja ceremony conducted with full Vedic rituals at the Yogi Ramsuratkumar Ashram.",
     "category": "festival",
     "image": "images/gallery/festival-2.jpg",
@@ -977,6 +1219,8 @@ var PHOTOS_DATA = [
   {
     "serial": 122,
     "name": "Thousands Gather for His Jayanti",
+    "name_ta": "",
+    "name_en": "",
     "description": "Massive gathering of devotees from across the world for the grand annual Jayanti festival.",
     "category": "festival",
     "image": "images/gallery/festival-3.jpg",
@@ -985,6 +1229,8 @@ var PHOTOS_DATA = [
   {
     "serial": 123,
     "name": "Young Swamiji — Early Years",
+    "name_ta": "",
+    "name_en": "",
     "description": "A rare and precious photograph of Swamiji from His early spiritual years of wandering.",
     "category": "early",
     "image": "images/gallery/early-1.jpg",
@@ -993,6 +1239,8 @@ var PHOTOS_DATA = [
   {
     "serial": 124,
     "name": "Wandering Yogi of Tiruvannamalai",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji during His wandering years on the sacred streets of Tiruvannamalai as a divine beggar.",
     "category": "early",
     "image": "images/gallery/early-2.jpg",
@@ -1001,6 +1249,8 @@ var PHOTOS_DATA = [
   {
     "serial": 125,
     "name": "Swamiji Blessing Devotees",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji extending His divine blessings to a group of devoted seekers who came for darshan.",
     "category": "devotees",
     "image": "images/gallery/devotees-1.jpg",
@@ -1009,6 +1259,8 @@ var PHOTOS_DATA = [
   {
     "serial": 126,
     "name": "International Devotees Gathering",
+    "name_ta": "",
+    "name_en": "",
     "description": "Devotees from different countries gathered at the ashram to receive Swamiji's divine grace.",
     "category": "devotees",
     "image": "images/gallery/devotees-2.jpg",
@@ -1017,6 +1269,8 @@ var PHOTOS_DATA = [
   {
     "serial": 127,
     "name": "Swamiji in Satsang",
+    "name_ta": "",
+    "name_en": "",
     "description": "An intimate satsang session with Swamiji and a small group of His close and devoted disciples.",
     "category": "devotees",
     "image": "images/gallery/devotees-3.jpg",
@@ -1025,6 +1279,8 @@ var PHOTOS_DATA = [
   {
     "serial": 128,
     "name": "Group Photo with Devotees",
+    "name_ta": "",
+    "name_en": "",
     "description": "Group photograph of Swamiji with His devoted disciples and visitors at the Tiruvannamalai ashram.",
     "category": "devotees",
     "image": "images/gallery/devotees-4.jpg",
@@ -1033,6 +1289,8 @@ var PHOTOS_DATA = [
   {
     "serial": 129,
     "name": "Swamiji in Morning Darshan",
+    "name_ta": "",
+    "name_en": "",
     "description": "A divine photograph of Swamiji during morning darshan hours at the ashram, radiating infinite compassion.",
     "category": "darshan",
     "image": "images/gallery/darshan-1.jpg",
@@ -1041,6 +1299,8 @@ var PHOTOS_DATA = [
   {
     "serial": 130,
     "name": "Evening Darshan at the Ashram",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji blessing devotees during the evening darshan sessions with His divine grace.",
     "category": "darshan",
     "image": "images/gallery/darshan-2.jpg",
@@ -1049,6 +1309,8 @@ var PHOTOS_DATA = [
   {
     "serial": 131,
     "name": "Swamiji's Divine Gaze",
+    "name_ta": "",
+    "name_en": "",
     "description": "A rare close-up capturing Swamiji's compassionate gaze filled with divine love and boundless grace.",
     "category": "darshan",
     "image": "images/gallery/darshan-3.jpg",
@@ -1057,6 +1319,8 @@ var PHOTOS_DATA = [
   {
     "serial": 132,
     "name": "Blessed Moment of Grace",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji in a moment of deep spiritual grace radiating divine peace to all those around Him.",
     "category": "darshan",
     "image": "images/gallery/darshan-4.jpg",
@@ -1065,6 +1329,8 @@ var PHOTOS_DATA = [
   {
     "serial": 133,
     "name": "Ashram — Main Hall",
+    "name_ta": "",
+    "name_en": "",
     "description": "The grand main hall of the Yogi Ramsuratkumar Ashram in Tiruvannamalai, Tamil Nadu.",
     "category": "ashram",
     "image": "images/gallery/ashram-1.jpg",
@@ -1073,6 +1339,8 @@ var PHOTOS_DATA = [
   {
     "serial": 134,
     "name": "Samadhi Mandir — Sacred Shrine",
+    "name_ta": "",
+    "name_en": "",
     "description": "The sacred Samadhi Mandir where Swamiji's mortal remains rest in eternal divine peace.",
     "category": "ashram",
     "image": "images/gallery/ashram-2.jpg",
@@ -1081,6 +1349,8 @@ var PHOTOS_DATA = [
   {
     "serial": 135,
     "name": "Ashram Garden and Grounds",
+    "name_ta": "",
+    "name_en": "",
     "description": "Beautiful garden and lush green grounds of the ashram premises at Tiruvannamalai.",
     "category": "ashram",
     "image": "images/gallery/ashram-3.jpg",
@@ -1089,6 +1359,8 @@ var PHOTOS_DATA = [
   {
     "serial": 136,
     "name": "Annual Birthday Celebration",
+    "name_ta": "",
+    "name_en": "",
     "description": "Thousands of devotees gathered for Swamiji's Jayanti birthday celebration at the ashram.",
     "category": "festival",
     "image": "images/gallery/festival-1.jpg",
@@ -1097,6 +1369,8 @@ var PHOTOS_DATA = [
   {
     "serial": 137,
     "name": "Puja Ceremony at the Ashram",
+    "name_ta": "",
+    "name_en": "",
     "description": "Sacred puja ceremony conducted with full Vedic rituals at the Yogi Ramsuratkumar Ashram.",
     "category": "festival",
     "image": "images/gallery/festival-2.jpg",
@@ -1105,6 +1379,8 @@ var PHOTOS_DATA = [
   {
     "serial": 138,
     "name": "Thousands Gather for His Jayanti",
+    "name_ta": "",
+    "name_en": "",
     "description": "Massive gathering of devotees from across the world for the grand annual Jayanti festival.",
     "category": "festival",
     "image": "images/gallery/festival-3.jpg",
@@ -1113,6 +1389,8 @@ var PHOTOS_DATA = [
   {
     "serial": 139,
     "name": "Young Swamiji — Early Years",
+    "name_ta": "",
+    "name_en": "",
     "description": "A rare and precious photograph of Swamiji from His early spiritual years of wandering.",
     "category": "early",
     "image": "images/gallery/early-1.jpg",
@@ -1121,6 +1399,8 @@ var PHOTOS_DATA = [
   {
     "serial": 140,
     "name": "Wandering Yogi of Tiruvannamalai",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji during His wandering years on the sacred streets of Tiruvannamalai as a divine beggar.",
     "category": "early",
     "image": "images/gallery/early-2.jpg",
@@ -1129,6 +1409,8 @@ var PHOTOS_DATA = [
   {
     "serial": 141,
     "name": "Swamiji Blessing Devotees",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji extending His divine blessings to a group of devoted seekers who came for darshan.",
     "category": "devotees",
     "image": "images/gallery/devotees-1.jpg",
@@ -1137,6 +1419,8 @@ var PHOTOS_DATA = [
   {
     "serial": 142,
     "name": "International Devotees Gathering",
+    "name_ta": "",
+    "name_en": "",
     "description": "Devotees from different countries gathered at the ashram to receive Swamiji's divine grace.",
     "category": "devotees",
     "image": "images/gallery/devotees-2.jpg",
@@ -1145,6 +1429,8 @@ var PHOTOS_DATA = [
   {
     "serial": 143,
     "name": "Swamiji in Satsang",
+    "name_ta": "",
+    "name_en": "",
     "description": "An intimate satsang session with Swamiji and a small group of His close and devoted disciples.",
     "category": "devotees",
     "image": "images/gallery/devotees-3.jpg",
@@ -1153,6 +1439,8 @@ var PHOTOS_DATA = [
   {
     "serial": 144,
     "name": "Group Photo with Devotees",
+    "name_ta": "",
+    "name_en": "",
     "description": "Group photograph of Swamiji with His devoted disciples and visitors at the Tiruvannamalai ashram.",
     "category": "devotees",
     "image": "images/gallery/devotees-4.jpg",
@@ -1161,6 +1449,8 @@ var PHOTOS_DATA = [
   {
     "serial": 145,
     "name": "Swamiji in Morning Darshan",
+    "name_ta": "",
+    "name_en": "",
     "description": "A divine photograph of Swamiji during morning darshan hours at the ashram, radiating infinite compassion.",
     "category": "darshan",
     "image": "images/gallery/darshan-1.jpg",
@@ -1169,6 +1459,8 @@ var PHOTOS_DATA = [
   {
     "serial": 146,
     "name": "Evening Darshan at the Ashram",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji blessing devotees during the evening darshan sessions with His divine grace.",
     "category": "darshan",
     "image": "images/gallery/darshan-2.jpg",
@@ -1177,6 +1469,8 @@ var PHOTOS_DATA = [
   {
     "serial": 147,
     "name": "Swamiji's Divine Gaze",
+    "name_ta": "",
+    "name_en": "",
     "description": "A rare close-up capturing Swamiji's compassionate gaze filled with divine love and boundless grace.",
     "category": "darshan",
     "image": "images/gallery/darshan-3.jpg",
@@ -1185,6 +1479,8 @@ var PHOTOS_DATA = [
   {
     "serial": 148,
     "name": "Blessed Moment of Grace",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji in a moment of deep spiritual grace radiating divine peace to all those around Him.",
     "category": "darshan",
     "image": "images/gallery/darshan-4.jpg",
@@ -1193,6 +1489,8 @@ var PHOTOS_DATA = [
   {
     "serial": 149,
     "name": "Ashram — Main Hall",
+    "name_ta": "",
+    "name_en": "",
     "description": "The grand main hall of the Yogi Ramsuratkumar Ashram in Tiruvannamalai, Tamil Nadu.",
     "category": "ashram",
     "image": "images/gallery/ashram-1.jpg",
@@ -1201,6 +1499,8 @@ var PHOTOS_DATA = [
   {
     "serial": 150,
     "name": "Samadhi Mandir — Sacred Shrine",
+    "name_ta": "",
+    "name_en": "",
     "description": "The sacred Samadhi Mandir where Swamiji's mortal remains rest in eternal divine peace.",
     "category": "ashram",
     "image": "images/gallery/ashram-2.jpg",
@@ -1209,6 +1509,8 @@ var PHOTOS_DATA = [
   {
     "serial": 151,
     "name": "Ashram Garden and Grounds",
+    "name_ta": "",
+    "name_en": "",
     "description": "Beautiful garden and lush green grounds of the ashram premises at Tiruvannamalai.",
     "category": "ashram",
     "image": "images/gallery/ashram-3.jpg",
@@ -1217,6 +1519,8 @@ var PHOTOS_DATA = [
   {
     "serial": 152,
     "name": "Annual Birthday Celebration",
+    "name_ta": "",
+    "name_en": "",
     "description": "Thousands of devotees gathered for Swamiji's Jayanti birthday celebration at the ashram.",
     "category": "festival",
     "image": "images/gallery/festival-1.jpg",
@@ -1225,6 +1529,8 @@ var PHOTOS_DATA = [
   {
     "serial": 153,
     "name": "Puja Ceremony at the Ashram",
+    "name_ta": "",
+    "name_en": "",
     "description": "Sacred puja ceremony conducted with full Vedic rituals at the Yogi Ramsuratkumar Ashram.",
     "category": "festival",
     "image": "images/gallery/festival-2.jpg",
@@ -1233,6 +1539,8 @@ var PHOTOS_DATA = [
   {
     "serial": 154,
     "name": "Thousands Gather for His Jayanti",
+    "name_ta": "",
+    "name_en": "",
     "description": "Massive gathering of devotees from across the world for the grand annual Jayanti festival.",
     "category": "festival",
     "image": "images/gallery/festival-3.jpg",
@@ -1241,6 +1549,8 @@ var PHOTOS_DATA = [
   {
     "serial": 155,
     "name": "Young Swamiji — Early Years",
+    "name_ta": "",
+    "name_en": "",
     "description": "A rare and precious photograph of Swamiji from His early spiritual years of wandering.",
     "category": "early",
     "image": "images/gallery/early-1.jpg",
@@ -1249,6 +1559,8 @@ var PHOTOS_DATA = [
   {
     "serial": 156,
     "name": "Wandering Yogi of Tiruvannamalai",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji during His wandering years on the sacred streets of Tiruvannamalai as a divine beggar.",
     "category": "early",
     "image": "images/gallery/early-2.jpg",
@@ -1257,6 +1569,8 @@ var PHOTOS_DATA = [
   {
     "serial": 157,
     "name": "Swamiji Blessing Devotees",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji extending His divine blessings to a group of devoted seekers who came for darshan.",
     "category": "devotees",
     "image": "images/gallery/devotees-1.jpg",
@@ -1265,6 +1579,8 @@ var PHOTOS_DATA = [
   {
     "serial": 158,
     "name": "International Devotees Gathering",
+    "name_ta": "",
+    "name_en": "",
     "description": "Devotees from different countries gathered at the ashram to receive Swamiji's divine grace.",
     "category": "devotees",
     "image": "images/gallery/devotees-2.jpg",
@@ -1273,6 +1589,8 @@ var PHOTOS_DATA = [
   {
     "serial": 159,
     "name": "Swamiji in Satsang",
+    "name_ta": "",
+    "name_en": "",
     "description": "An intimate satsang session with Swamiji and a small group of His close and devoted disciples.",
     "category": "devotees",
     "image": "images/gallery/devotees-3.jpg",
@@ -1281,6 +1599,8 @@ var PHOTOS_DATA = [
   {
     "serial": 160,
     "name": "Group Photo with Devotees",
+    "name_ta": "",
+    "name_en": "",
     "description": "Group photograph of Swamiji with His devoted disciples and visitors at the Tiruvannamalai ashram.",
     "category": "devotees",
     "image": "images/gallery/devotees-4.jpg",
@@ -1289,6 +1609,8 @@ var PHOTOS_DATA = [
   {
     "serial": 161,
     "name": "Swamiji in Morning Darshan",
+    "name_ta": "",
+    "name_en": "",
     "description": "A divine photograph of Swamiji during morning darshan hours at the ashram, radiating infinite compassion.",
     "category": "darshan",
     "image": "images/gallery/darshan-1.jpg",
@@ -1297,6 +1619,8 @@ var PHOTOS_DATA = [
   {
     "serial": 162,
     "name": "Evening Darshan at the Ashram",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji blessing devotees during the evening darshan sessions with His divine grace.",
     "category": "darshan",
     "image": "images/gallery/darshan-2.jpg",
@@ -1305,6 +1629,8 @@ var PHOTOS_DATA = [
   {
     "serial": 163,
     "name": "Swamiji's Divine Gaze",
+    "name_ta": "",
+    "name_en": "",
     "description": "A rare close-up capturing Swamiji's compassionate gaze filled with divine love and boundless grace.",
     "category": "darshan",
     "image": "images/gallery/darshan-3.jpg",
@@ -1313,6 +1639,8 @@ var PHOTOS_DATA = [
   {
     "serial": 164,
     "name": "Blessed Moment of Grace",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji in a moment of deep spiritual grace radiating divine peace to all those around Him.",
     "category": "darshan",
     "image": "images/gallery/darshan-4.jpg",
@@ -1321,6 +1649,8 @@ var PHOTOS_DATA = [
   {
     "serial": 165,
     "name": "Ashram — Main Hall",
+    "name_ta": "",
+    "name_en": "",
     "description": "The grand main hall of the Yogi Ramsuratkumar Ashram in Tiruvannamalai, Tamil Nadu.",
     "category": "ashram",
     "image": "images/gallery/ashram-1.jpg",
@@ -1329,6 +1659,8 @@ var PHOTOS_DATA = [
   {
     "serial": 166,
     "name": "Samadhi Mandir — Sacred Shrine",
+    "name_ta": "",
+    "name_en": "",
     "description": "The sacred Samadhi Mandir where Swamiji's mortal remains rest in eternal divine peace.",
     "category": "ashram",
     "image": "images/gallery/ashram-2.jpg",
@@ -1337,6 +1669,8 @@ var PHOTOS_DATA = [
   {
     "serial": 167,
     "name": "Ashram Garden and Grounds",
+    "name_ta": "",
+    "name_en": "",
     "description": "Beautiful garden and lush green grounds of the ashram premises at Tiruvannamalai.",
     "category": "ashram",
     "image": "images/gallery/ashram-3.jpg",
@@ -1345,6 +1679,8 @@ var PHOTOS_DATA = [
   {
     "serial": 168,
     "name": "Annual Birthday Celebration",
+    "name_ta": "",
+    "name_en": "",
     "description": "Thousands of devotees gathered for Swamiji's Jayanti birthday celebration at the ashram.",
     "category": "festival",
     "image": "images/gallery/festival-1.jpg",
@@ -1353,6 +1689,8 @@ var PHOTOS_DATA = [
   {
     "serial": 169,
     "name": "Puja Ceremony at the Ashram",
+    "name_ta": "",
+    "name_en": "",
     "description": "Sacred puja ceremony conducted with full Vedic rituals at the Yogi Ramsuratkumar Ashram.",
     "category": "festival",
     "image": "images/gallery/festival-2.jpg",
@@ -1361,6 +1699,8 @@ var PHOTOS_DATA = [
   {
     "serial": 170,
     "name": "Thousands Gather for His Jayanti",
+    "name_ta": "",
+    "name_en": "",
     "description": "Massive gathering of devotees from across the world for the grand annual Jayanti festival.",
     "category": "festival",
     "image": "images/gallery/festival-3.jpg",
@@ -1369,6 +1709,8 @@ var PHOTOS_DATA = [
   {
     "serial": 171,
     "name": "Young Swamiji — Early Years",
+    "name_ta": "",
+    "name_en": "",
     "description": "A rare and precious photograph of Swamiji from His early spiritual years of wandering.",
     "category": "early",
     "image": "images/gallery/early-1.jpg",
@@ -1377,6 +1719,8 @@ var PHOTOS_DATA = [
   {
     "serial": 172,
     "name": "Wandering Yogi of Tiruvannamalai",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji during His wandering years on the sacred streets of Tiruvannamalai as a divine beggar.",
     "category": "early",
     "image": "images/gallery/early-2.jpg",
@@ -1385,6 +1729,8 @@ var PHOTOS_DATA = [
   {
     "serial": 173,
     "name": "Swamiji Blessing Devotees",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji extending His divine blessings to a group of devoted seekers who came for darshan.",
     "category": "devotees",
     "image": "images/gallery/devotees-1.jpg",
@@ -1393,6 +1739,8 @@ var PHOTOS_DATA = [
   {
     "serial": 174,
     "name": "International Devotees Gathering",
+    "name_ta": "",
+    "name_en": "",
     "description": "Devotees from different countries gathered at the ashram to receive Swamiji's divine grace.",
     "category": "devotees",
     "image": "images/gallery/devotees-2.jpg",
@@ -1401,6 +1749,8 @@ var PHOTOS_DATA = [
   {
     "serial": 175,
     "name": "Swamiji in Satsang",
+    "name_ta": "",
+    "name_en": "",
     "description": "An intimate satsang session with Swamiji and a small group of His close and devoted disciples.",
     "category": "devotees",
     "image": "images/gallery/devotees-3.jpg",
@@ -1409,6 +1759,8 @@ var PHOTOS_DATA = [
   {
     "serial": 176,
     "name": "Group Photo with Devotees",
+    "name_ta": "",
+    "name_en": "",
     "description": "Group photograph of Swamiji with His devoted disciples and visitors at the Tiruvannamalai ashram.",
     "category": "devotees",
     "image": "images/gallery/devotees-4.jpg",
@@ -1417,6 +1769,8 @@ var PHOTOS_DATA = [
   {
     "serial": 177,
     "name": "Swamiji in Morning Darshan",
+    "name_ta": "",
+    "name_en": "",
     "description": "A divine photograph of Swamiji during morning darshan hours at the ashram, radiating infinite compassion.",
     "category": "darshan",
     "image": "images/gallery/darshan-1.jpg",
@@ -1425,6 +1779,8 @@ var PHOTOS_DATA = [
   {
     "serial": 178,
     "name": "Evening Darshan at the Ashram",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji blessing devotees during the evening darshan sessions with His divine grace.",
     "category": "darshan",
     "image": "images/gallery/darshan-2.jpg",
@@ -1433,6 +1789,8 @@ var PHOTOS_DATA = [
   {
     "serial": 179,
     "name": "Swamiji's Divine Gaze",
+    "name_ta": "",
+    "name_en": "",
     "description": "A rare close-up capturing Swamiji's compassionate gaze filled with divine love and boundless grace.",
     "category": "darshan",
     "image": "images/gallery/darshan-3.jpg",
@@ -1441,6 +1799,8 @@ var PHOTOS_DATA = [
   {
     "serial": 180,
     "name": "Blessed Moment of Grace",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji in a moment of deep spiritual grace radiating divine peace to all those around Him.",
     "category": "darshan",
     "image": "images/gallery/darshan-4.jpg",
@@ -1449,6 +1809,8 @@ var PHOTOS_DATA = [
   {
     "serial": 181,
     "name": "Ashram — Main Hall",
+    "name_ta": "",
+    "name_en": "",
     "description": "The grand main hall of the Yogi Ramsuratkumar Ashram in Tiruvannamalai, Tamil Nadu.",
     "category": "ashram",
     "image": "images/gallery/ashram-1.jpg",
@@ -1457,6 +1819,8 @@ var PHOTOS_DATA = [
   {
     "serial": 182,
     "name": "Samadhi Mandir — Sacred Shrine",
+    "name_ta": "",
+    "name_en": "",
     "description": "The sacred Samadhi Mandir where Swamiji's mortal remains rest in eternal divine peace.",
     "category": "ashram",
     "image": "images/gallery/ashram-2.jpg",
@@ -1465,6 +1829,8 @@ var PHOTOS_DATA = [
   {
     "serial": 183,
     "name": "Ashram Garden and Grounds",
+    "name_ta": "",
+    "name_en": "",
     "description": "Beautiful garden and lush green grounds of the ashram premises at Tiruvannamalai.",
     "category": "ashram",
     "image": "images/gallery/ashram-3.jpg",
@@ -1473,6 +1839,8 @@ var PHOTOS_DATA = [
   {
     "serial": 184,
     "name": "Annual Birthday Celebration",
+    "name_ta": "",
+    "name_en": "",
     "description": "Thousands of devotees gathered for Swamiji's Jayanti birthday celebration at the ashram.",
     "category": "festival",
     "image": "images/gallery/festival-1.jpg",
@@ -1481,6 +1849,8 @@ var PHOTOS_DATA = [
   {
     "serial": 185,
     "name": "Puja Ceremony at the Ashram",
+    "name_ta": "",
+    "name_en": "",
     "description": "Sacred puja ceremony conducted with full Vedic rituals at the Yogi Ramsuratkumar Ashram.",
     "category": "festival",
     "image": "images/gallery/festival-2.jpg",
@@ -1489,6 +1859,8 @@ var PHOTOS_DATA = [
   {
     "serial": 186,
     "name": "Thousands Gather for His Jayanti",
+    "name_ta": "",
+    "name_en": "",
     "description": "Massive gathering of devotees from across the world for the grand annual Jayanti festival.",
     "category": "festival",
     "image": "images/gallery/festival-3.jpg",
@@ -1497,6 +1869,8 @@ var PHOTOS_DATA = [
   {
     "serial": 187,
     "name": "Young Swamiji — Early Years",
+    "name_ta": "",
+    "name_en": "",
     "description": "A rare and precious photograph of Swamiji from His early spiritual years of wandering.",
     "category": "early",
     "image": "images/gallery/early-1.jpg",
@@ -1505,6 +1879,8 @@ var PHOTOS_DATA = [
   {
     "serial": 188,
     "name": "Wandering Yogi of Tiruvannamalai",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji during His wandering years on the sacred streets of Tiruvannamalai as a divine beggar.",
     "category": "early",
     "image": "images/gallery/early-2.jpg",
@@ -1513,6 +1889,8 @@ var PHOTOS_DATA = [
   {
     "serial": 189,
     "name": "Swamiji Blessing Devotees",
+    "name_ta": "",
+    "name_en": "",
     "description": "Swamiji extending His divine blessings to a group of devoted seekers who came for darshan.",
     "category": "devotees",
     "image": "images/gallery/devotees-1.jpg",
@@ -1521,6 +1899,8 @@ var PHOTOS_DATA = [
   {
     "serial": 190,
     "name": "International Devotees Gathering",
+    "name_ta": "",
+    "name_en": "",
     "description": "Devotees from different countries gathered at the ashram to receive Swamiji's divine grace.",
     "category": "devotees",
     "image": "images/gallery/devotees-2.jpg",
@@ -1529,6 +1909,8 @@ var PHOTOS_DATA = [
   {
     "serial": 191,
     "name": "Swamiji in Satsang",
+    "name_ta": "",
+    "name_en": "",
     "description": "An intimate satsang session with Swamiji and a small group of His close and devoted disciples.",
     "category": "devotees",
     "image": "images/gallery/devotees-3.jpg",
@@ -1537,6 +1919,8 @@ var PHOTOS_DATA = [
   {
     "serial": 192,
     "name": "Group Photo with Devotees",
+    "name_ta": "",
+    "name_en": "",
     "description": "Group photograph of Swamiji with His devoted disciples and visitors at the Tiruvannamalai ashram.",
     "category": "devotees",
     "image": "images/gallery/devotees-4.jpg",

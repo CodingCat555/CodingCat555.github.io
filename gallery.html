@@ -48,34 +48,35 @@
     .gallery-share { position:absolute; top:8px; right:8px; z-index:10; }
     .share-toggle {
       width:34px; height:34px; border-radius:50%; border:none; cursor:pointer;
-      background:rgba(255,255,255,0.95); color:var(--green-dark); font-size:1rem;
+      background:rgba(15,69,32,0.88); color:#FFD700; font-size:1rem;
       display:flex; align-items:center; justify-content:center;
       box-shadow:0 2px 10px rgba(0,0,0,0.22); transition:all 0.2s;
       opacity:1;
     }
-    .share-toggle:hover { background:var(--green); color:white; transform:scale(1.12); }
+    .share-toggle:hover { background:var(--green); color:#FFD700; transform:scale(1.12); }
     .share-menu {
       position:absolute; top:38px; right:0; background:white;
-      border-radius:10px; box-shadow:0 4px 20px rgba(0,0,0,0.18);
-      padding:6px; min-width:160px; display:none; z-index:99;
+      border-radius:8px; box-shadow:0 4px 20px rgba(0,0,0,0.18);
+      border:1px solid #000;
+      padding:4px; min-width:145px; display:none; z-index:99;
     }
     .share-menu.open { display:block; }
     .share-option {
-      display:flex; align-items:center; gap:10px;
-      padding:8px 12px; border-radius:7px; cursor:pointer;
-      font-size:0.83rem; font-weight:600; color:#333;
+      display:flex; align-items:center; gap:7px;
+      padding:5px 9px; border-radius:6px; cursor:pointer;
+      font-size:0.79rem; font-weight:600; color:#333;
       text-decoration:none; transition:background 0.15s;
       border:none; background:none; width:100%; text-align:left;
     }
     .share-option:hover { background:#f4f4f4; }
-    .share-option .sh-icon { width:22px; height:22px; border-radius:5px; display:flex; align-items:center; justify-content:center; font-size:0.85rem; flex-shrink:0; }
+    .share-option .sh-icon { width:18px; height:18px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; flex-shrink:0; }
     .sh-native { background:var(--green); color:white; }
     .sh-fb     { background:#1877f2; color:white; }
     .sh-wa     { background:#25d366; color:white; }
     .sh-tw     { background:#000;    color:white; }
     .sh-dl     { background:#e67e22; color:white; }
     .sh-copy   { background:#6c757d; color:white; }
-    .share-divider { height:1px; background:#eee; margin:4px 0; }
+    .share-divider { height:1px; background:#eee; margin:3px 0; }
     /* Allow share menu to overflow gallery card bounds and sit above other cards */
     .gallery-item.share-open { overflow: visible; z-index: 200; position: relative; }
     .gallery-item.share-open > img,
@@ -88,7 +89,7 @@
       background: white;
       border-radius: calc(var(--radius-lg) + 5px);
       padding: 5px 5px 10px;
-      border: 1.5px solid rgba(26,107,46,0.15);
+      border: 1px solid rgba(26,107,46,0.40);
       box-shadow: 0 3px 14px rgba(0,0,0,0.10);
       transition: box-shadow 0.22s, border-color 0.22s, transform 0.22s;
     }
@@ -305,6 +306,14 @@ $(function () {
     return parts.join('/') + '/thumbs/' + filename;
   }
 
+  /* Return the display name based on current language, fallback to item.name */
+  function getPhotoName(item) {
+    var lang = localStorage.getItem('yrk_lang') || 'en';
+    if (lang === 'ta' && item.name_ta) return item.name_ta;
+    if (lang === 'en' && item.name_en) return item.name_en;
+    return item.name;
+  }
+
   var SVG_SHARE = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>';
 
   function makeShareMenu(item) {
@@ -323,18 +332,18 @@ $(function () {
         '<a class="share-option" href="' + twUrl + '" target="_blank" rel="noopener"><span class="sh-icon sh-tw">𝕏</span> Twitter / X</a>' +
         '<div class="share-divider"></div>' +
         '<button class="share-option share-download"><span class="sh-icon sh-dl">⬇</span> Download Photo</button>' +
-        '<button class="share-option share-copy"><span class="sh-icon sh-copy">&#128279;</span> Copy Link</button>' +
       '</div>' +
     '</div>';
   }
 
   function makeItem(item) {
     var sn = '#' + String(item.serial).padStart(2, '0');
+    var displayName = getPhotoName(item);
     var $card = $('<div>', {
       'class': 'gallery-item fade-in',
       'data-category': item.category,
       'data-img'     : item.image,
-      'data-caption' : item.name
+      'data-caption' : displayName
     }).append(
       '<span class="serial-badge">' + sn + '</span>',
       $('<img>', { 'data-src': thumbPath(item.image), 'data-full': item.image, alt: item.name }).on('error', function () {
@@ -350,12 +359,12 @@ $(function () {
         $img.replaceWith(
           '<div class="gallery-placeholder">' +
             '<span class="ph-icon">🪔</span>' +
-            '<span class="ph-text">' + sn + ' ' + item.name + '</span>' +
+            '<span class="ph-text">' + sn + ' ' + displayName + '</span>' +
           '</div>'
         );
       }),
       '<div class="gallery-overlay">' +
-        '<span class="gallery-caption">' + item.name + '</span>' +
+        '<span class="gallery-caption">' + displayName + '</span>' +
         '<span class="gallery-desc">' + item.description + '</span>' +
       '</div>',
       makeShareMenu(item)
@@ -363,7 +372,7 @@ $(function () {
     /* Wrap card + name label below it */
     return $('<div class="gallery-card-wrap">').append(
       $card,
-      '<p class="gallery-name">' + item.name + '</p>'
+      '<p class="gallery-name">' + displayName + '</p>'
     );
   }
 
@@ -515,10 +524,37 @@ $(function () {
     $('#galleryContainer').html(noDataMsg());
   }
 
+
 });
 </script>
 <script src="data/lang/en.js"></script>
 <script src="data/lang/ta.js"></script>
 <script src="data/lang-loader.js"></script>
+<script>
+/* Patch applyLang AFTER lang-loader has defined it — refresh gallery photo names on lang switch */
+(function () {
+  var _orig = window.applyLang;
+  window.applyLang = function (scope) {
+    if (_orig) _orig(scope);
+    var lang = localStorage.getItem('yrk_lang') || 'en';
+    var photos = (typeof PHOTOS_DATA !== 'undefined') ? PHOTOS_DATA : [];
+    document.querySelectorAll('#galleryContainer .gallery-card-wrap').forEach(function (wrap) {
+      var card = wrap.querySelector('.gallery-item');
+      if (!card) return;
+      var imgPath = card.getAttribute('data-img');
+      var item = photos.find(function (p) { return p.image === imgPath; });
+      if (!item) return;
+      var name = (lang === 'ta' && item.name_ta) ? item.name_ta
+               : (lang === 'en' && item.name_en) ? item.name_en
+               : item.name;
+      var nameEl = wrap.querySelector('.gallery-name');
+      if (nameEl) nameEl.textContent = name;
+      card.setAttribute('data-caption', name);
+      var caption = card.querySelector('.gallery-caption');
+      if (caption) caption.textContent = name;
+    });
+  };
+})();
+</script>
 </body>
 </html>
