@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quotes Design Preview</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f7f2; color: #1a1a1a; padding: 30px 20px; }
+
+    h1 { text-align:center; color:#1a6b2e; margin-bottom:6px; font-size:1.6rem; }
+    .subtitle { text-align:center; color:#666; margin-bottom:40px; font-size:0.9rem; }
+
+    .section { margin-bottom: 56px; }
+    .section-label {
+      display: inline-block; background: #1a6b2e; color: white;
+      padding: 6px 18px; border-radius: 20px; font-size: 0.78rem;
+      font-weight: 700; letter-spacing: 0.08em; margin-bottom: 18px;
+    }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; max-width: 860px; }
+    .grid-1 { display: grid; grid-template-columns: 1fr; gap: 18px; max-width: 500px; }
+
+    /* Sample image placeholder */
+    .img-placeholder {
+      background: linear-gradient(135deg, #1a6b2e 0%, #0f4520 60%, #2d8a47 100%);
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,0.5); font-size: 2rem;
+    }
+
+    /* ═══════════════════════════════════════════
+       OPTION A — Clean White Card
+    ═══════════════════════════════════════════ */
+    .card-a {
+      display: flex; background: white; border-radius: 14px;
+      overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.09);
+      border: 1px solid rgba(26,107,46,0.18);
+    }
+    .card-a .img-box {
+      width: 130px; height: 130px; flex-shrink: 0;
+    }
+    .card-a .body {
+      flex: 1; padding: 14px 16px;
+      border-left: 3px solid #1a6b2e;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .card-a .quote { font-size: 0.82rem; line-height: 1.65; color: #1a1a1a; font-weight: 500; }
+    .card-a .source { font-size: 0.62rem; color: #1a6b2e; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; margin-top: 8px; }
+    .card-a .serial {
+      position: absolute; top: 8px; left: 8px;
+      background: rgba(15,69,32,0.88); color: #FFD700;
+      font-size: 0.62rem; font-weight: 700; padding: 2px 8px;
+      border-radius: 50px;
+    }
+
+    /* ═══════════════════════════════════════════
+       OPTION B — Gradient Accent Card
+    ═══════════════════════════════════════════ */
+    .card-b {
+      display: flex; background: white; border-radius: 16px;
+      overflow: hidden; box-shadow: 0 4px 24px rgba(26,107,46,0.12);
+      border: 1.5px solid rgba(26,107,46,0.22);
+    }
+    .card-b .img-box {
+      width: 130px; height: 130px; flex-shrink: 0; position: relative;
+    }
+    .card-b .img-box::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to right, rgba(26,107,46,0.18) 0%, transparent 100%);
+    }
+    .card-b .body {
+      flex: 1; padding: 14px 16px;
+      background: linear-gradient(135deg, #f8fff9 0%, white 100%);
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .card-b .badge {
+      background: #1a6b2e; color: white; font-size: 0.58rem;
+      font-weight: 700; padding: 2px 8px; border-radius: 50px;
+      display: inline-block; margin-bottom: 8px; letter-spacing: 0.06em;
+    }
+    .card-b .quote { font-size: 0.82rem; line-height: 1.65; color: #1a1a1a; font-weight: 500; }
+    .card-b .source { font-size: 0.62rem; color: #888; font-style: italic; margin-top: 8px; }
+
+    /* ═══════════════════════════════════════════
+       OPTION C — Dark Elegant Card
+    ═══════════════════════════════════════════ */
+    .card-c {
+      display: flex; background: #0f2d18; border-radius: 16px;
+      overflow: hidden; box-shadow: 0 6px 28px rgba(0,0,0,0.28);
+    }
+    .card-c .img-box {
+      width: 130px; height: 130px; flex-shrink: 0;
+    }
+    .card-c .body {
+      flex: 1; padding: 14px 16px;
+      border-left: 2px solid rgba(255,215,0,0.4);
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .card-c .serial-c {
+      font-size: 0.6rem; color: #FFD700; font-weight: 700;
+      letter-spacing: 0.1em; margin-bottom: 6px;
+    }
+    .card-c .quote { font-size: 0.82rem; line-height: 1.65; color: #e8f5ec; font-weight: 400; font-style: italic; }
+    .card-c .source { font-size: 0.62rem; color: #FFD700; font-weight: 600; margin-top: 8px; opacity: 0.9; }
+
+    /* ═══════════════════════════════════════════
+       OPTION D — Gold Accent Minimal
+    ═══════════════════════════════════════════ */
+    .card-d {
+      display: flex; background: white; border-radius: 12px;
+      overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      border-top: 3px solid #CCA800;
+    }
+    .card-d .img-box {
+      width: 130px; height: 130px; flex-shrink: 0;
+    }
+    .card-d .body {
+      flex: 1; padding: 14px 16px;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .card-d .serial-d {
+      font-size: 0.6rem; color: #CCA800; font-weight: 800;
+      letter-spacing: 0.1em; margin-bottom: 6px;
+    }
+    .card-d .quote { font-size: 0.82rem; line-height: 1.65; color: #333; }
+    .card-d .source { font-size: 0.62rem; color: #999; margin-top: 8px; }
+    .card-d .divider { width: 30px; height: 2px; background: #CCA800; border-radius: 2px; margin: 6px 0; }
+
+    /* ═══════════════════════════════════════════
+       OPTION E — Soft Shadow Rounded (Mobile-first)
+    ═══════════════════════════════════════════ */
+    .card-e {
+      display: flex; background: white; border-radius: 20px;
+      overflow: hidden; box-shadow: 0 8px 30px rgba(26,107,46,0.14);
+    }
+    .card-e .img-box {
+      width: 120px; height: 120px; flex-shrink: 0; border-radius: 16px;
+      margin: 8px; overflow: hidden;
+    }
+    .card-e .body {
+      flex: 1; padding: 12px 14px 12px 6px;
+      display: flex; flex-direction: column; justify-content: center; gap: 6px;
+    }
+    .card-e .serial-e {
+      font-size: 0.58rem; background: #e8f5ec; color: #1a6b2e;
+      font-weight: 700; padding: 2px 8px; border-radius: 50px;
+      display: inline-block; width: fit-content;
+    }
+    .card-e .quote { font-size: 0.80rem; line-height: 1.6; color: #222; }
+    .card-e .source { font-size: 0.60rem; color: #1a6b2e; font-weight: 600; }
+
+    /* ═══════════════════════════════════════════
+       OPTION F — Magazine Style
+    ═══════════════════════════════════════════ */
+    .card-f {
+      display: flex; background: white; border-radius: 14px;
+      overflow: hidden; box-shadow: 0 3px 18px rgba(0,0,0,0.10);
+    }
+    .card-f .img-box {
+      width: 140px; height: 140px; flex-shrink: 0; position: relative;
+    }
+    .card-f .img-num {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: rgba(15,69,32,0.88); color: #FFD700;
+      text-align: center; font-size: 0.62rem; font-weight: 800;
+      padding: 4px; letter-spacing: 0.1em;
+    }
+    .card-f .body {
+      flex: 1; padding: 0;
+      display: flex; flex-direction: column;
+    }
+    .card-f .body-top {
+      flex: 1; padding: 14px 16px 10px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .card-f .quote { font-size: 0.82rem; line-height: 1.65; color: #1a1a1a; font-style: italic; }
+    .card-f .body-bot {
+      padding: 8px 16px;
+      background: #f8fff9;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-f .source { font-size: 0.60rem; color: #1a6b2e; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+    .card-f .dot { width: 5px; height: 5px; background: #1a6b2e; border-radius: 50%; }
+
+    /* ═══════════════════════════════════════════
+       OPTION G — Spiritual / Temple Style
+    ═══════════════════════════════════════════ */
+    .card-g {
+      display: flex; background: #fffdf5;
+      border-radius: 14px; overflow: hidden;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+      border: 1px solid rgba(204,168,0,0.3);
+    }
+    .card-g .img-box {
+      width: 130px; height: 130px; flex-shrink: 0;
+      border-right: 3px solid #CCA800;
+    }
+    .card-g .body {
+      flex: 1; padding: 14px 16px;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .card-g .serial-g {
+      font-size: 0.6rem; color: #CCA800; font-weight: 700; margin-bottom: 6px;
+    }
+    .card-g .quote { font-size: 0.82rem; line-height: 1.65; color: #3a2a00; font-weight: 500; }
+    .card-g .source { font-size: 0.62rem; color: #8a7000; font-weight: 700; text-transform: uppercase; margin-top: 8px; letter-spacing: 0.06em; }
+
+    /* ═══════════════════════════════════════════
+       OPTION H — Pill / Bubble Style
+    ═══════════════════════════════════════════ */
+    .card-h {
+      display: flex; align-items: center;
+      background: white; border-radius: 60px;
+      overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.10);
+      padding: 8px; gap: 14px;
+    }
+    .card-h .img-box {
+      width: 96px; height: 96px; flex-shrink: 0;
+      border-radius: 50%; overflow: hidden;
+      border: 3px solid #1a6b2e;
+    }
+    .card-h .body { flex: 1; padding-right: 14px; }
+    .card-h .quote { font-size: 0.78rem; line-height: 1.6; color: #222; font-style: italic; }
+    .card-h .source { font-size: 0.60rem; color: #1a6b2e; font-weight: 700; margin-top: 6px; }
+
+    @media (max-width: 600px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<h1>📜 Quotes Card — Design Preview</h1>
+<p class="subtitle">8 design options — same content, different styles. Pick your favourite!</p>
+
+<!-- OPTION A -->
+<div class="section">
+  <div class="section-label">Option A — Clean White + Green Border</div>
+  <div class="grid-2">
+    <div class="card-a" style="position:relative;">
+      <div class="img-box img-placeholder">🙏</div>
+      <span class="serial">#01</span>
+      <div class="body">
+        <p class="quote">Father alone exists. Nothing else. Nobody else.</p>
+        <p class="source">— Yogi Ramsuratkumar</p>
+      </div>
+    </div>
+    <div class="card-a" style="position:relative;">
+      <div class="img-box img-placeholder">✨</div>
+      <span class="serial">#02</span>
+      <div class="body">
+        <p class="quote">This beggar's blessings are always with you, my child.</p>
+        <p class="source">— Yogi Ramsuratkumar</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION B -->
+<div class="section">
+  <div class="section-label">Option B — Gradient Accent</div>
+  <div class="grid-2">
+    <div class="card-b">
+      <div class="img-box img-placeholder">🙏</div>
+      <div class="body">
+        <div>
+          <span class="badge">#01</span>
+          <p class="quote">Father alone exists. Nothing else. Nobody else.</p>
+        </div>
+        <p class="source">— Yogi Ramsuratkumar</p>
+      </div>
+    </div>
+    <div class="card-b">
+      <div class="img-box img-placeholder">✨</div>
+      <div class="body">
+        <div>
+          <span class="badge">#02</span>
+          <p class="quote">This beggar's blessings are always with you, my child.</p>
+        </div>
+        <p class="source">— Yogi Ramsuratkumar</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION C -->
+<div class="section">
+  <div class="section-label">Option C — Dark Elegant</div>
+  <div class="grid-2">
+    <div class="card-c">
+      <div class="img-box img-placeholder">🙏</div>
+      <div class="body">
+        <p class="serial-c">#01</p>
+        <p class="quote">Father alone exists. Nothing else. Nobody else.</p>
+        <p class="source">— Yogi Ramsuratkumar</p>
+      </div>
+    </div>
+    <div class="card-c">
+      <div class="img-box img-placeholder">✨</div>
+      <div class="body">
+        <p class="serial-c">#02</p>
+        <p class="quote">This beggar's blessings are always with you, my child.</p>
+        <p class="source">— Yogi Ramsuratkumar</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION D -->
+<div class="section">
+  <div class="section-label">Option D — Gold Accent Minimal</div>
+  <div class="grid-2">
+    <div class="card-d">
+      <div class="img-box img-placeholder">🙏</div>
+      <div class="body">
+        <div>
+          <p class="serial-d">#01</p>
+          <div class="divider"></div>
+          <p class="quote">Father alone exists. Nothing else. Nobody else.</p>
+        </div>
+        <p class="source">— Yogi Ramsuratkumar</p>
+      </div>
+    </div>
+    <div class="card-d">
+      <div class="img-box img-placeholder">✨</div>
+      <div class="body">
+        <div>
+          <p class="serial-d">#02</p>
+          <div class="divider"></div>
+          <p class="quote">This beggar's blessings are always with you, my child.</p>
+        </div>
+        <p class="source">— Yogi Ramsuratkumar</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION E -->
+<div class="section">
+  <div class="section-label">Option E — Soft Rounded (Mobile-first)</div>
+  <div class="grid-2">
+    <div class="card-e">
+      <div class="img-box img-placeholder">🙏</div>
+      <div class="body">
+        <span class="serial-e">#01</span>
+        <p class="quote">Father alone exists. Nothing else. Nobody else.</p>
+        <p class="source">— Yogi Ramsuratkumar</p>
+      </div>
+    </div>
+    <div class="card-e">
+      <div class="img-box img-placeholder">✨</div>
+      <div class="body">
+        <span class="serial-e">#02</span>
+        <p class="quote">This beggar's blessings are always with you, my child.</p>
+        <p class="source">— Yogi Ramsuratkumar</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION F -->
+<div class="section">
+  <div class="section-label">Option F — Magazine Style</div>
+  <div class="grid-2">
+    <div class="card-f">
+      <div class="img-box img-placeholder" style="position:relative;">🙏<div class="img-num">#01</div></div>
+      <div class="body">
+        <div class="body-top"><p class="quote">Father alone exists. Nothing else. Nobody else.</p></div>
+        <div class="body-bot"><span class="source">Yogi Ramsuratkumar</span><div class="dot"></div></div>
+      </div>
+    </div>
+    <div class="card-f">
+      <div class="img-box img-placeholder" style="position:relative;">✨<div class="img-num">#02</div></div>
+      <div class="body">
+        <div class="body-top"><p class="quote">This beggar's blessings are always with you, my child.</p></div>
+        <div class="body-bot"><span class="source">Yogi Ramsuratkumar</span><div class="dot"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION G -->
+<div class="section">
+  <div class="section-label">Option G — Spiritual / Temple Style ⭐</div>
+  <div class="grid-2">
+    <div class="card-g">
+      <div class="img-box img-placeholder">🙏</div>
+      <div class="body">
+        <div>
+          <p class="serial-g">#01</p>
+          <p class="quote">Father alone exists. Nothing else. Nobody else.</p>
+        </div>
+        <p class="source">— Yogi Ramsuratkumar</p>
+      </div>
+    </div>
+    <div class="card-g">
+      <div class="img-box img-placeholder">✨</div>
+      <div class="body">
+        <div>
+          <p class="serial-g">#02</p>
+          <p class="quote">This beggar's blessings are always with you, my child.</p>
+        </div>
+        <p class="source">— Yogi Ramsuratkumar</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION H -->
+<div class="section">
+  <div class="section-label">Option H — Pill / Circular Image</div>
+  <div class="grid-1">
+    <div class="card-h">
+      <div class="img-box img-placeholder">🙏</div>
+      <div class="body">
+        <p class="quote">Father alone exists. Nothing else. Nobody else.</p>
+        <p class="source">— Yogi Ramsuratkumar · #01</p>
+      </div>
+    </div>
+    <div class="card-h">
+      <div class="img-box img-placeholder">✨</div>
+      <div class="body">
+        <p class="quote">This beggar's blessings are always with you, my child.</p>
+        <p class="source">— Yogi Ramsuratkumar · #02</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
