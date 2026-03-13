@@ -37,136 +37,105 @@
     /* ── Category pills ── */
     .quotes-filters { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:10px; }
 
-    /* ── Quotes grid — 3 columns ── */
+    /* ── Quotes grid — 2 columns ── */
     .quotes-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 18px;
     }
-    @media (max-width: 900px) { .quotes-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 560px) { .quotes-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 640px) { .quotes-grid { grid-template-columns: 1fr; } }
 
-    /* ── Quote card ── */
+    /* ── Quote card — Option B style ── */
     .quote-card {
-      position: relative;
+      display: flex;
+      background: white;
       border-radius: var(--radius-lg);
       overflow: hidden;
-      aspect-ratio: 4 / 3;
-      background: #111;
       box-shadow: var(--shadow);
+      border: 1px solid rgba(26,107,46,0.50);
+      min-height: 190px;
       transition: var(--transition);
-      cursor: default;
+      position: relative;
     }
-    .quote-card:hover { transform: scale(1.02); box-shadow: var(--shadow-hover); }
+    .quote-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
 
-    /* Image fills entire card */
-    .quote-card img {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
+    /* Image side */
+    .quote-img-wrap {
+      width: 180px; flex-shrink: 0;
+      position: relative; overflow: hidden;
+      background: #111;
+    }
+    .quote-img-wrap img {
       width: 100%; height: 100%;
-      object-fit: contain;
-      object-position: center center;
-      transition: transform 0.5s ease;
-      display: block;
+      object-fit: cover; object-position: center top;
+      display: block; transition: transform 0.5s;
     }
-    .quote-card:hover img { transform: scale(1.06); }
+    .quote-card:hover .quote-img-wrap img { transform: scale(1.05); }
 
-    /* Dark gradient overlay — always visible */
-    .quote-overlay {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background:
-        linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0.15) 100%),
-        rgba(0,0,0,0.10);
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 14px 14px 16px;
-    }
-
-    /* Text-only card: solid green gradient background */
-    .quote-card-text {
+    /* Text-only card image side */
+    .quote-card-text .quote-img-wrap {
       background: linear-gradient(135deg,#1a6b2e 0%,#0f4520 100%);
+      display: flex; align-items: center; justify-content: center;
     }
-    .quote-card-text .quote-overlay {
-      background: none;
-      justify-content: center;
-      padding: 20px;
-      text-align: center;
-    }
-    .quote-card-text .quote-overlay::before {
+    .quote-card-text .quote-img-wrap::before {
       content: '❝';
-      display: block;
-      font-size: 4rem;
-      line-height: 1;
-      color: rgba(255,255,255,0.15);
-      font-family: Georgia, serif;
-      margin-bottom: 8px;
-      flex-shrink: 0;
+      font-size: 5rem; color: rgba(255,255,255,0.18);
+      font-family: Georgia, serif; line-height: 1;
     }
 
-    /* Quote text styles */
-    .quote-text {
-      color: #fff;
-      font-size: 0.84rem;
-      line-height: 1.55;
-      font-weight: 500;
-      margin: 0 0 5px;
-    }
-    .quote-ta {
-      color: rgba(255,255,255,0.75);
-      font-size: 0.76rem;
-      line-height: 1.45;
-      margin: 0 0 7px;
-      font-style: italic;
-    }
-    .quote-source {
-      font-size: 0.70rem;
-      color: var(--gold);
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      display: block;
-    }
-
-    /* ── Serial badge ── */
+    /* Serial badge on image */
     .quote-serial {
-      position: absolute; top: 6px; left: 6px; z-index: 10;
+      position: absolute; top: 8px; left: 8px; z-index: 10;
       background: rgba(15,69,32,0.88); color: #FFD700;
-      font-size: 0.7rem; font-weight: 700; padding: 3px 9px;
+      font-size: 0.68rem; font-weight: 700; padding: 3px 9px;
       border-radius: 50px; letter-spacing: 0.06em;
       backdrop-filter: blur(4px); border: 1px solid rgba(255,215,0,0.3);
       pointer-events: none;
     }
-    /* ── Share button ── */
-    .quote-share { position: absolute; top: 6px; right: 6px; z-index: 10; }
-    .quote-share .share-toggle {
-      width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer;
-      background: rgba(15,69,32,0.88); color: #FFD700; font-size: 1rem;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.22); transition: all 0.2s;
+
+    /* Text body side */
+    .quote-body {
+      flex: 1; padding: 16px 18px;
+      display: flex; flex-direction: column; justify-content: space-between;
+      border-left: 4px solid var(--green);
+      min-width: 0;
     }
-    .quote-share .share-toggle:hover { background: var(--green); transform: scale(1.12); }
-    .quote-share .share-menu {
-      position: absolute; top: 38px; right: 0; background: white;
-      border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.18);
-      border: 1px solid #000; padding: 4px; min-width: 145px;
-      display: none; z-index: 99;
+    .quote-mark {
+      font-size: 3rem; color: rgba(26,107,46,0.12);
+      font-family: Georgia, serif; line-height: 1;
+      margin-bottom: 4px; flex-shrink: 0;
     }
-    .quote-share .share-menu.open { display: block; }
-    .quote-share .share-option {
-      display: flex; align-items: center; gap: 7px;
-      padding: 5px 9px; border-radius: 6px; cursor: pointer;
-      font-size: 0.79rem; font-weight: 600; color: #333;
-      border: none; background: none; width: 100%; text-align: left; transition: background 0.15s;
+    .quote-text {
+      font-size: 0.82rem; color: #1a1a1a;
+      line-height: 1.65; font-weight: 500;
+      margin: 0 0 6px;
     }
-    .quote-share .share-option:hover { background: #f4f4f4; }
-    .quote-share .sh-icon { width: 18px; height: 18px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0; }
-    .quote-share .sh-native { background: var(--green); color: white; }
-    .quote-share .sh-dl     { background: #e67e22; color: white; }
-    .quote-share .share-divider { height: 1px; background: #eee; margin: 3px 0; }
-    /* open state — elevate card */
-    .quote-card.share-open { z-index: 200; }
+    .quote-ta {
+      font-size: 0.75rem; color: #666;
+      line-height: 1.5; font-style: italic;
+      margin: 0 0 10px;
+    }
+    .quote-footer {
+      display: flex; align-items: center;
+      justify-content: space-between; flex-wrap: wrap; gap: 6px;
+    }
+    .quote-source {
+      font-size: 0.65rem; color: var(--green);
+      font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .quote-actions { display: flex; gap: 5px; flex-wrap: wrap; }
+    .q-btn {
+      border: none; cursor: pointer; border-radius: 7px;
+      padding: 4px 10px; font-size: 0.70rem; font-weight: 600;
+      display: flex; align-items: center; gap: 4px; transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .q-btn-share { background: var(--green); color: white; }
+    .q-btn-dl    { background: #fff3cd; color: #856404; border: 1px solid #ffc107; }
+    .q-btn-copy  { background: #f0faf3; color: var(--green); border: 1px solid rgba(26,107,46,0.25); }
+    .q-btn:hover { opacity: 0.85; transform: scale(1.04); }
+    .q-btn-copy.copied { background: var(--green); color: white; border-color: var(--green); }
 
     /* ── Fade-in ── */
     .fade-in { animation: fadeUp 0.36s ease both; }
@@ -314,37 +283,49 @@ $(function () {
       'data-en': q.en, 'data-ta': q.ta || '', 'data-source': q.source || ''
     });
 
-    /* Serial badge */
-    $card.append('<span class="quote-serial">' + sn + '</span>');
-
-    /* Quote text content (shared) */
-    var $content = $('<div class="quote-overlay">').append(
-      $('<p class="quote-text">').text(text),
-      altText ? $('<p class="quote-ta">').text(altText) : null,
-      $('<span class="quote-source">').text(source)
-    );
+    /* ── Image side ── */
+    var $imgWrap = $('<div class="quote-img-wrap">');
+    $imgWrap.append('<span class="quote-serial">' + sn + '</span>');
 
     if (q.image) {
-      /* Image card: photo fills card, text overlaid */
       var thumb = quoteThumbPath(q.image);
-      var $img  = $('<img>', { alt: q.source || 'Quote', 'data-full': q.image });
+      var $img  = $('<img>', { alt: q.source || 'Quote' });
       $img.attr('data-src', thumb);
-      $img.on('error', function () {
-        if (this.src !== q.image) { this.src = q.image; }
-      });
-
-      $card.append($img, $content, makeShareMenu(q.image, q.source || 'Quote'));
-
-      if (lazyObserver) { lazyObserver.observe($img[0]); }
-      else { $img[0].src = thumb; }
-
+      $img.on('error', function () { if (this.src !== q.image) this.src = q.image; });
+      $imgWrap.append($img);
+      if (lazyObserver) lazyObserver.observe($img[0]);
+      else $img[0].src = thumb;
     } else {
-      /* Text card: green gradient background */
-      $card.addClass('quote-card-text')
-           .css('background', GRADIENTS[idx % GRADIENTS.length])
-           .append($content);
+      $card.addClass('quote-card-text');
     }
 
+    /* ── Text body side ── */
+    var $body = $('<div class="quote-body">');
+    var $top  = $('<div>').append(
+      '<div class="quote-mark">❝</div>',
+      $('<p class="quote-text">').text(text),
+      altText ? $('<p class="quote-ta">').text(altText) : null
+    );
+
+    /* Action buttons */
+    var $actions = $('<div class="quote-actions">');
+    $actions.append(
+      $('<button class="q-btn q-btn-copy" title="Copy text">').html('📋 Copy').attr('data-en', q.en).attr('data-ta', q.ta || '')
+    );
+    if (q.image) {
+      $actions.append(
+        $('<button class="q-btn q-btn-dl" title="Download image">').html('⬇ Save').attr('data-img', q.image).attr('data-name', q.source || 'quote'),
+        $('<button class="q-btn q-btn-share" title="Share image">').html('📤 Share').attr('data-img', q.image).attr('data-name', q.source || 'quote')
+      );
+    }
+
+    var $footer = $('<div class="quote-footer">').append(
+      $('<span class="quote-source">').text(source),
+      $actions
+    );
+
+    $body.append($top, $footer);
+    $card.append($imgWrap, $body);
     return $card;
   }
 
@@ -357,26 +338,13 @@ $(function () {
     });
   }
 
-  function closeQuoteShareMenus() {
-    $('.quote-share .share-menu').removeClass('open');
-    $('.quote-card.share-open').removeClass('share-open');
-  }
-
-  $(document).on('click', '.quote-share .share-toggle', function (e) {
+  /* 📤 Share image */
+  $(document).on('click', '.q-btn-share', function (e) {
     e.stopPropagation();
-    var $menu = $(this).next('.share-menu');
-    var $card = $(this).closest('.quote-card');
-    var isOpen = $menu.hasClass('open');
-    closeQuoteShareMenus();
-    if (!isOpen) { $menu.addClass('open'); $card.addClass('share-open'); }
-  });
-
-  $(document).on('click', '.quote-share .share-native', function (e) {
-    e.stopPropagation(); closeQuoteShareMenus();
     var img  = $(this).data('img');
     var name = $(this).data('name');
-    var $icon = $(this).find('.sh-icon');
-    $icon.text('⏳');
+    var $btn = $(this);
+    $btn.html('⏳');
     fetchImageFile(img, name).then(function (file) {
       var sd = { title: 'Yogi Ramsuratkumar — ' + name, files: [file] };
       if (navigator.canShare && navigator.canShare(sd)) return navigator.share(sd);
@@ -384,15 +352,16 @@ $(function () {
       var a = document.createElement('a'); a.href = img; a.download = file.name; a.click();
     }).catch(function (err) {
       if (err.name !== 'AbortError') console.warn('Share failed:', err);
-    }).finally(function () { $icon.text('📤'); });
+    }).finally(function () { $btn.html('📤 Share'); });
   });
 
-  $(document).on('click', '.quote-share .share-download', function (e) {
-    e.stopPropagation(); closeQuoteShareMenus();
+  /* ⬇ Download image */
+  $(document).on('click', '.q-btn-dl', function (e) {
+    e.stopPropagation();
     var img  = $(this).data('img');
     var name = $(this).data('name');
-    var $icon = $(this).find('.sh-icon');
-    $icon.text('⏳');
+    var $btn = $(this);
+    $btn.html('⏳');
     fetchImageFile(img, name).then(function (file) {
       var url = URL.createObjectURL(file);
       var a = document.createElement('a');
@@ -402,11 +371,29 @@ $(function () {
       setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
     }).catch(function () {
       var a = document.createElement('a'); a.href = img; a.download = img.split('/').pop(); a.click();
-    }).finally(function () { $icon.text('⬇'); });
+    }).finally(function () { $btn.html('⬇ Save'); });
   });
 
-  $(document).on('click', function (e) {
-    if (!$(e.target).closest('.quote-share').length) closeQuoteShareMenus();
+  /* 📋 Copy text */
+  $(document).on('click', '.q-btn-copy', function (e) {
+    e.stopPropagation();
+    var lang = curLang();
+    var ta   = $(this).data('ta');
+    var en   = $(this).data('en');
+    var txt  = (lang === 'ta' && ta) ? ta : en;
+    var $btn = $(this);
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(txt).then(function () {
+        $btn.html('✅ Copied').addClass('copied');
+        setTimeout(function () { $btn.html('📋 Copy').removeClass('copied'); }, 2000);
+      });
+    } else {
+      var ta2 = document.createElement('textarea');
+      ta2.value = txt; document.body.appendChild(ta2); ta2.select();
+      document.execCommand('copy'); document.body.removeChild(ta2);
+      $btn.html('✅ Copied').addClass('copied');
+      setTimeout(function () { $btn.html('📋 Copy').removeClass('copied'); }, 2000);
+    }
   });
 
   /* ── Render a batch ── */
