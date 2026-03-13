@@ -53,14 +53,14 @@
       .quote-ta   { font-size: 0.70rem; }
     }
 
-    /* ── Quote card — Option B style ── */
+    /* ── Quote card — Option G: Spiritual / Temple Style ── */
     .quote-card {
       display: flex;
-      background: white;
+      background: #fffdf5;
       border-radius: var(--radius-lg);
       overflow: hidden;
       box-shadow: var(--shadow);
-      border: 1px solid rgba(26,107,46,0.50);
+      border: 1px solid rgba(26,107,46,0.6);
       min-height: unset;
       transition: var(--transition);
       position: relative;
@@ -71,7 +71,8 @@
     .quote-img-wrap {
       width: 160px; height: 160px; flex-shrink: 0;
       position: relative; overflow: hidden;
-      background: #111;
+      background: #1a1a1a;
+      border-right: 3px solid var(--green);
     }
     .quote-img-wrap img {
       width: 100%; height: 100%;
@@ -87,7 +88,7 @@
     }
     .quote-card-text .quote-img-wrap::before { display: none; }
 
-    /* Serial badge on image */
+    /* Serial badge — top-left on image (same as photo gallery) */
     .quote-serial {
       position: absolute; top: 8px; left: 8px; z-index: 10;
       background: rgba(15,69,32,0.88); color: #FFD700;
@@ -101,21 +102,15 @@
     .quote-body {
       flex: 1; padding: 16px 18px;
       display: flex; flex-direction: column; justify-content: space-between;
-      border-left: 4px solid var(--green);
       min-width: 0;
     }
-    .quote-mark {
-      font-size: 3rem; color: rgba(26,107,46,0.12);
-      font-family: Georgia, serif; line-height: 1;
-      margin-bottom: 4px; flex-shrink: 0;
-    }
     .quote-text {
-      font-size: 0.82rem; color: #1a1a1a;
+      font-size: 0.82rem; color: #3a2a00;
       line-height: 1.65; font-weight: 500;
       margin: 0 0 6px;
     }
     .quote-ta {
-      font-size: 0.75rem; color: #666;
+      font-size: 0.75rem; color: #7a6a00;
       line-height: 1.5; font-style: italic;
       margin: 0 0 10px;
     }
@@ -124,7 +119,7 @@
       justify-content: space-between; flex-wrap: wrap; gap: 6px;
     }
     .quote-source {
-      font-size: 0.65rem; color: var(--green);
+      font-size: 0.65rem; color: #8a7000;
       font-weight: 700; text-transform: uppercase;
       letter-spacing: 0.05em;
     }
