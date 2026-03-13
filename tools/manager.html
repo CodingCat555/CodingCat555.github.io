@@ -1180,6 +1180,26 @@ $(function () {
     });
   }
 
+  /* Resize + center-crop to exact square (size × size) */
+  function resizeBlobSquare(blob, size) {
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(blob);
+      var img = new Image();
+      img.onload = function () {
+        URL.revokeObjectURL(url);
+        var s    = Math.min(img.width, img.height);   /* source square side */
+        var sx   = (img.width  - s) / 2;              /* center crop X */
+        var sy   = (img.height - s) / 2;              /* center crop Y */
+        var canvas = document.createElement('canvas');
+        canvas.width = size; canvas.height = size;
+        canvas.getContext('2d').drawImage(img, sx, sy, s, s, 0, 0, size, size);
+        canvas.toBlob(function (b) { b ? resolve(b) : reject(new Error('Canvas toBlob failed')); }, 'image/jpeg', 0.85);
+      };
+      img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('Image load failed')); };
+      img.src = url;
+    });
+  }
+
   /* Write blob to a file via File System Access API */
   function writeBlob(dirHandle, filename, blob) {
     return dirHandle.getFileHandle(filename, { create: true }).then(function (fh) {
@@ -1321,7 +1341,7 @@ $(function () {
   });
 
   /* ── Generate Quote Thumbnails ──────────────────────────────
-     Reads each quote's Image path, resizes to 360×480 JPEG and saves
+     Reads each quote's Image path, resizes to 360×360 square JPEG and saves
      to [same-folder]/thumbs/ via File System Access API */
   $('#btnGenQuoteThumbs').on('click', function () {
     var quotes   = readQuotes();
@@ -1347,7 +1367,7 @@ $(function () {
           var thumbFolders = parts.slice(0, -1).concat(['thumbs']); /* quotes/images → quotes/images/thumbs */
 
           return readFileFromDir(rootDir, parts)
-            .then(function (blob) { return resizeBlob(blob, 360, 480); })
+            .then(function (blob) { return resizeBlobSquare(blob, 360); })
             .then(function (thumbBlob) {
               return getDir(rootDir, thumbFolders).then(function (thumbDir) {
                 return writeBlob(thumbDir, filename, thumbBlob);
