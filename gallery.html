@@ -98,12 +98,15 @@
     }
     /* Remove double shadow from inner card */
     .gallery-card-wrap .gallery-item { box-shadow: none; }
+    /* Each card sizes to its own content — no forced row-height stretching */
+    .gallery-grid { align-items: start; }
     .gallery-name {
       padding: 8px 8px 2px;
       font-size: 0.78rem; font-weight: 600;
       color: var(--text);
       text-align: center;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      line-height: 1.45;
+      word-break: break-word;
     }
   </style>
 </head>
