@@ -327,7 +327,7 @@ $(function () {
       '<div class="share-menu">' +
         '<button class="share-option share-native"><span class="sh-icon sh-native">📤</span> Share Photo</button>' +
         '<div class="share-divider"></div>' +
-        '<a class="share-option" href="' + waUrl + '" target="_blank" rel="noopener"><span class="sh-icon sh-wa">&#128172;</span> WhatsApp</a>' +
+        '<button class="share-option share-whatsapp" data-waurl="' + waUrl + '"><span class="sh-icon sh-wa">&#128172;</span> WhatsApp</button>' +
         '<a class="share-option" href="' + fbUrl + '" target="_blank" rel="noopener"><span class="sh-icon sh-fb">f</span> Facebook</a>' +
         '<a class="share-option" href="' + twUrl + '" target="_blank" rel="noopener"><span class="sh-icon sh-tw">𝕏</span> Twitter / X</a>' +
         '<div class="share-divider"></div>' +
@@ -481,6 +481,27 @@ $(function () {
     }).catch(function (err) {
       if (err.name !== 'AbortError') console.warn('Share failed:', err);
     }).finally(function () { $icon.text('📤'); });
+  });
+
+  /* 💬 WhatsApp — share actual image file via Web Share API, fallback to link */
+  $(document).on('click', '.share-whatsapp', function (e) {
+    e.stopPropagation();
+    var waUrl = $(this).data('waurl');
+    closeAllShareMenus();
+    var d = getShareData($(this).closest('.gallery-share'));
+    var $icon = $(this).find('.sh-icon');
+    $icon.text('⏳');
+    fetchImageFile(d.img, d.name).then(function (file) {
+      var shareData = { title: 'Yogi Ramsuratkumar — ' + d.name, files: [file] };
+      if (navigator.canShare && navigator.canShare(shareData)) {
+        return navigator.share(shareData);
+      } else {
+        /* Fallback: open WhatsApp with link */
+        window.open(waUrl, '_blank');
+      }
+    }).catch(function (err) {
+      if (err.name !== 'AbortError') window.open(waUrl, '_blank');
+    }).finally(function () { $icon.html('&#128172;'); });
   });
 
   /* ⬇ Download Photo */

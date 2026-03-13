@@ -303,6 +303,7 @@ section { padding: 80px 0; }
   pointer-events: none;
 }
 .video-serial { top: 8px; left: 8px; }
+
 .pdf-serial-inline {
   display: inline-block; background: var(--green); color: white;
   font-size: 0.68rem; font-weight: 700; padding: 1px 8px;
