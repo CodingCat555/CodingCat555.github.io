@@ -46,33 +46,34 @@
     @media (max-width: 640px) {
       .quotes-grid { grid-template-columns: 1fr; }
 
-      /* Square image — smaller on mobile */
-      .quote-img-wrap { width: 110px; height: 110px; }
+      /* Image — smaller on mobile */
+      .quote-img-wrap { width: 100px; }
       .quote-body { padding: 12px 14px; }
       .quote-text { font-size: 0.78rem; }
       .quote-ta   { font-size: 0.70rem; }
     }
 
-    /* ── Quote card — Option G: Spiritual / Temple Style ── */
+    /* ── Quote card — Minimal List Style ── */
     .quote-card {
       display: flex;
-      background: #fffdf5;
+      background: #fff;
       border-radius: var(--radius-lg);
       overflow: hidden;
       box-shadow: var(--shadow);
-      border: 1px solid rgba(26,107,46,0.6);
+      border: 1px solid rgba(26,107,46,0.5);
       min-height: unset;
       transition: var(--transition);
       position: relative;
     }
     .quote-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
 
-    /* Image side — square */
+    /* Image side */
     .quote-img-wrap {
-      width: 160px; height: 160px; flex-shrink: 0;
+      width: 140px; flex-shrink: 0;
       position: relative; overflow: hidden;
-      background: #1a1a1a;
+      background: #e8f5ec;
       border-right: 3px solid var(--green);
+      align-self: stretch;
     }
     .quote-img-wrap img {
       width: 100%; height: 100%;
@@ -100,17 +101,17 @@
 
     /* Text body side */
     .quote-body {
-      flex: 1; padding: 16px 18px;
+      flex: 1; padding: 14px 16px;
       display: flex; flex-direction: column; justify-content: space-between;
       min-width: 0;
     }
     .quote-text {
-      font-size: 0.82rem; color: #3a2a00;
+      font-size: 0.83rem; color: var(--text);
       line-height: 1.65; font-weight: 500;
       margin: 0 0 6px;
     }
     .quote-ta {
-      font-size: 0.75rem; color: #7a6a00;
+      font-size: 0.76rem; color: #555;
       line-height: 1.5; font-style: italic;
       margin: 0 0 10px;
     }
@@ -119,7 +120,7 @@
       justify-content: space-between; flex-wrap: wrap; gap: 6px;
     }
     .quote-source {
-      font-size: 0.65rem; color: #8a7000;
+      font-size: 0.65rem; color: var(--green);
       font-weight: 700; text-transform: uppercase;
       letter-spacing: 0.05em;
     }
