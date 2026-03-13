@@ -77,11 +77,6 @@
     .sh-dl     { background:#e67e22; color:white; }
     .sh-copy   { background:#6c757d; color:white; }
     .share-divider { height:1px; background:#eee; margin:3px 0; }
-    /* Allow share menu to overflow gallery card bounds and sit above other cards */
-    .gallery-item.share-open { overflow: visible; z-index: 200; position: relative; }
-    .gallery-item.share-open > img,
-    .gallery-item.share-open .gallery-overlay,
-    .gallery-item.share-open .serial-badge { border-radius: var(--radius-lg); }
 
     /* ── Card wrapper: photo frame style ── */
     .gallery-card-wrap {
@@ -92,6 +87,7 @@
       border: 1px solid rgba(26,107,46,0.40);
       box-shadow: 0 3px 14px rgba(0,0,0,0.10);
       transition: box-shadow 0.22s, border-color 0.22s, transform 0.22s;
+      position: relative; /* share menu positioned inside wrap */
     }
     .gallery-card-wrap:hover {
       box-shadow: 0 8px 32px rgba(0,0,0,0.18);
@@ -99,6 +95,8 @@
     }
     /* Remove double shadow from inner card */
     .gallery-card-wrap .gallery-item { box-shadow: none; }
+    /* share-open on wrap — elevate above sibling cards */
+    .gallery-card-wrap.share-open { z-index: 200; }
     /* Each card sizes to its own content — no forced row-height stretching */
     .gallery-grid { align-items: start; }
     .gallery-name {
@@ -319,11 +317,11 @@ $(function () {
         '<span class="gallery-caption">' + displayName + '</span>' +
         '<span class="gallery-desc">' + item.description + '</span>' +
       '</div>',
-      makeShareMenu(item)
     );
-    /* Wrap card + name label below it */
+    /* Wrap card + name label below it; share menu sits on wrap (not inside card) so overflow:hidden on card is preserved */
     return $('<div class="gallery-card-wrap">').append(
       $card,
+      makeShareMenu(item),
       '<p class="gallery-name">' + displayName + '</p>'
     );
   }
@@ -397,18 +395,18 @@ $(function () {
   /* Toggle share menu */
   function closeAllShareMenus() {
     $('.share-menu').removeClass('open');
-    $('.gallery-item.share-open').removeClass('share-open');
+    $('.gallery-card-wrap.share-open').removeClass('share-open');
   }
 
   $(document).on('click', '.share-toggle', function (e) {
     e.stopPropagation();
     var $menu = $(this).next('.share-menu');
-    var $item = $(this).closest('.gallery-item');
+    var $wrap = $(this).closest('.gallery-card-wrap');
     var isOpen = $menu.hasClass('open');
     closeAllShareMenus();
     if (!isOpen) {
       $menu.addClass('open');
-      $item.addClass('share-open');
+      $wrap.addClass('share-open');
     }
   });
 
