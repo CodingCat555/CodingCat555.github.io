@@ -262,7 +262,7 @@ section { padding: 80px 0; }
 /* ============================================================
    GALLERY
    ============================================================ */
-.gallery-section { background: var(--cream); }
+.gallery-section { background: var(--cream); padding-top: 32px; padding-bottom: 60px; }
 .gallery-filters { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 32px; }
 .filter-btn {
   padding: 8px 22px; border: 2px solid var(--border); border-radius: 50px;
