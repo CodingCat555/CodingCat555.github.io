@@ -157,43 +157,52 @@
     .share-divider { height:1px; background:#eee; margin:3px 0; }
 
     /* ── Audio Info ── */
+    /* ── Option C: Compact Modern + Gold Divider ── */
     .audio-info {
-      padding: 16px;
+      padding: 12px 14px 14px;
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
     }
     .audio-title {
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       font-weight: 700;
       color: var(--text);
       line-height: 1.4;
       margin: 0;
     }
     .audio-desc {
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       color: var(--text-light);
-      line-height: 1.55;
+      line-height: 1.45;
       margin: 0;
       display: -webkit-box;
-      -webkit-line-clamp: 2;
+      -webkit-line-clamp: 1;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
+    .audio-gold-divider {
+      height: 1px;
+      background: linear-gradient(to right, rgba(255,215,0,0.55), rgba(255,215,0,0.08));
+      margin: 2px 0;
+    }
     .audio-meta {
-      font-size: 0.76rem;
+      font-size: 0.70rem;
       color: var(--text-light);
       display: flex;
-      gap: 12px;
+      gap: 6px;
       align-items: center;
       flex-wrap: wrap;
     }
-
-    /* ── Category text in card info ── */
-    .audio-cat-text {
-      font-size: 0.7rem; color: var(--text-light);
-      text-transform: capitalize; font-style: italic;
+    .audio-meta .dur-text {
+      font-weight: 700; color: var(--green); font-size: 0.72rem;
+    }
+    .audio-meta .meta-sep {
+      color: rgba(0,0,0,0.18); user-select: none;
+    }
+    .audio-meta .cat-text {
+      font-style: italic; text-transform: capitalize;
     }
 
     /* ── Gallery utilities ── */
@@ -208,11 +217,6 @@
     .gallery-search button { padding:11px 18px; background:var(--green); color:white; border:none; cursor:pointer; font-size:1rem; transition:var(--transition); }
     .gallery-search button:hover { background:var(--green-dark); }
 
-    /* ── Duration badge ── */
-    .dur-badge {
-      background: rgba(26,107,46,0.1); color: var(--green);
-      border-radius: 4px; padding: 2px 7px; font-size: 0.72rem; font-weight: 600;
-    }
 
     /* ══════════════════════════════════════════
        Global Audio Player Bar (sticky bottom)
@@ -422,6 +426,19 @@
       }
       .pl-title { max-width: none; }
     }
+
+    /* ── Audio unavailable toast ── */
+    #audioToast {
+      position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(12px);
+      background: rgba(180,0,0,0.9); color: white;
+      padding: 10px 22px; border-radius: 50px;
+      font-size: 0.82rem; font-weight: 600;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.3);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.25s, transform 0.25s;
+      z-index: 9999; white-space: nowrap;
+    }
+    #audioToast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </head>
 <body>
@@ -541,6 +558,15 @@ $(function () {
   var gMuted   = false;
   var gPrevVol = 1;
 
+  /* ── Toast notification ── */
+  function showAudioToast(msg) {
+    var $t = $('#audioToast');
+    if (!$t.length) $t = $('<div id="audioToast">').appendTo('body');
+    $t.text(msg).addClass('show');
+    clearTimeout($t.data('timer'));
+    $t.data('timer', setTimeout(function () { $t.removeClass('show'); }, 3000));
+  }
+
   function fmtTime(sec) {
     if (!isFinite(sec) || isNaN(sec)) return '--:--';
     var m = Math.floor(sec / 60), s = Math.floor(sec % 60);
@@ -555,7 +581,7 @@ $(function () {
       var $activeCard = $('.audio-card[data-serial="' + gList[gIdx].serial + '"]');
       $activeCard.toggleClass('is-playing', playing);
       $activeCard.find('.audio-play-circle')
-        .text(playing ? '⏸' : '▶')
+        .html(playing ? '<span class="pl-pause-bars"><i></i><i></i></span>' : '▶')
         .css('padding-left', playing ? '0' : '3px');
     }
   }
@@ -590,9 +616,18 @@ $(function () {
     updateProgressBar();
 
     /* Reset all cards, then highlight active */
-    $('.audio-play-circle').text('▶').css('padding-left', '3px');
+    $('.audio-play-circle').html('▶').css('padding-left', '3px');
     $('.audio-card').removeClass('now-playing is-playing');
-    $('.audio-card[data-serial="' + a.serial + '"]').addClass('now-playing');
+    var $activeCard = $('.audio-card[data-serial="' + a.serial + '"]');
+    $activeCard.addClass('now-playing');
+
+    /* Scroll active card into view (centre of screen) */
+    var el = $activeCard[0];
+    if (el) {
+      setTimeout(function () {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 150);
+    }
 
     /* Show player bar */
     $('#audioPlayer').addClass('visible');
@@ -632,6 +667,20 @@ $(function () {
 
   gAudio.addEventListener('play',  function () { setPlayIcon(true);  });
   gAudio.addEventListener('pause', function () { setPlayIcon(false); });
+
+  /* ── Audio file not found / network error ── */
+  gAudio.addEventListener('error', function () {
+    if (!gAudio.src) return;
+    setPlayIcon(false);
+    /* Mark the active card as unavailable */
+    if (gIdx >= 0 && gList[gIdx]) {
+      var $card = $('.audio-card[data-serial="' + gList[gIdx].serial + '"]');
+      $card.removeClass('now-playing is-playing');
+      $card.find('.audio-play-circle').html('✕').css({ 'padding-left': '0', 'background': 'rgba(200,0,0,0.75)', 'cursor': 'not-allowed' });
+    }
+    /* Show toast */
+    showAudioToast('Audio file not available');
+  });
 
   /* ── Player controls ── */
   $('#plPlayPause').on('click', function () {
@@ -684,7 +733,7 @@ $(function () {
   $('#plClose').on('click', function () {
     gAudio.pause();
     gAudio.src = '';
-    $('.audio-play-circle').text('▶').css('padding-left', '3px');
+    $('.audio-play-circle').html('▶').css('padding-left', '3px');
     gIdx = -1;
     $('#audioPlayer').removeClass('visible');
     $('body').removeClass('player-open');
@@ -814,8 +863,9 @@ $(function () {
 
   function makeCard(a) {
     var serial  = '#' + String(a.serial).padStart(2, '0');
-    var durHtml = a.duration ? '<span class="dur-badge">⏱ ' + a.duration + '</span>' : '';
-    var catHtml = a.category ? '<span class="audio-cat-text">' + a.category + '</span>'  : '';
+    var durHtml  = a.duration ? '<span class="dur-text">⏱ ' + a.duration + '</span>' : '';
+    var sizeHtml = a.size     ? '<span>💾 ' + a.size + '</span>' : '';
+    var catHtml  = a.category ? '<span class="cat-text">' + a.category + '</span>' : '';
 
     var $card = $('<div>', {
       'class'        : 'audio-card fade-in',
@@ -836,13 +886,17 @@ $(function () {
       $thumb.append('<button class="audio-play-circle" title="Play">▶</button>');
     }
 
-    /* Info — title, description, meta row */
-    var $meta = (durHtml || catHtml)
-      ? $('<div class="audio-meta">').append(durHtml + catHtml)
-      : null;
+    /* Info — Option C: title, 1-line desc, gold divider, compact meta row */
+    var sep = '<span class="meta-sep">|</span>';
+    var metaContent = durHtml
+      + (durHtml && sizeHtml ? sep : '')
+      + sizeHtml
+      + ((durHtml || sizeHtml) && catHtml ? sep : '')
+      + catHtml;
+    var $meta = metaContent ? $('<div class="audio-meta">').append(metaContent) : null;
     var $info = $('<div class="audio-info">').append(
       '<h3 class="audio-title">' + $('<div>').text(a.name).html() + '</h3>',
-      a.description ? '<p class="audio-desc">' + $('<div>').text(a.description).html() + '</p>' : '',
+      $meta ? '<div class="audio-gold-divider"></div>' : '',
       $meta
     );
 

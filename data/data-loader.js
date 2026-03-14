@@ -120,6 +120,7 @@
         audioFile   : 'Audio File',
         image       : 'Image File',
         duration    : 'Duration',
+        size        : 'Size',
         isActive    : 'Is Active'
       });
 

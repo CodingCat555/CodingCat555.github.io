@@ -13,7 +13,8 @@ var AUDIOS_DATA = [
     "category": "discourse",
     "audioFile": "audios/1-yogi-ramsuratkumar-chanting-his-own-name.mp3",
     "image": "audios/images/1-yogi-ramsuratkumar-audio.jpg",
-    "duration": "2.57",
+    "duration": "02.57 min",
+    "size": "1.42 MB",
     "isActive": "yes"
   },
   {
@@ -23,7 +24,8 @@ var AUDIOS_DATA = [
     "category": "bhajan",
     "audioFile": "audios/2-sita-ram-sita-ram.mp3",
     "image": "audios/images/2-yogi-ramsuratkumar-audio.jpg",
-    "duration": "4",
+    "duration": "04:00 min",
+    "size": "3.47 MB",
     "isActive": "yes"
   },
   {
@@ -33,7 +35,8 @@ var AUDIOS_DATA = [
     "category": "talk",
     "audioFile": "audios/3-pallandu-pallandu-vazhiye-vazhiye.mp3",
     "image": "audios/images/3-yogi-ramsuratkumar-audio.jpg",
-    "duration": "3.46",
+    "duration": "03:46 min",
+    "size": "3.17 MB",
     "isActive": "yes"
   },
   {
@@ -43,7 +46,8 @@ var AUDIOS_DATA = [
     "category": "chant",
     "audioFile": "audios/4-sri-rama-jaya-rama-jaya-jaya-rama.mp3",
     "image": "audios/images/4-yogi-ramsuratkumar-audio.jpg",
-    "duration": "1",
+    "duration": "01:00 min",
+    "size": "651 KB",
     "isActive": "yes"
   },
   {
@@ -53,7 +57,8 @@ var AUDIOS_DATA = [
     "category": "rare",
     "audioFile": "audios/5-yog-sadguru-yogi-ramsuratkumar-ashram-songs.mp3",
     "image": "audios/images/5-yogi-ramsuratkumar-audio.jpg",
-    "duration": "1.12",
+    "duration": "01:12 min",
+    "size": "1.09 MB",
     "isActive": "yes"
   },
   {
@@ -64,6 +69,7 @@ var AUDIOS_DATA = [
     "audioFile": "audios/ram-nam-discourse.mp3",
     "image": "",
     "duration": "",
+    "size": "",
     "isActive": "yes"
   },
   {
@@ -74,6 +80,7 @@ var AUDIOS_DATA = [
     "audioFile": "audios/jaya-guru-raya.mp3",
     "image": "",
     "duration": "",
+    "size": "",
     "isActive": "yes"
   },
   {
@@ -84,6 +91,7 @@ var AUDIOS_DATA = [
     "audioFile": "audios/evening-satsang.mp3",
     "image": "",
     "duration": "",
+    "size": "",
     "isActive": "yes"
   },
   {
@@ -94,6 +102,7 @@ var AUDIOS_DATA = [
     "audioFile": "audios/ram-nam-chanting.mp3",
     "image": "",
     "duration": "",
+    "size": "",
     "isActive": "yes"
   },
   {
@@ -104,6 +113,7 @@ var AUDIOS_DATA = [
     "audioFile": "audios/rare-early-days.mp3",
     "image": "",
     "duration": "",
+    "size": "",
     "isActive": "yes"
   },
   {
@@ -114,6 +124,7 @@ var AUDIOS_DATA = [
     "audioFile": "audios/ram-nam-discourse.mp3",
     "image": "",
     "duration": "",
+    "size": "",
     "isActive": "yes"
   },
   {
@@ -124,6 +135,7 @@ var AUDIOS_DATA = [
     "audioFile": "audios/jaya-guru-raya.mp3",
     "image": "",
     "duration": "",
+    "size": "",
     "isActive": "yes"
   },
   {
@@ -134,6 +146,7 @@ var AUDIOS_DATA = [
     "audioFile": "audios/evening-satsang.mp3",
     "image": "",
     "duration": "",
+    "size": "",
     "isActive": "yes"
   },
   {
@@ -144,6 +157,7 @@ var AUDIOS_DATA = [
     "audioFile": "audios/ram-nam-chanting.mp3",
     "image": "",
     "duration": "",
+    "size": "",
     "isActive": "yes"
   },
   {
@@ -154,6 +168,7 @@ var AUDIOS_DATA = [
     "audioFile": "audios/rare-early-days.mp3",
     "image": "",
     "duration": "",
+    "size": "",
     "isActive": "yes"
   },
   {
@@ -164,6 +179,7 @@ var AUDIOS_DATA = [
     "audioFile": "audios/ram-nam-discourse.mp3",
     "image": "",
     "duration": "",
+    "size": "",
     "isActive": "yes"
   },
   {
@@ -174,6 +190,7 @@ var AUDIOS_DATA = [
     "audioFile": "audios/jaya-guru-raya.mp3",
     "image": "",
     "duration": "",
+    "size": "",
     "isActive": "yes"
   },
   {
@@ -184,6 +201,7 @@ var AUDIOS_DATA = [
     "audioFile": "audios/evening-satsang.mp3",
     "image": "",
     "duration": "",
+    "size": "",
     "isActive": "yes"
   },
   {
@@ -194,6 +212,7 @@ var AUDIOS_DATA = [
     "audioFile": "audios/ram-nam-chanting.mp3",
     "image": "",
     "duration": "",
+    "size": "",
     "isActive": "yes"
   },
   {
@@ -204,6 +223,7 @@ var AUDIOS_DATA = [
     "audioFile": "audios/rare-early-days.mp3",
     "image": "",
     "duration": "",
+    "size": "",
     "isActive": "yes"
   }
 ];
