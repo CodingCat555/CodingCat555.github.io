@@ -424,6 +424,9 @@
         box-shadow: 0 2px 14px rgba(255,215,0,0.5);
       }
       #plPlayPause:hover { background: #ffe84d; color: #0F4520; }
+      /* ▶ glyph has inherent left gap — nudge only when NOT playing (pause bars are already centred) */
+      #audioPlayer:not(.playing) #plPlayPause { padding-left: 3px; }
+      #audioPlayer.playing #plPlayPause { padding-left: 0; }
 
       /* Row 3 — progress */
       .pl-progress {
@@ -442,14 +445,16 @@
         align-items: center; gap: 5px;
         width: auto; padding: 5px 0 0;
         justify-content: flex-end;
+        margin-right: -28px; /* bleed to same right edge as the divider lines */
       }
       .pl-vol-icon { order: 1; font-size: 0.78rem; line-height: 1; }
       .pl-vol-bar {
         order: 2;
         writing-mode: horizontal-tb;
         direction: ltr;
-        width: 56px; height: 4px;
-        flex: none;
+        flex: 1;       /* fill available space */
+        width: auto;   /* override fixed width */
+        height: 4px;
       }
 
       .pl-title { max-width: none; }
@@ -583,8 +588,9 @@ $(function () {
   var gAudio   = new Audio();
   var gList    = [];   /* tracks with audioFile from currentFiltered */
   var gIdx     = -1;
-  var gMuted   = false;
-  var gPrevVol = 1;
+  var gMuted        = false;
+  var gPrevVol      = 1;
+  var gShowRemaining = false;  /* toggle: total duration ↔ remaining time */
 
   /* ── Toast notification ── */
   function showAudioToast(msg) {
@@ -673,6 +679,10 @@ $(function () {
   /* ── Audio element events ── */
   gAudio.addEventListener('timeupdate', function () {
     $('#plCurrent').text(fmtTime(gAudio.currentTime));
+    if (gShowRemaining && gAudio.duration) {
+      var rem = gAudio.duration - gAudio.currentTime;
+      $('#plTotal').text('-' + fmtTime(rem));
+    }
     updateProgressBar();
   });
 
@@ -727,6 +737,15 @@ $(function () {
     if (!gList.length) return;
     var nextIdx = (gIdx < gList.length - 1) ? gIdx + 1 : 0;
     loadTrack(nextIdx, !gAudio.paused);
+  });
+
+  /* ── Toggle remaining / total time on click ── */
+  $('#plTotal').css('cursor', 'pointer').on('click', function () {
+    if (!gAudio.duration) return;
+    gShowRemaining = !gShowRemaining;
+    $(this).css('opacity', gShowRemaining ? '1' : '');
+    var rem = gAudio.duration - gAudio.currentTime;
+    $(this).text(gShowRemaining ? '-' + fmtTime(rem) : fmtTime(gAudio.duration));
   });
 
   $('#plBar').on('input', function () {
