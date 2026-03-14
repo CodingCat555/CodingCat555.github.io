@@ -84,6 +84,8 @@
       this.photos = rows('Photos', {
         serial      : 'Serial No',
         name        : 'Name',
+        name_ta     : 'Name (Tamil)',
+        name_en     : 'Name (English)',
         description : 'Description',
         category    : 'Category',
         image       : 'Image File',
@@ -183,6 +185,11 @@
         window.SITE_DATA.pdfs.length   || window.SITE_DATA.audios.length ||
         window.SITE_DATA.quotes.length) {
       window.SITE_DATA.loaded = true;
+      /* Cache the static data in localStorage so subsequent loads are instant.
+         Version is stored alongside — if version.js changes on next deploy,
+         data-loader will detect the mismatch, clear this cache, and reload
+         the fresh static files automatically. */
+      try { window.SITE_DATA.saveToStorage(); } catch (e) { /* storage full or private mode */ }
     }
   }
 

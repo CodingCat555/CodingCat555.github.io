@@ -206,6 +206,9 @@
     }
     #audioPlayer.visible { transform: translateY(0); }
     body.player-open { padding-bottom: 74px; }
+    @media (max-width:768px) {
+      body.player-open { padding-bottom: 96px; } /* mobile player is taller */
+    }
 
     /* Track info */
     .pl-info { display:flex; align-items:center; gap:10px; flex:1; min-width:0; }
@@ -302,11 +305,64 @@
     }
     .audio-play-btn .play-icon { font-size:1rem; }
 
-    /* Responsive — hide progress/volume on small screens */
-    @media (max-width:600px) {
-      .pl-progress { display:none; }
-      .pl-vol      { display:none; }
-      .pl-title    { max-width:130px; }
+    /* Responsive — mobile layout (CSS Grid):
+       Col layout: [auto] [1fr]
+       Row 1:  🎵 Title (spans both cols, left-aligned)
+       Row 2:  ⏮▶⏭  | 0:00 ━━━━━━ 4:32
+       Right column (absolute): ✕ top-right → slider → 🔊 icon bottom */
+    @media (max-width:768px) {
+      #audioPlayer {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        grid-template-rows: auto auto;
+        grid-template-areas:
+          "info  info"
+          "ctrl  prog";
+        padding: 8px 32px 8px 12px; /* right gap for absolute right column */
+        gap: 5px 8px;
+        min-height: 82px;
+        align-items: center;
+        /* position: fixed is kept from base style — do NOT override */
+      }
+      /* Row 1: title flush left, spans both columns */
+      .pl-info  { grid-area: info; min-width: 0; }
+      /* Row 2: controls auto, progress fills */
+      .pl-controls { grid-area: ctrl; }
+      .pl-progress { grid-area: prog; display: flex; min-width: 0; }
+      /* ✕ — absolute top-right corner */
+      .pl-close {
+        position: absolute;
+        top: 5px; right: 8px;
+        bottom: auto; left: auto;
+        transform: none;
+        font-size: 0.95rem; padding: 4px 6px;
+      }
+      /* Right vertical column: slider (middle) + 🔊 icon (bottom), below ✕ */
+      .pl-vol {
+        position: absolute;
+        right: 6px;
+        top: 30px;   /* starts below ✕ button */
+        bottom: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        width: 22px;
+        padding: 0 0 4px;
+      }
+      .pl-vol-bar {
+        order: 1;                   /* slider above icon */
+        writing-mode: vertical-lr;
+        direction: rtl;             /* fills bottom → top */
+        width: 4px; height: 36px;
+        flex: none;
+      }
+      .pl-vol-icon {
+        order: 2;                   /* 🔊 at bottom */
+        font-size: 0.72rem; line-height: 1;
+      }
+      .pl-title { max-width: none; }
     }
   </style>
 </head>

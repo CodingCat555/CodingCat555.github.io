@@ -1,0 +1,29 @@
+# Cloudflare Pages — Custom HTTP Headers
+# https://developers.cloudflare.com/pages/configuration/headers/
+
+# version.js must never be cached — it drives the cache-busting system.
+# If it is cached, updated data after a deploy will never be seen.
+/data/version.js
+  Cache-Control: no-cache, must-revalidate
+
+# Data JS files — short cache (5 min) so updates appear quickly after deploy
+/data/photos.js
+  Cache-Control: public, max-age=300
+
+/data/videos.js
+  Cache-Control: public, max-age=300
+
+/data/audios.js
+  Cache-Control: public, max-age=300
+
+/data/pdfs.js
+  Cache-Control: public, max-age=300
+
+/data/quotes.js
+  Cache-Control: public, max-age=300
+
+/data/lang/en.js
+  Cache-Control: public, max-age=300
+
+/data/lang/ta.js
+  Cache-Control: public, max-age=300
