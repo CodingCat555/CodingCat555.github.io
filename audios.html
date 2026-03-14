@@ -267,8 +267,11 @@
       transition:background 0.15s, color 0.15s; line-height:1;
     }
     .pl-btn:hover { background:rgba(255,255,255,0.13); color:white; }
-    #plPlayPause { font-size:1.55rem; color:#FFD700; }
+    #plPlayPause { font-size:1.55rem; color:#FFD700; display:flex; align-items:center; justify-content:center; }
     #plPlayPause:hover { color:#ffe84d; }
+    /* CSS-drawn pause bars — avoids emoji orange rendering on mobile */
+    .pl-pause-bars { display:inline-flex; gap:4px; align-items:center; height:20px; }
+    .pl-pause-bars i { display:block; width:4px; height:18px; background:currentColor; border-radius:2px; }
 
     /* Progress */
     .pl-progress {
@@ -545,7 +548,7 @@ $(function () {
   }
 
   function setPlayIcon(playing) {
-    $('#plPlayPause').html(playing ? '⏸\uFE0E' : '▶');
+    $('#plPlayPause').html(playing ? '<span class="pl-pause-bars"><i></i><i></i></span>' : '▶');
     $('#audioPlayer').toggleClass('playing', playing);
     /* Sync active card circle + is-playing animation class */
     if (gIdx >= 0 && gList[gIdx]) {
