@@ -287,7 +287,6 @@ $(function () {
       '<button class="share-toggle" title="Share Photo">' + SVG_SHARE + '</button>' +
       '<div class="share-menu">' +
         '<button class="share-option share-native"><span class="sh-icon sh-native">📤</span> Share Photo</button>' +
-        '<button class="share-option share-whatsapp"><span class="sh-icon sh-wa">💬</span> WhatsApp</button>' +
         '<div class="share-divider"></div>' +
         '<button class="share-option share-download"><span class="sh-icon sh-dl">⬇</span> Download Photo</button>' +
       '</div>' +
@@ -439,27 +438,6 @@ $(function () {
     }).catch(function (err) {
       if (err.name !== 'AbortError') console.warn('Share failed:', err);
     }).finally(function () { $icon.text('📤'); });
-  });
-
-  /* 💬 WhatsApp — mobile only, share actual photo via native OS share sheet */
-  $(document).on('click', '.share-whatsapp', function (e) {
-    e.stopPropagation();
-    closeAllShareMenus();
-    var d = getShareData($(this).closest('.gallery-share'));
-    var $icon = $(this).find('.sh-icon');
-    $icon.text('⏳');
-    fetchImageFile(d.img, d.name).then(function (file) {
-      var shareData = { title: 'Yogi Ramsuratkumar — ' + d.name, files: [file] };
-      if (navigator.canShare && navigator.canShare(shareData)) {
-        return navigator.share(shareData);
-      }
-      /* Fallback: share without file */
-      if (navigator.share) {
-        return navigator.share({ title: 'Yogi Ramsuratkumar — ' + d.name, url: window.location.href.split('?')[0] });
-      }
-    }).catch(function (err) {
-      if (err.name !== 'AbortError') console.warn('WhatsApp share failed:', err);
-    }).finally(function () { $icon.html('&#128172;'); });
   });
 
   /* ⬇ Download Photo */

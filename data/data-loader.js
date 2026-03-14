@@ -118,6 +118,7 @@
         description : 'Description',
         category    : 'Category',
         audioFile   : 'Audio File',
+        image       : 'Image File',
         duration    : 'Duration',
         isActive    : 'Is Active'
       });

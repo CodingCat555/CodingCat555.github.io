@@ -315,6 +315,7 @@
       <button class="btn btn-outline" id="btnGenThumbs">🖼 Generate Photo Thumbnails</button>
       <button class="btn btn-outline" id="btnGenPdfThumbs">📄 Generate PDF Thumbnails</button>
       <button class="btn btn-outline" id="btnGenQuoteThumbs">✨ Generate Quote Thumbnails</button>
+      <button class="btn btn-outline" id="btnGenAudioThumbs">🎵 Generate Audio Thumbnails</button>
       <span class="pill no-data" id="galleryDataPill">⚠ No data cached</span>
     </div>
   </div>
@@ -405,6 +406,7 @@
             <th style="min-width:220px">Description</th>
             <th style="min-width:110px">Category</th>
             <th style="min-width:220px">Audio File</th>
+            <th style="min-width:220px">Image File</th>
             <th style="min-width:80px">Duration</th>
             <th class="active-th">Is Active</th>
             <th style="width:40px"></th>
@@ -831,6 +833,7 @@ $(function () {
         $('<td class="desc-cell">').html(cell(r.description, '', 'textarea')),
         $('<td>').html(catSelect(CAT.audios, r.category)),
         $('<td>').html(cell(r.audioFile)),
+        $('<td>').html(cell(r.image)),
         $('<td>').html(cell(r.duration)),
         $('<td class="active-td">').html(activeSelect(r.isActive)),
         $('<td>').html(delBtn())
@@ -898,7 +901,7 @@ $(function () {
   function readAudios() {
     return $('#audiosBody tr').map(function (i) {
       var $t = $(this).find('td');
-      return { serial: i+1, name: $t.eq(1).find('.editable').val().trim(), description: $t.eq(2).find('.editable').val().trim(), category: $t.eq(3).find('.editable').val(), audioFile: $t.eq(4).find('.editable').val().trim(), duration: $t.eq(5).find('.editable').val().trim(), isActive: $t.eq(6).find('.editable').val() };
+      return { serial: i+1, name: $t.eq(1).find('.editable').val().trim(), description: $t.eq(2).find('.editable').val().trim(), category: $t.eq(3).find('.editable').val(), audioFile: $t.eq(4).find('.editable').val().trim(), image: $t.eq(5).find('.editable').val().trim(), duration: $t.eq(6).find('.editable').val().trim(), isActive: $t.eq(7).find('.editable').val() };
     }).get();
   }
 
@@ -918,7 +921,7 @@ $(function () {
     var map = [
       { pre: 'photosOutput', dl: 'btnDownloadPhotosJs', cp: 'btnCopyPhotosJs', fn: 'photos.js', js: buildDataJS('PHOTOS_DATA', 'data/photos.js — Photo Gallery Data', 'serial, name, name_ta, name_en, description, category, image, isActive', photos) },
       { pre: 'videosOutput', dl: 'btnDownloadVideosJs', cp: 'btnCopyVideosJs', fn: 'videos.js', js: buildDataJS('VIDEOS_DATA', 'data/videos.js — Video Gallery Data', 'serial, name, description, category, youtubeUrl, duration, isActive', videos) },
-      { pre: 'audiosOutput', dl: 'btnDownloadAudiosJs', cp: 'btnCopyAudiosJs', fn: 'audios.js', js: buildDataJS('AUDIOS_DATA', 'data/audios.js — Audio Gallery Data', 'serial, name, description, category, audioFile, duration, isActive', audios) },
+      { pre: 'audiosOutput', dl: 'btnDownloadAudiosJs', cp: 'btnCopyAudiosJs', fn: 'audios.js', js: buildDataJS('AUDIOS_DATA', 'data/audios.js — Audio Gallery Data', 'serial, name, description, category, audioFile, image, duration, isActive', audios) },
       { pre: 'pdfsOutput',   dl: 'btnDownloadPdfsJs',   cp: 'btnCopyPdfsJs',   fn: 'pdfs.js',   js: buildDataJS('PDFS_DATA',   'data/pdfs.js — PDF Downloads Data',   'serial, name, author, category, file, pages, fileSize, thumbImage, isActive', pdfs) }
     ];
     map.forEach(function (m) {
@@ -987,7 +990,7 @@ $(function () {
             if (sel.indexOf('photos') > -1) writes.push(writeFileToDir(dir, 'photos.js', buildDataJS('PHOTOS_DATA', 'data/photos.js — Photo Gallery Data', 'serial, name, name_ta, name_en, description, category, image, isActive', photos)));
             if (sel.indexOf('videos') > -1) writes.push(writeFileToDir(dir, 'videos.js', buildDataJS('VIDEOS_DATA', 'data/videos.js — Video Gallery Data', 'serial, name, description, category, youtubeUrl, duration, isActive', videos)));
             if (sel.indexOf('pdfs')   > -1) writes.push(writeFileToDir(dir, 'pdfs.js',   buildDataJS('PDFS_DATA',   'data/pdfs.js — PDF Downloads Data',   'serial, name, author, category, file, pages, fileSize, thumbImage, isActive', pdfs)));
-            if (sel.indexOf('audios') > -1) writes.push(writeFileToDir(dir, 'audios.js', buildDataJS('AUDIOS_DATA', 'data/audios.js — Audio Gallery Data', 'serial, name, description, category, audioFile, duration, isActive', audios)));
+            if (sel.indexOf('audios') > -1) writes.push(writeFileToDir(dir, 'audios.js', buildDataJS('AUDIOS_DATA', 'data/audios.js — Audio Gallery Data', 'serial, name, description, category, audioFile, image, duration, isActive', audios)));
             if (sel.indexOf('quotes') > -1) writes.push(writeFileToDir(dir, 'quotes.js', buildQuotesJS(quotes.filter(function(r){ return r.isActive !== 'no'; }))));
             return Promise.all(writes).then(function () {
               showStatus('Saved! ' + summary + ' Version: <strong>' + newDataVer + '</strong> — old cache auto-clears on next page visit.', 'success', true);
@@ -1025,7 +1028,7 @@ $(function () {
         }
         if (wb.Sheets['Audios']) {
           renderAudios(XLSX.utils.sheet_to_json(wb.Sheets['Audios'], {defval:''}).map(function(r,i){
-            return { serial: Number(r['Serial No'])||(i+1), name: String(r['Name']||''), description: String(r['Description']||''), category: String(r['Category']||'discourse'), audioFile: String(r['Audio File']||''), duration: String(r['Duration']||''), isActive: parseActive(r['Is Active']) };
+            return { serial: Number(r['Serial No'])||(i+1), name: String(r['Name']||''), description: String(r['Description']||''), category: String(r['Category']||'discourse'), audioFile: String(r['Audio File']||''), image: String(r['Image File']||''), duration: String(r['Duration']||''), isActive: parseActive(r['Is Active']) };
           }).sort(sortBySerial));
         }
         if (wb.Sheets['PDFs']) {
@@ -1064,9 +1067,9 @@ $(function () {
     var dWs = XLSX.utils.aoa_to_sheet(dD); dWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:32},{wch:12},{wch:10}];
     XLSX.utils.book_append_sheet(wb, dWs, 'PDFs');
 
-    var aD = [['Serial No','Name','Description','Category','Audio File','Duration','Is Active']];
-    readAudios().forEach(function(r){ aD.push([r.serial,r.name,r.description,r.category,r.audioFile,r.duration,r.isActive||'yes']); });
-    var aWs = XLSX.utils.aoa_to_sheet(aD); aWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:40},{wch:12},{wch:10}];
+    var aD = [['Serial No','Name','Description','Category','Audio File','Image File','Duration','Is Active']];
+    readAudios().forEach(function(r){ aD.push([r.serial,r.name,r.description,r.category,r.audioFile,r.image||'',r.duration,r.isActive||'yes']); });
+    var aWs = XLSX.utils.aoa_to_sheet(aD); aWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:40},{wch:32},{wch:12},{wch:10}];
     XLSX.utils.book_append_sheet(wb, aWs, 'Audios');
 
     var qD = [['Serial No','English','Tamil','Source','Category','Image','Is Active']];
@@ -1093,8 +1096,8 @@ $(function () {
     dWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:32},{wch:12},{wch:10}];
     XLSX.utils.book_append_sheet(wb, dWs, 'PDFs');
 
-    var aWs = XLSX.utils.aoa_to_sheet([['Serial No','Name','Description','Category','Audio File','Duration','Is Active']]);
-    aWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:40},{wch:12},{wch:10}];
+    var aWs = XLSX.utils.aoa_to_sheet([['Serial No','Name','Description','Category','Audio File','Image File','Duration','Is Active']]);
+    aWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:40},{wch:32},{wch:12},{wch:10}];
     XLSX.utils.book_append_sheet(wb, aWs, 'Audios');
 
     var qWs = XLSX.utils.aoa_to_sheet([
@@ -1392,6 +1395,59 @@ $(function () {
           'Quote thumbnails done! ' + done + ' generated' +
           (failed ? ', ' + failed + ' failed (check console)' : '') +
           '. Saved to quotes/images/thumbs/', 'success', true
+        );
+      });
+
+    }).catch(function (e) {
+      if (e.name !== 'AbortError') showStatus('Error: ' + e.message, 'error');
+    });
+  });
+
+  /* ── Generate Audio Thumbnails ──────────────────────────────
+     Reads each audio's Image File path, resizes to 400×200 landscape JPEG
+     and saves to [same-folder]/thumbs/ via File System Access API */
+  $('#btnGenAudioThumbs').on('click', function () {
+    var audios    = readAudios();
+    var imgPaths  = audios.map(function (r) { return r.image; }).filter(Boolean);
+    if (!imgPaths.length) { showStatus('No Image Files found in Audios. Fill the "Image File" column first.', 'error'); return; }
+
+    var unique = imgPaths.filter(function (p, i) { return imgPaths.indexOf(p) === i; });
+
+    window.showDirectoryPicker({ mode: 'readwrite' }).then(function (rootDir) {
+      showStatus('⏳ Generating audio thumbnails for ' + unique.length + ' image(s)…', 'info');
+
+      var done = 0, failed = 0;
+      var chain = Promise.resolve();
+
+      unique.forEach(function (imgPath) {
+        chain = chain.then(function () {
+          var parts        = imgPath.replace(/\\/g, '/').split('/');
+          var filename     = parts[parts.length - 1];
+          var thumbFolders = parts.slice(0, -1).concat(['thumbs']); /* audio/images → audio/images/thumbs */
+
+          return readFileFromDir(rootDir, parts)
+            .then(function (blob) { return resizeBlob(blob, 400, 200); })
+            .then(function (thumbBlob) {
+              return getDir(rootDir, thumbFolders).then(function (thumbDir) {
+                return writeBlob(thumbDir, filename, thumbBlob);
+              });
+            })
+            .then(function () {
+              done++;
+              showStatus('⏳ Generated ' + done + ' / ' + unique.length + ' audio thumbnails…', 'info');
+            })
+            .catch(function (err) {
+              failed++;
+              console.warn('Audio thumb failed for ' + imgPath + ':', err.message);
+            });
+        });
+      });
+
+      return chain.then(function () {
+        showStatus(
+          'Audio thumbnails done! ' + done + ' generated' +
+          (failed ? ', ' + failed + ' failed (check console)' : '') +
+          '. Saved to audio/images/thumbs/', 'success', true
         );
       });
 

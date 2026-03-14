@@ -1,7 +1,7 @@
 /* ============================================================
    data/audios.js — Audio Gallery Data
    Edit using tools/manager.html → Gallery Manager
-   Fields: serial, name, description, category, audioFile, duration, isActive
+   Fields: serial, name, description, category, audioFile, image, duration, isActive
    isActive: "yes" = show | "no" = hide without deleting
    ============================================================ */
 
@@ -12,6 +12,7 @@ var AUDIOS_DATA = [
     "description": "Yogi Ramsuratkumar chanting His own Name  - Description",
     "category": "discourse",
     "audioFile": "audios/1-yogi-ramsuratkumar-chanting-his-own-name.mp3",
+    "image": "audios/images/1-yogi-ramsuratkumar-audio.jpg",
     "duration": "2.57",
     "isActive": "yes"
   },
@@ -21,6 +22,7 @@ var AUDIOS_DATA = [
     "description": "Sita Ram Sita Ram  - Description",
     "category": "bhajan",
     "audioFile": "audios/2-sita-ram-sita-ram.mp3",
+    "image": "audios/images/2-yogi-ramsuratkumar-audio.jpg",
     "duration": "4",
     "isActive": "yes"
   },
@@ -30,6 +32,7 @@ var AUDIOS_DATA = [
     "description": "Pallandu Pallandu Vazhiye Vazhiye  - Description",
     "category": "talk",
     "audioFile": "audios/3-pallandu-pallandu-vazhiye-vazhiye.mp3",
+    "image": "audios/images/3-yogi-ramsuratkumar-audio.jpg",
     "duration": "3.46",
     "isActive": "yes"
   },
@@ -39,6 +42,7 @@ var AUDIOS_DATA = [
     "description": "Sri Rama Jaya Rama Jaya Jaya Rama  - Description",
     "category": "chant",
     "audioFile": "audios/4-sri-rama-jaya-rama-jaya-jaya-rama.mp3",
+    "image": "audios/images/4-yogi-ramsuratkumar-audio.jpg",
     "duration": "1",
     "isActive": "yes"
   },
@@ -48,6 +52,7 @@ var AUDIOS_DATA = [
     "description": "Yog Sadguru - Yogi Ramsuratkumar Ashram Songs  - Description",
     "category": "rare",
     "audioFile": "audios/5-yog-sadguru-yogi-ramsuratkumar-ashram-songs.mp3",
+    "image": "audios/images/5-yogi-ramsuratkumar-audio.jpg",
     "duration": "1.12",
     "isActive": "yes"
   },
@@ -57,6 +62,7 @@ var AUDIOS_DATA = [
     "description": "Swamiji explains the divine significance and transforming power of constantly repeating the holy name of Ram in daily life.",
     "category": "discourse",
     "audioFile": "audios/ram-nam-discourse.mp3",
+    "image": "",
     "duration": "",
     "isActive": "yes"
   },
@@ -66,6 +72,7 @@ var AUDIOS_DATA = [
     "description": "Sacred bhajan chanting the divine name of Yogi Ramsuratkumar, performed by devoted disciples at the Ashram.",
     "category": "bhajan",
     "audioFile": "audios/jaya-guru-raya.mp3",
+    "image": "",
     "duration": "",
     "isActive": "yes"
   },
@@ -75,6 +82,7 @@ var AUDIOS_DATA = [
     "description": "A rare evening satsang recording of Swamiji speaking to devotees about surrender and the grace of the Divine Father.",
     "category": "talk",
     "audioFile": "audios/evening-satsang.mp3",
+    "image": "",
     "duration": "",
     "isActive": "yes"
   },
@@ -84,6 +92,7 @@ var AUDIOS_DATA = [
     "description": "Group chanting of Ram Nam led by Swamiji during a special gathering at the Ashram.",
     "category": "chant",
     "audioFile": "audios/ram-nam-chanting.mp3",
+    "image": "",
     "duration": "",
     "isActive": "yes"
   },
@@ -93,6 +102,7 @@ var AUDIOS_DATA = [
     "description": "A rare audio recording from the early days of Swamiji's spiritual mission in Tiruvannamalai.",
     "category": "rare",
     "audioFile": "audios/rare-early-days.mp3",
+    "image": "",
     "duration": "",
     "isActive": "yes"
   },
@@ -102,6 +112,7 @@ var AUDIOS_DATA = [
     "description": "Swamiji explains the divine significance and transforming power of constantly repeating the holy name of Ram in daily life.",
     "category": "discourse",
     "audioFile": "audios/ram-nam-discourse.mp3",
+    "image": "",
     "duration": "",
     "isActive": "yes"
   },
@@ -111,6 +122,7 @@ var AUDIOS_DATA = [
     "description": "Sacred bhajan chanting the divine name of Yogi Ramsuratkumar, performed by devoted disciples at the Ashram.",
     "category": "bhajan",
     "audioFile": "audios/jaya-guru-raya.mp3",
+    "image": "",
     "duration": "",
     "isActive": "yes"
   },
@@ -120,6 +132,7 @@ var AUDIOS_DATA = [
     "description": "A rare evening satsang recording of Swamiji speaking to devotees about surrender and the grace of the Divine Father.",
     "category": "talk",
     "audioFile": "audios/evening-satsang.mp3",
+    "image": "",
     "duration": "",
     "isActive": "yes"
   },
@@ -129,6 +142,7 @@ var AUDIOS_DATA = [
     "description": "Group chanting of Ram Nam led by Swamiji during a special gathering at the Ashram.",
     "category": "chant",
     "audioFile": "audios/ram-nam-chanting.mp3",
+    "image": "",
     "duration": "",
     "isActive": "yes"
   },
@@ -138,6 +152,7 @@ var AUDIOS_DATA = [
     "description": "A rare audio recording from the early days of Swamiji's spiritual mission in Tiruvannamalai.",
     "category": "rare",
     "audioFile": "audios/rare-early-days.mp3",
+    "image": "",
     "duration": "",
     "isActive": "yes"
   },
@@ -147,6 +162,7 @@ var AUDIOS_DATA = [
     "description": "Swamiji explains the divine significance and transforming power of constantly repeating the holy name of Ram in daily life.",
     "category": "discourse",
     "audioFile": "audios/ram-nam-discourse.mp3",
+    "image": "",
     "duration": "",
     "isActive": "yes"
   },
@@ -156,6 +172,7 @@ var AUDIOS_DATA = [
     "description": "Sacred bhajan chanting the divine name of Yogi Ramsuratkumar, performed by devoted disciples at the Ashram.",
     "category": "bhajan",
     "audioFile": "audios/jaya-guru-raya.mp3",
+    "image": "",
     "duration": "",
     "isActive": "yes"
   },
@@ -165,6 +182,7 @@ var AUDIOS_DATA = [
     "description": "A rare evening satsang recording of Swamiji speaking to devotees about surrender and the grace of the Divine Father.",
     "category": "talk",
     "audioFile": "audios/evening-satsang.mp3",
+    "image": "",
     "duration": "",
     "isActive": "yes"
   },
@@ -174,6 +192,7 @@ var AUDIOS_DATA = [
     "description": "Group chanting of Ram Nam led by Swamiji during a special gathering at the Ashram.",
     "category": "chant",
     "audioFile": "audios/ram-nam-chanting.mp3",
+    "image": "",
     "duration": "",
     "isActive": "yes"
   },
@@ -183,6 +202,7 @@ var AUDIOS_DATA = [
     "description": "A rare audio recording from the early days of Swamiji's spiritual mission in Tiruvannamalai.",
     "category": "rare",
     "audioFile": "audios/rare-early-days.mp3",
+    "image": "",
     "duration": "",
     "isActive": "yes"
   }
