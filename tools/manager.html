@@ -960,11 +960,10 @@ $(function () {
     if (!photos.length && !videos.length && !pdfs.length && !audios.length && !quotes.length) {
       showStatus('No data to save. Upload an Excel file or add rows first.', 'error'); return;
     }
-    var newDataVer = makeVersion();
-    var langVer = (typeof SITE_VERSION !== 'undefined' && SITE_VERSION.lang) ? SITE_VERSION.lang : '1.0';
-    if (typeof SITE_VERSION !== 'undefined') SITE_VERSION.data = newDataVer;
+    var langVer    = (typeof SITE_VERSION !== 'undefined' && SITE_VERSION.lang) ? SITE_VERSION.lang : '1.0';
+    var curDataVer = (typeof SITE_VERSION !== 'undefined' && SITE_VERSION.data) ? SITE_VERSION.data : '1.0';
     SITE_DATA.photos = photos; SITE_DATA.videos = videos; SITE_DATA.pdfs = pdfs; SITE_DATA.audios = audios; SITE_DATA.quotes = quotes;
-    SITE_DATA.saveToStorage();
+    SITE_DATA.saveToStorage(); /* save with CURRENT version — stays consistent with disk */
     updateGalleryPill();
 
     var summaryParts = [];
@@ -979,6 +978,10 @@ $(function () {
       showStatus('ℹ Select the <strong>root</strong> folder (where index.html lives) to save JS files…', 'info');
       window.showDirectoryPicker({ mode: 'readwrite' })
         .then(function (rootDir) {
+          /* Bump version only now that we know the disk write will happen */
+          var newDataVer = makeVersion();
+          if (typeof SITE_VERSION !== 'undefined') SITE_VERSION.data = newDataVer;
+          SITE_DATA.saveToStorage(); /* re-save localStorage with bumped version — in sync with disk */
           return rootDir.getDirectoryHandle('data', { create: true }).then(function (dir) {
             var writes = [writeFileToDir(dir, 'version.js', buildVersionJS(newDataVer, langVer))];
             if (sel.indexOf('photos') > -1) writes.push(writeFileToDir(dir, 'photos.js', buildDataJS('PHOTOS_DATA', 'data/photos.js — Photo Gallery Data', 'serial, name, name_ta, name_en, description, category, image, isActive', photos)));
@@ -993,8 +996,8 @@ $(function () {
         })
         .catch(function (e) {
           showStatus(e.name === 'AbortError'
-            ? 'Saved to localStorage (v' + newDataVer + '). ' + summary + ' Select root folder to also update JS files.'
-            : 'Saved to localStorage (v' + newDataVer + '). JS write error: ' + e.message, 'info');
+            ? 'Saved to localStorage (v' + curDataVer + '). ' + summary + ' Select root folder to also update JS files.'
+            : 'Saved to localStorage (v' + curDataVer + '). JS write error: ' + e.message, 'info');
         });
     } else {
       showStatus('Saved! ' + summary, 'success', true);
@@ -1601,16 +1604,21 @@ $('#btnLangSave').on('click', function () {
   var activeCount = activeLangRows().length;
   var enJS = generateJS('en', 'LANG_EN', 'English');
   var taJS = generateJS('ta', 'LANG_TA', 'Tamil (தமிழ்)');
-  var newLangVer = makeVersion();
-  var dataVer = (typeof SITE_VERSION !== 'undefined' && SITE_VERSION.data) ? SITE_VERSION.data : '1.0';
-  if (typeof SITE_VERSION !== 'undefined') SITE_VERSION.lang = newLangVer;
-  localStorage.setItem(LANG_STORAGE_KEY, JSON.stringify({ version: newLangVer, en: buildLangObject('en'), ta: buildLangObject('ta'), loadedAt: new Date().toLocaleString() }));
-  $('#langStatusPill').removeClass('no-data').addClass('loaded').text('✅ Saved: ' + activeCount + ' active keys (v' + newLangVer + ')');
+  var curLangVer = (typeof SITE_VERSION !== 'undefined' && SITE_VERSION.lang) ? SITE_VERSION.lang : '1.0';
+  var dataVer    = (typeof SITE_VERSION !== 'undefined' && SITE_VERSION.data) ? SITE_VERSION.data : '1.0';
+  /* Save to localStorage with CURRENT version — consistent with disk until a disk write succeeds */
+  localStorage.setItem(LANG_STORAGE_KEY, JSON.stringify({ version: curLangVer, en: buildLangObject('en'), ta: buildLangObject('ta'), loadedAt: new Date().toLocaleString() }));
+  $('#langStatusPill').removeClass('no-data').addClass('loaded').text('✅ Saved: ' + activeCount + ' active keys');
 
   if (window.showDirectoryPicker) {
     showStatus('ℹ Select the <strong>root</strong> folder (where index.html lives) to save JS files…', 'info');
     window.showDirectoryPicker({ mode: 'readwrite' })
       .then(function (rootDir) {
+        /* Bump version only now that we know the disk write will happen */
+        var newLangVer = makeVersion();
+        if (typeof SITE_VERSION !== 'undefined') SITE_VERSION.lang = newLangVer;
+        localStorage.setItem(LANG_STORAGE_KEY, JSON.stringify({ version: newLangVer, en: buildLangObject('en'), ta: buildLangObject('ta'), loadedAt: new Date().toLocaleString() }));
+        $('#langStatusPill').text('✅ Saved: ' + activeCount + ' active keys (v' + newLangVer + ')');
         return rootDir.getDirectoryHandle('data', { create: true }).then(function (dir) {
           return dir.getDirectoryHandle('lang', { create: true }).then(function (langDir) {
             return Promise.all([
@@ -1625,11 +1633,11 @@ $('#btnLangSave').on('click', function () {
       })
       .catch(function (e) {
         showStatus(e.name === 'AbortError'
-          ? 'Saved to localStorage (v' + newLangVer + ', ' + activeCount + ' keys). Select root folder to also update JS files.'
-          : 'Saved to localStorage (v' + newLangVer + '). JS write error: ' + e.message, 'info');
+          ? 'Saved to localStorage (v' + curLangVer + ', ' + activeCount + ' keys). Select root folder to also update JS files.'
+          : 'Saved to localStorage (v' + curLangVer + '). JS write error: ' + e.message, 'info');
       });
   } else {
-    showStatus('Saved ' + activeCount + ' active language keys (v' + newLangVer + '). Language switcher uses these translations instantly.', 'success', true);
+    showStatus('Saved ' + activeCount + ' active language keys (v' + curLangVer + '). Language switcher uses these translations instantly.', 'success', true);
   }
 });
 

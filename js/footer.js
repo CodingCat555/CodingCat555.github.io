@@ -81,7 +81,7 @@
       footer.querySelectorAll('.site-ver').forEach(function (el) { el.textContent = 'v' + ver; });
     }
     /* Re-apply i18n translations if lang-loader already ran */
-    if (typeof applyTranslations === 'function') applyTranslations();
+    if (typeof applyLang === 'function') applyLang();
   }
 
   if (document.readyState === 'loading') {
