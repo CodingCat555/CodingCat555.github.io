@@ -224,7 +224,7 @@
     #audioPlayer {
       position: fixed; bottom: 0; left: 0; right: 0; z-index: 1200;
       background: linear-gradient(135deg, #061A0E 0%, #0F4520 100%);
-      border-top: 2px solid rgba(255,215,0,0.45);
+      border-top: none;
       box-shadow: 0 -4px 24px rgba(0,0,0,0.35);
       padding: 10px 20px;
       display: flex; align-items: center; gap: 16px;
@@ -364,19 +364,19 @@
     }
 
     /* Responsive — mobile layout Option B (CSS Grid 3-row):
-       Row 1: [info .............. close]
-       Row 2: [ctrl — big centered ▶    ]
-       Row 3: [progress .......... vol  ] */
+       Row 1: [info — full width, ✕ absolute top-right]
+       Row 2: [ctrl — big centered ▶                  ]
+       Row 3: [progress .......... vol                ] */
     @media (max-width:768px) {
       #audioPlayer {
         display: grid;
         grid-template-columns: 1fr auto;
         grid-template-rows: auto auto auto;
         grid-template-areas:
-          "info  close"
+          "info  info"
           "ctrl  ctrl"
           "prog  vol";
-        padding: 10px 14px 12px;
+        padding: 10px 42px 12px 14px; /* right gap for absolute ✕ */
         column-gap: 10px;
         row-gap: 0;
         min-height: 110px;
@@ -384,30 +384,33 @@
         /* position: fixed is kept from base style — do NOT override */
       }
 
-      /* Row 1 — title */
+      /* Row 1 — title spans full width; negative margin extends border to right edge */
       .pl-info {
         grid-area: info; min-width: 0;
         padding-bottom: 6px;
+        margin-right: -28px; padding-right: 42px;  /* 42-28=14px right gap matches left padding */
         border-bottom: 1px solid rgba(255,215,0,0.18);
       }
 
-      /* Row 1 — close (in-flow, top-right) */
+      /* ✕ — absolute circle, top-right corner */
       .pl-close {
-        grid-area: close;
-        position: static;
-        top: auto; right: auto; bottom: auto; left: auto;
+        position: absolute;
+        top: 8px; right: 10px;
+        bottom: auto; left: auto;
         transform: none;
-        align-self: start;
-        margin-top: 2px;
-        font-size: 0.82rem; padding: 4px 9px;
+        width: 28px; height: 28px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        padding: 0; font-size: 0.82rem;
       }
 
-      /* Row 2 — big centered controls */
+      /* Row 2 — big centered controls; negative margin extends border to right edge */
       .pl-controls {
         grid-area: ctrl;
         justify-content: center;
         gap: 14px;
         padding: 6px 0 4px;
+        margin-right: -28px; /* 42-28=14px right gap matches left padding */
         border-bottom: 1px solid rgba(255,215,0,0.1);
       }
       .pl-controls .pl-btn { font-size: 1.4rem; padding: 4px 8px; }
