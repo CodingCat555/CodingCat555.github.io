@@ -8,47 +8,47 @@
 var AUDIOS_DATA = [
   {
     "serial": 1,
-    "name": "Ram Nam — The Supreme Mantra",
-    "description": "Swamiji explains the divine significance and transforming power of constantly repeating the holy name of Ram in daily life.",
+    "name": "Yogi Ramsuratkumar chanting His own Name",
+    "description": "Yogi Ramsuratkumar chanting His own Name  - Description",
     "category": "discourse",
-    "audioFile": "audio/ram-nam-discourse.mp3",
-    "duration": "",
+    "audioFile": "audios/1-yogi-ramsuratkumar-chanting-his-own-name.mp3",
+    "duration": "2.57",
     "isActive": "yes"
   },
   {
     "serial": 2,
-    "name": "Yogi Ramsuratkumar — Jaya Guru Raya Bhajan",
-    "description": "Sacred bhajan chanting the divine name of Yogi Ramsuratkumar, performed by devoted disciples at the Ashram.",
+    "name": "Sita Ram Sita Ram",
+    "description": "Sita Ram Sita Ram  - Description",
     "category": "bhajan",
-    "audioFile": "audio/jaya-guru-raya.mp3",
-    "duration": "",
+    "audioFile": "audios/2-sita-ram-sita-ram.mp3",
+    "duration": "4",
     "isActive": "yes"
   },
   {
     "serial": 3,
-    "name": "Evening Satsang Talk",
-    "description": "A rare evening satsang recording of Swamiji speaking to devotees about surrender and the grace of the Divine Father.",
+    "name": "Pallandu Pallandu Vazhiye Vazhiye",
+    "description": "Pallandu Pallandu Vazhiye Vazhiye  - Description",
     "category": "talk",
-    "audioFile": "audio/evening-satsang.mp3",
-    "duration": "",
+    "audioFile": "audios/3-pallandu-pallandu-vazhiye-vazhiye.mp3",
+    "duration": "3.46",
     "isActive": "yes"
   },
   {
     "serial": 4,
-    "name": "Ram Nam Chanting Session",
-    "description": "Group chanting of Ram Nam led by Swamiji during a special gathering at the Ashram.",
+    "name": "Sri Rama Jaya Rama Jaya Jaya Rama",
+    "description": "Sri Rama Jaya Rama Jaya Jaya Rama  - Description",
     "category": "chant",
-    "audioFile": "audio/ram-nam-chanting.mp3",
-    "duration": "",
+    "audioFile": "audios/4-sri-rama-jaya-rama-jaya-jaya-rama.mp3",
+    "duration": "1",
     "isActive": "yes"
   },
   {
     "serial": 5,
-    "name": "Rare Recording — Early Days",
-    "description": "A rare audio recording from the early days of Swamiji's spiritual mission in Tiruvannamalai.",
+    "name": "Yog Sadguru - Yogi Ramsuratkumar Ashram Songs",
+    "description": "Yog Sadguru - Yogi Ramsuratkumar Ashram Songs  - Description",
     "category": "rare",
-    "audioFile": "audio/rare-early-days.mp3",
-    "duration": "",
+    "audioFile": "audios/5-yog-sadguru-yogi-ramsuratkumar-ashram-songs.mp3",
+    "duration": "1.12",
     "isActive": "yes"
   },
   {
@@ -56,7 +56,7 @@ var AUDIOS_DATA = [
     "name": "Ram Nam — The Supreme Mantra",
     "description": "Swamiji explains the divine significance and transforming power of constantly repeating the holy name of Ram in daily life.",
     "category": "discourse",
-    "audioFile": "audio/ram-nam-discourse.mp3",
+    "audioFile": "audios/ram-nam-discourse.mp3",
     "duration": "",
     "isActive": "yes"
   },
@@ -65,7 +65,7 @@ var AUDIOS_DATA = [
     "name": "Yogi Ramsuratkumar — Jaya Guru Raya Bhajan",
     "description": "Sacred bhajan chanting the divine name of Yogi Ramsuratkumar, performed by devoted disciples at the Ashram.",
     "category": "bhajan",
-    "audioFile": "audio/jaya-guru-raya.mp3",
+    "audioFile": "audios/jaya-guru-raya.mp3",
     "duration": "",
     "isActive": "yes"
   },
@@ -74,7 +74,7 @@ var AUDIOS_DATA = [
     "name": "Evening Satsang Talk",
     "description": "A rare evening satsang recording of Swamiji speaking to devotees about surrender and the grace of the Divine Father.",
     "category": "talk",
-    "audioFile": "audio/evening-satsang.mp3",
+    "audioFile": "audios/evening-satsang.mp3",
     "duration": "",
     "isActive": "yes"
   },
@@ -83,7 +83,7 @@ var AUDIOS_DATA = [
     "name": "Ram Nam Chanting Session",
     "description": "Group chanting of Ram Nam led by Swamiji during a special gathering at the Ashram.",
     "category": "chant",
-    "audioFile": "audio/ram-nam-chanting.mp3",
+    "audioFile": "audios/ram-nam-chanting.mp3",
     "duration": "",
     "isActive": "yes"
   },
@@ -92,7 +92,7 @@ var AUDIOS_DATA = [
     "name": "Rare Recording — Early Days",
     "description": "A rare audio recording from the early days of Swamiji's spiritual mission in Tiruvannamalai.",
     "category": "rare",
-    "audioFile": "audio/rare-early-days.mp3",
+    "audioFile": "audios/rare-early-days.mp3",
     "duration": "",
     "isActive": "yes"
   },
@@ -101,7 +101,7 @@ var AUDIOS_DATA = [
     "name": "Ram Nam — The Supreme Mantra",
     "description": "Swamiji explains the divine significance and transforming power of constantly repeating the holy name of Ram in daily life.",
     "category": "discourse",
-    "audioFile": "audio/ram-nam-discourse.mp3",
+    "audioFile": "audios/ram-nam-discourse.mp3",
     "duration": "",
     "isActive": "yes"
   },
@@ -110,7 +110,7 @@ var AUDIOS_DATA = [
     "name": "Yogi Ramsuratkumar — Jaya Guru Raya Bhajan",
     "description": "Sacred bhajan chanting the divine name of Yogi Ramsuratkumar, performed by devoted disciples at the Ashram.",
     "category": "bhajan",
-    "audioFile": "audio/jaya-guru-raya.mp3",
+    "audioFile": "audios/jaya-guru-raya.mp3",
     "duration": "",
     "isActive": "yes"
   },
@@ -119,7 +119,7 @@ var AUDIOS_DATA = [
     "name": "Evening Satsang Talk",
     "description": "A rare evening satsang recording of Swamiji speaking to devotees about surrender and the grace of the Divine Father.",
     "category": "talk",
-    "audioFile": "audio/evening-satsang.mp3",
+    "audioFile": "audios/evening-satsang.mp3",
     "duration": "",
     "isActive": "yes"
   },
@@ -128,7 +128,7 @@ var AUDIOS_DATA = [
     "name": "Ram Nam Chanting Session",
     "description": "Group chanting of Ram Nam led by Swamiji during a special gathering at the Ashram.",
     "category": "chant",
-    "audioFile": "audio/ram-nam-chanting.mp3",
+    "audioFile": "audios/ram-nam-chanting.mp3",
     "duration": "",
     "isActive": "yes"
   },
@@ -137,7 +137,7 @@ var AUDIOS_DATA = [
     "name": "Rare Recording — Early Days",
     "description": "A rare audio recording from the early days of Swamiji's spiritual mission in Tiruvannamalai.",
     "category": "rare",
-    "audioFile": "audio/rare-early-days.mp3",
+    "audioFile": "audios/rare-early-days.mp3",
     "duration": "",
     "isActive": "yes"
   },
@@ -146,7 +146,7 @@ var AUDIOS_DATA = [
     "name": "Ram Nam — The Supreme Mantra",
     "description": "Swamiji explains the divine significance and transforming power of constantly repeating the holy name of Ram in daily life.",
     "category": "discourse",
-    "audioFile": "audio/ram-nam-discourse.mp3",
+    "audioFile": "audios/ram-nam-discourse.mp3",
     "duration": "",
     "isActive": "yes"
   },
@@ -155,7 +155,7 @@ var AUDIOS_DATA = [
     "name": "Yogi Ramsuratkumar — Jaya Guru Raya Bhajan",
     "description": "Sacred bhajan chanting the divine name of Yogi Ramsuratkumar, performed by devoted disciples at the Ashram.",
     "category": "bhajan",
-    "audioFile": "audio/jaya-guru-raya.mp3",
+    "audioFile": "audios/jaya-guru-raya.mp3",
     "duration": "",
     "isActive": "yes"
   },
@@ -164,7 +164,7 @@ var AUDIOS_DATA = [
     "name": "Evening Satsang Talk",
     "description": "A rare evening satsang recording of Swamiji speaking to devotees about surrender and the grace of the Divine Father.",
     "category": "talk",
-    "audioFile": "audio/evening-satsang.mp3",
+    "audioFile": "audios/evening-satsang.mp3",
     "duration": "",
     "isActive": "yes"
   },
@@ -173,7 +173,7 @@ var AUDIOS_DATA = [
     "name": "Ram Nam Chanting Session",
     "description": "Group chanting of Ram Nam led by Swamiji during a special gathering at the Ashram.",
     "category": "chant",
-    "audioFile": "audio/ram-nam-chanting.mp3",
+    "audioFile": "audios/ram-nam-chanting.mp3",
     "duration": "",
     "isActive": "yes"
   },
@@ -182,7 +182,7 @@ var AUDIOS_DATA = [
     "name": "Rare Recording — Early Days",
     "description": "A rare audio recording from the early days of Swamiji's spiritual mission in Tiruvannamalai.",
     "category": "rare",
-    "audioFile": "audio/rare-early-days.mp3",
+    "audioFile": "audios/rare-early-days.mp3",
     "duration": "",
     "isActive": "yes"
   }
