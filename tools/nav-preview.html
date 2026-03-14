@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Nav Design Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --green: #1a6b2e; --green-dark: #0f4520; --gold: #CCA800; --text: #1a2a1e; }
+body { font-family: 'Segoe UI', sans-serif; background: #e8f5ec; }
+
+.page-title { text-align:center; padding:32px 16px 6px; font-size:1.5rem; font-weight:700; color:var(--green); }
+.page-sub { text-align:center; color:#666; margin-bottom:36px; font-size:0.88rem; }
+.section { margin-bottom:56px; }
+.section-label { display:block; text-align:center; background:var(--green); color:#fff; font-size:0.72rem; font-weight:700; letter-spacing:1.5px; padding:5px 0; margin-bottom:0; }
+.section-desc { text-align:center; font-size:0.8rem; color:#555; padding:10px 16px 0; background:#fff; }
+
+/* ── SVG Share ── */
+.svg-share { display:inline-flex; }
+
+/* ═══════════════════════════════════
+   OPTION A — Dark Green Solid
+═══════════════════════════════════ */
+.nav-a {
+  background: linear-gradient(135deg, #0f4520 0%, #1a6b2e 100%);
+  padding: 0 32px;
+  height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 3px 20px rgba(0,0,0,0.2);
+}
+.nav-a .logo { display:flex; align-items:center; gap:12px; text-decoration:none; }
+.nav-a .logo-icon { width:40px; height:40px; border-radius:50%; background:rgba(255,215,0,0.15); border:1.5px solid rgba(255,215,0,0.4); display:flex; align-items:center; justify-content:center; font-size:1.2rem; }
+.nav-a .logo-name { font-family:'Cinzel',serif; font-size:1rem; font-weight:700; color:#fff; line-height:1.2; }
+.nav-a .logo-sub { font-size:0.6rem; color:rgba(255,255,255,0.6); letter-spacing:0.12em; text-transform:uppercase; }
+.nav-a .links { display:flex; align-items:center; gap:4px; }
+.nav-a .links a, .nav-a .links button {
+  color:rgba(255,255,255,0.85); font-size:0.84rem; font-weight:500;
+  padding:7px 13px; border-radius:6px; text-decoration:none; border:none; background:none; cursor:pointer;
+  transition:background 0.2s, color 0.2s;
+}
+.nav-a .links a:hover, .nav-a .links button:hover { background:rgba(255,255,255,0.12); color:#fff; }
+.nav-a .links a.active { background:rgba(255,215,0,0.18); color:#FFD700; }
+.nav-a .share-btn { display:flex; align-items:center; gap:6px; border:1px solid rgba(255,215,0,0.4) !important; color:#FFD700 !important; border-radius:20px !important; padding:6px 14px !important; }
+.nav-a .share-btn:hover { background:rgba(255,215,0,0.15) !important; }
+.nav-a .lang-btn { font-size:0.78rem !important; padding:5px 10px !important; border:1px solid rgba(255,255,255,0.25) !important; border-radius:20px !important; }
+
+/* ═══════════════════════════════════
+   OPTION B — Frosted Glass
+═══════════════════════════════════ */
+.nav-b-wrap {
+  background: linear-gradient(135deg, #1a6b2e, #0f4520);
+  height: 100px; display:flex; align-items:center; position:relative;
+}
+.nav-b {
+  position:absolute; top:0; left:0; right:0;
+  height:64px;
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  background: rgba(255,255,255,0.14);
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  padding: 0 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+}
+.nav-b .logo { display:flex; align-items:center; gap:12px; text-decoration:none; }
+.nav-b .logo-icon { width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,0.2); border:1.5px solid rgba(255,255,255,0.4); display:flex; align-items:center; justify-content:center; font-size:1.2rem; }
+.nav-b .logo-name { font-family:'Cinzel',serif; font-size:1rem; font-weight:700; color:#fff; }
+.nav-b .logo-sub { font-size:0.6rem; color:rgba(255,255,255,0.65); letter-spacing:0.12em; text-transform:uppercase; }
+.nav-b .links { display:flex; align-items:center; gap:4px; }
+.nav-b .links a, .nav-b .links button {
+  color:rgba(255,255,255,0.9); font-size:0.84rem; font-weight:500;
+  padding:7px 13px; border-radius:6px; text-decoration:none; border:none; background:none; cursor:pointer;
+  transition:background 0.2s;
+}
+.nav-b .links a:hover, .nav-b .links button:hover { background:rgba(255,255,255,0.18); }
+.nav-b .share-btn { display:flex; align-items:center; gap:6px; border:1px solid rgba(255,255,255,0.35) !important; border-radius:20px !important; padding:6px 14px !important; }
+.nav-b .lang-btn { font-size:0.78rem !important; border:1px solid rgba(255,255,255,0.25) !important; border-radius:20px !important; padding:5px 10px !important; }
+
+/* ═══════════════════════════════════
+   OPTION C — White + Gold Bottom Border
+═══════════════════════════════════ */
+.nav-c {
+  background: #fff;
+  border-bottom: 3px solid var(--gold);
+  padding: 0 32px;
+  height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+.nav-c .logo { display:flex; align-items:center; gap:12px; text-decoration:none; }
+.nav-c .logo-icon { width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,#e8f5e9,#f1f8e9); border:1.5px solid rgba(26,107,46,0.25); display:flex; align-items:center; justify-content:center; font-size:1.2rem; }
+.nav-c .logo-name { font-family:'Cinzel',serif; font-size:1rem; font-weight:700; color:var(--green-dark); }
+.nav-c .logo-sub { font-size:0.6rem; color:#999; letter-spacing:0.12em; text-transform:uppercase; }
+.nav-c .links { display:flex; align-items:center; gap:2px; }
+.nav-c .links a, .nav-c .links button {
+  color:#444; font-size:0.84rem; font-weight:500;
+  padding:7px 13px; border-radius:6px; text-decoration:none; border:none; background:none; cursor:pointer;
+  transition:color 0.2s, background 0.2s;
+}
+.nav-c .links a:hover, .nav-c .links button:hover { color:var(--green); background:rgba(26,107,46,0.07); }
+.nav-c .links a.active { color:var(--green); font-weight:700; border-bottom:2px solid var(--gold); border-radius:0; }
+.nav-c .share-btn { display:flex; align-items:center; gap:6px; color:var(--green) !important; border:1.5px solid var(--gold) !important; border-radius:20px !important; padding:6px 14px !important; }
+.nav-c .share-btn:hover { background:rgba(204,168,0,0.08) !important; }
+.nav-c .lang-btn { font-size:0.78rem !important; border:1px solid rgba(26,107,46,0.25) !important; border-radius:20px !important; padding:5px 10px !important; color:var(--green) !important; }
+
+/* ═══════════════════════════════════
+   OPTION D — Slim Compact Dark
+═══════════════════════════════════ */
+.nav-d {
+  background: #0f4520;
+  padding: 0 32px;
+  height: 52px;
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+}
+.nav-d .logo { display:flex; align-items:center; gap:10px; text-decoration:none; }
+.nav-d .logo-icon { font-size:1rem; }
+.nav-d .logo-name { font-family:'Cinzel',serif; font-size:0.9rem; font-weight:700; color:#fff; }
+.nav-d .links { display:flex; align-items:center; gap:2px; }
+.nav-d .links a, .nav-d .links button {
+  color:rgba(255,255,255,0.75); font-size:0.8rem;
+  padding:5px 11px; border-radius:5px; text-decoration:none; border:none; background:none; cursor:pointer;
+  transition:background 0.2s, color 0.2s;
+}
+.nav-d .links a:hover, .nav-d .links button:hover { color:#fff; background:rgba(255,255,255,0.1); }
+.nav-d .links a.active { color:#FFD700; }
+.nav-d .share-btn { display:flex; align-items:center; gap:5px; color:#FFD700 !important; padding:4px 11px !important; }
+.nav-d .lang-btn { font-size:0.75rem !important; padding:4px 9px !important; border:1px solid rgba(255,255,255,0.2) !important; border-radius:15px !important; }
+
+/* ═══════════════════════════════════
+   OPTION E — Green Gradient + Logo Image
+═══════════════════════════════════ */
+.nav-e {
+  background: #fff;
+  padding: 0 32px;
+  height: 68px;
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 2px 20px rgba(26,107,46,0.12);
+  border-bottom: 1px solid rgba(26,107,46,0.1);
+}
+.nav-e .logo { display:flex; align-items:center; gap:14px; text-decoration:none; }
+.nav-e .logo-icon {
+  width:44px; height:44px; border-radius:50%;
+  background:linear-gradient(135deg,#1a6b2e,#0f4520);
+  border:2.5px solid var(--gold);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.3rem;
+  box-shadow: 0 3px 12px rgba(26,107,46,0.25);
+}
+.nav-e .logo-name { font-family:'Cinzel',serif; font-size:1.05rem; font-weight:700; color:var(--green-dark); }
+.nav-e .logo-sub { font-size:0.6rem; color:var(--gold); letter-spacing:0.12em; text-transform:uppercase; font-weight:600; }
+.nav-e .links { display:flex; align-items:center; gap:2px; }
+.nav-e .links a, .nav-e .links button {
+  color:#444; font-size:0.85rem; font-weight:500;
+  padding:8px 14px; border-radius:7px; text-decoration:none; border:none; background:none; cursor:pointer;
+  transition:color 0.2s, background 0.2s;
+}
+.nav-e .links a:hover, .nav-e .links button:hover { color:var(--green); background:rgba(26,107,46,0.07); }
+.nav-e .links a.active {
+  color:#fff; background:var(--green);
+  border-radius:20px;
+}
+.nav-e .share-btn { display:flex; align-items:center; gap:6px; background:var(--green) !important; color:#fff !important; border-radius:20px !important; padding:7px 16px !important; font-size:0.82rem !important; }
+.nav-e .share-btn:hover { background:var(--green-dark) !important; }
+.nav-e .lang-btn { font-size:0.78rem !important; border:1.5px solid rgba(26,107,46,0.3) !important; border-radius:20px !important; padding:5px 12px !important; color:var(--green) !important; }
+
+/* SVG */
+svg { display:inline-block; vertical-align:middle; }
+</style>
+</head>
+<body>
+
+<div class="page-title">Navigation Bar — Design Preview</div>
+<div class="page-sub">5 options — scroll and compare, then tell me which you prefer</div>
+
+<!-- OPTION A -->
+<div class="section">
+  <span class="section-label">OPTION A — Dark Green Solid Bar</span>
+  <p class="section-desc">Deep green gradient background, white links, gold share button. Premium devotional feel.</p>
+  <nav class="nav-a">
+    <a href="#" class="logo">
+      <div class="logo-icon">🪔</div>
+      <div>
+        <div class="logo-name">Yogi Ramsuratkumar</div>
+        <div class="logo-sub">Tiruvannamalai · 1918–2001</div>
+      </div>
+    </a>
+    <div class="links">
+      <a href="#" class="active">Home</a>
+      <a href="#">About ▾</a>
+      <a href="#">Gallery ▾</a>
+      <a href="#">Contact</a>
+      <button class="lang-btn">🌐 EN ▾</button>
+      <button class="share-btn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Share
+      </button>
+    </div>
+  </nav>
+</div>
+
+<!-- OPTION B -->
+<div class="section">
+  <span class="section-label">OPTION B — Frosted Glass</span>
+  <p class="section-desc">Transparent blur over a green background. Modern, translucent, premium. Great when hero shows behind nav.</p>
+  <div class="nav-b-wrap">
+    <nav class="nav-b">
+      <a href="#" class="logo">
+        <div class="logo-icon">🪔</div>
+        <div>
+          <div class="logo-name">Yogi Ramsuratkumar</div>
+          <div class="logo-sub">Tiruvannamalai · 1918–2001</div>
+        </div>
+      </a>
+      <div class="links">
+        <a href="#">Home</a>
+        <a href="#">About ▾</a>
+        <a href="#">Gallery ▾</a>
+        <a href="#">Contact</a>
+        <button class="lang-btn">🌐 EN ▾</button>
+        <button class="share-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Share
+        </button>
+      </div>
+    </nav>
+  </div>
+</div>
+
+<!-- OPTION C -->
+<div class="section">
+  <span class="section-label">OPTION C — White + Gold Bottom Border</span>
+  <p class="section-desc">Clean white nav with a 3px gold accent bottom line. Minimal, rich, elegant. Active link underlined in gold.</p>
+  <nav class="nav-c">
+    <a href="#" class="logo">
+      <div class="logo-icon">🪔</div>
+      <div>
+        <div class="logo-name">Yogi Ramsuratkumar</div>
+        <div class="logo-sub">Tiruvannamalai · 1918–2001</div>
+      </div>
+    </a>
+    <div class="links">
+      <a href="#" class="active">Home</a>
+      <a href="#">About ▾</a>
+      <a href="#">Gallery ▾</a>
+      <a href="#">Contact</a>
+      <button class="lang-btn">🌐 EN ▾</button>
+      <button class="share-btn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Share
+      </button>
+    </div>
+  </nav>
+</div>
+
+<!-- OPTION D -->
+<div class="section">
+  <span class="section-label">OPTION D — Slim Compact Dark</span>
+  <p class="section-desc">52px height dark green bar. Very compact, gives more screen space. Clean and minimal.</p>
+  <nav class="nav-d">
+    <a href="#" class="logo">
+      <div class="logo-icon">🪔</div>
+      <div class="logo-name">Yogi Ramsuratkumar</div>
+    </a>
+    <div class="links">
+      <a href="#" class="active">Home</a>
+      <a href="#">About ▾</a>
+      <a href="#">Gallery ▾</a>
+      <a href="#">Contact</a>
+      <button class="lang-btn">🌐 EN</button>
+      <button class="share-btn">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Share
+      </button>
+    </div>
+  </nav>
+</div>
+
+<!-- OPTION E -->
+<div class="section">
+  <span class="section-label">OPTION E — White + Gold Ring Logo + Green Active</span>
+  <p class="section-desc">White nav, logo icon with gold ring border, active link as green pill, green share button. Modern and balanced.</p>
+  <nav class="nav-e">
+    <a href="#" class="logo">
+      <div class="logo-icon">🪔</div>
+      <div>
+        <div class="logo-name">Yogi Ramsuratkumar</div>
+        <div class="logo-sub">Tiruvannamalai · 1918–2001</div>
+      </div>
+    </a>
+    <div class="links">
+      <a href="#" class="active">Home</a>
+      <a href="#">About ▾</a>
+      <a href="#">Gallery ▾</a>
+      <a href="#">Contact</a>
+      <button class="lang-btn">🌐 EN ▾</button>
+      <button class="share-btn">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Share
+      </button>
+    </div>
+  </nav>
+</div>
+
+<div style="height:40px;"></div>
+</body>
+</html>

@@ -6,7 +6,6 @@
   <title>Photo Gallery — Yogi Ramsuratkumar</title>
   <link rel="stylesheet" href="css/style.css" />
   <!-- SheetJS (reads Excel) + jQuery -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <!-- Static data files -->
   <script src="data/photos.js"></script>
@@ -524,6 +523,72 @@ $(function () {
       if (caption) caption.textContent = name;
     });
   };
+})();
+</script>
+<script>
+/* ── Lightbox with swipe support ── */
+(function () {
+  var lbItems = [], lbIndex = 0, swipeStartX = 0, swipeStartY = 0;
+  function buildLbItems() {
+    lbItems = [];
+    document.querySelectorAll("#galleryContainer .gallery-item").forEach(function (card) {
+      var imgEl = card.querySelector("img");
+      var img = (imgEl && imgEl.getAttribute("data-full")) || card.getAttribute("data-img") || "";
+      var caption = card.getAttribute("data-caption") || "";
+      if (img) lbItems.push({ img: img, caption: caption });
+    });
+  }
+  function openLb(index) {
+    buildLbItems(); if (!lbItems.length) return;
+    lbIndex = Math.max(0, Math.min(index, lbItems.length - 1));
+    showLb(lbIndex);
+    document.getElementById("lightbox").classList.add("active");
+    document.body.style.overflow = "hidden";
+  }
+  function closeLb() {
+    document.getElementById("lightbox").classList.remove("active");
+    document.body.style.overflow = "";
+    document.getElementById("lbImg").src = "";
+  }
+  function showLb(index) {
+    var item = lbItems[index]; if (!item) return;
+    var img = document.getElementById("lbImg");
+    img.style.opacity = "0"; img.src = item.img;
+    img.onload = function () { img.style.transition = "opacity 0.25s"; img.style.opacity = "1"; };
+    document.getElementById("lbCaption").textContent = item.caption;
+    document.getElementById("lbCounter").textContent = (index + 1) + " / " + lbItems.length;
+    document.getElementById("lbPrev").style.display = index === 0 ? "none" : "";
+    document.getElementById("lbNext").style.display = index === lbItems.length - 1 ? "none" : "";
+  }
+  function prevLb() { if (lbIndex > 0) { lbIndex--; showLb(lbIndex); } }
+  function nextLb() { if (lbIndex < lbItems.length - 1) { lbIndex++; showLb(lbIndex); } }
+  document.addEventListener("click", function (e) {
+    if (e.target.closest(".gallery-share,.share-toggle,.share-menu")) return;
+    var card = e.target.closest(".gallery-item");
+    if (!card) return;
+    buildLbItems();
+    var imgEl2 = card.querySelector("img");
+    var imgFull = (imgEl2 && imgEl2.getAttribute("data-full")) || card.getAttribute("data-img") || "";
+    var idx = lbItems.findIndex(function (it) { return it.img === imgFull; });
+    openLb(idx >= 0 ? idx : 0);
+  });
+  document.getElementById("lbClose").addEventListener("click", closeLb);
+  document.getElementById("lbOverlay").addEventListener("click", closeLb);
+  document.getElementById("lbPrev").addEventListener("click", function (e) { e.stopPropagation(); prevLb(); });
+  document.getElementById("lbNext").addEventListener("click", function (e) { e.stopPropagation(); nextLb(); });
+  document.addEventListener("keydown", function (e) {
+    if (!document.getElementById("lightbox").classList.contains("active")) return;
+    if (e.key === "ArrowLeft")  { e.preventDefault(); prevLb(); }
+    if (e.key === "ArrowRight") { e.preventDefault(); nextLb(); }
+    if (e.key === "Escape") closeLb();
+  });
+  var lb = document.getElementById("lightbox");
+  lb.addEventListener("touchstart", function (e) { swipeStartX = e.touches[0].clientX; swipeStartY = e.touches[0].clientY; }, { passive: true });
+  lb.addEventListener("touchend", function (e) {
+    var dx = e.changedTouches[0].clientX - swipeStartX;
+    var dy = e.changedTouches[0].clientY - swipeStartY;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) { if (dx < 0) nextLb(); else prevLb(); }
+  }, { passive: true });
 })();
 </script>
 </body>
