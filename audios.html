@@ -94,7 +94,7 @@
     .audio-wave {
       position: absolute; bottom: 0; left: 0; right: 0;
       display: flex; align-items: flex-end; justify-content: flex-start;
-      gap: 2px; padding: 0 58px 0 10px;
+      gap: 2px; padding: 0 18px 0 10px;
       height: 50px; opacity: 0.28;
       transform-origin: bottom;
     }
@@ -234,7 +234,7 @@
     #audioPlayer.visible { transform: translateY(0); }
     body.player-open { padding-bottom: 74px; }
     @media (max-width:768px) {
-      body.player-open { padding-bottom: 96px; } /* mobile player is taller */
+      body.player-open { padding-bottom: 118px; } /* 3-row mobile player */
     }
 
     /* Track info */
@@ -363,67 +363,92 @@
       50%      { box-shadow: 0 0 0 9px rgba(255,215,0,0.12), 0 4px 28px rgba(255,215,0,0.7); }
     }
 
-    /* Responsive — mobile layout (CSS Grid):
-       Col layout: [auto] [1fr]
-       Row 1:  🎵 Title (spans both cols, left-aligned)
-       Row 2:  ⏮▶⏭  | 0:00 ━━━━━━ 4:32
-       Right column (absolute): ✕ top-right → slider → 🔊 icon bottom */
+    /* Responsive — mobile layout Option B (CSS Grid 3-row):
+       Row 1: [info .............. close]
+       Row 2: [ctrl — big centered ▶    ]
+       Row 3: [progress .......... vol  ] */
     @media (max-width:768px) {
       #audioPlayer {
         display: grid;
-        grid-template-columns: auto 1fr;
-        grid-template-rows: auto auto;
+        grid-template-columns: 1fr auto;
+        grid-template-rows: auto auto auto;
         grid-template-areas:
-          "info  info"
-          "ctrl  prog";
-        padding: 8px 32px 8px 12px; /* right gap for absolute right column */
-        gap: 5px 8px;
-        min-height: 82px;
+          "info  close"
+          "ctrl  ctrl"
+          "prog  vol";
+        padding: 10px 14px 12px;
+        column-gap: 10px;
+        row-gap: 0;
+        min-height: 110px;
         align-items: center;
         /* position: fixed is kept from base style — do NOT override */
       }
-      /* Row 1: title flush left, spans both columns */
-      .pl-info  {
+
+      /* Row 1 — title */
+      .pl-info {
         grid-area: info; min-width: 0;
+        padding-bottom: 6px;
         border-bottom: 1px solid rgba(255,215,0,0.18);
-        padding-bottom: 4px;
       }
-      /* Row 2: controls auto, progress fills */
-      .pl-controls { grid-area: ctrl; }
-      .pl-progress { grid-area: prog; display: flex; min-width: 0; }
-      /* ✕ — absolute top-right corner */
+
+      /* Row 1 — close (in-flow, top-right) */
       .pl-close {
-        position: absolute;
-        top: 5px; right: 8px;
-        bottom: auto; left: auto;
+        grid-area: close;
+        position: static;
+        top: auto; right: auto; bottom: auto; left: auto;
         transform: none;
-        font-size: 0.95rem; padding: 4px 6px;
+        align-self: start;
+        margin-top: 2px;
+        font-size: 0.82rem; padding: 4px 9px;
       }
-      /* Right vertical column: slider (middle) + 🔊 icon (bottom), below ✕ */
-      .pl-vol {
-        position: absolute;
-        right: 6px;
-        top: 30px;   /* starts below ✕ button */
-        bottom: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+
+      /* Row 2 — big centered controls */
+      .pl-controls {
+        grid-area: ctrl;
         justify-content: center;
-        gap: 4px;
-        width: 22px;
-        padding: 0 0 4px;
+        gap: 14px;
+        padding: 6px 0 4px;
+        border-bottom: 1px solid rgba(255,215,0,0.1);
       }
+      .pl-controls .pl-btn { font-size: 1.4rem; padding: 4px 8px; }
+
+      /* Row 2 — big gold circle play button */
+      #plPlayPause {
+        width: 44px; height: 44px; border-radius: 50%;
+        background: #FFD700; color: #0F4520;
+        display: inline-flex; align-items: center; justify-content: center;
+        padding: 0; font-size: 1.1rem;
+        box-shadow: 0 2px 14px rgba(255,215,0,0.5);
+      }
+      #plPlayPause:hover { background: #ffe84d; color: #0F4520; }
+
+      /* Row 3 — progress */
+      .pl-progress {
+        grid-area: prog;
+        display: flex; align-items: center;
+        min-width: 0;
+        padding: 5px 0 0;
+      }
+
+      /* Row 3 — horizontal volume */
+      .pl-vol {
+        grid-area: vol;
+        position: static;
+        top: auto; right: auto; bottom: auto; left: auto;
+        display: flex; flex-direction: row;
+        align-items: center; gap: 5px;
+        width: auto; padding: 5px 0 0;
+        justify-content: flex-end;
+      }
+      .pl-vol-icon { order: 1; font-size: 0.78rem; line-height: 1; }
       .pl-vol-bar {
-        order: 1;                   /* slider above icon */
-        writing-mode: vertical-lr;
-        direction: rtl;             /* fills bottom → top */
-        width: 4px; height: 36px;
+        order: 2;
+        writing-mode: horizontal-tb;
+        direction: ltr;
+        width: 56px; height: 4px;
         flex: none;
       }
-      .pl-vol-icon {
-        order: 2;                   /* 🔊 at bottom */
-        font-size: 0.72rem; line-height: 1;
-      }
+
       .pl-title { max-width: none; }
     }
 
@@ -670,7 +695,7 @@ $(function () {
 
   /* ── Audio file not found / network error ── */
   gAudio.addEventListener('error', function () {
-    if (!gAudio.src) return;
+    if (gIdx < 0 || !gAudio.src) return;  /* ignore errors from intentional close/reset */
     setPlayIcon(false);
     /* Mark the active card as unavailable */
     if (gIdx >= 0 && gList[gIdx]) {
@@ -732,9 +757,10 @@ $(function () {
 
   $('#plClose').on('click', function () {
     gAudio.pause();
-    gAudio.src = '';
+    gIdx = -1;                        /* set before removing src so error handler ignores it */
+    gAudio.removeAttribute('src');    /* proper HTML5 reset — avoids triggering error event */
+    gAudio.load();
     $('.audio-play-circle').html('▶').css('padding-left', '3px');
-    gIdx = -1;
     $('#audioPlayer').removeClass('visible');
     $('body').removeClass('player-open');
     $('.audio-card').removeClass('now-playing is-playing');

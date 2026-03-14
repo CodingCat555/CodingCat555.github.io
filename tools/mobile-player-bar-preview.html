@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mobile Player Bar — Design Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --green:      #1A6B2E;
+      --green-dark: #0F4520;
+      --gold:       #FFD700;
+      --bar-bg:     #0F2318;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #e8f5ec;
+      padding: 30px 16px 60px;
+      color: white;
+    }
+    h1 {
+      text-align: center;
+      font-family: 'Cinzel', serif;
+      color: #0F4520;
+      font-size: 1.25rem;
+      margin-bottom: 6px;
+    }
+    .subtitle {
+      text-align: center;
+      font-size: 0.82rem;
+      color: #5a7a68;
+      margin-bottom: 32px;
+    }
+
+    /* ── Wrapper — simulate phone screen width ── */
+    .phone-wrap {
+      max-width: 390px;
+      margin: 0 auto 40px;
+    }
+    .option-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.82rem; font-weight: 700;
+      color: white;
+      background: #0F4520;
+      padding: 9px 16px;
+      border-radius: 10px 10px 0 0;
+      text-align: center;
+      letter-spacing: 0.04em;
+    }
+    .option-note {
+      text-align: center;
+      font-size: 0.72rem;
+      color: #555;
+      background: #f0f8f3;
+      border: 1px solid rgba(26,107,46,0.2);
+      padding: 5px 12px 6px;
+    }
+
+    /* ── Shared player bar shell ── */
+    .player-bar {
+      background: linear-gradient(135deg, #0A1C10 0%, #0F2318 60%, #122B1A 100%);
+      border-top: 2px solid rgba(255,215,0,0.35);
+      padding: 10px 14px 12px;
+      position: relative;
+      border-radius: 0 0 10px 10px;
+      box-shadow: 0 -4px 24px rgba(0,0,0,0.35);
+    }
+
+    /* ── Shared elements ── */
+    .pl-title {
+      font-size: 0.88rem; font-weight: 700;
+      color: white; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
+      flex: 1; min-width: 0;
+    }
+    .pl-close {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: rgba(255,255,255,0.8);
+      font-size: 0.75rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .pl-btn {
+      background: none; border: none; color: rgba(255,255,255,0.85);
+      font-size: 1.2rem; padding: 6px 10px; cursor: pointer;
+      border-radius: 7px; line-height: 1;
+    }
+    .pl-play {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: #FFD700; color: #0F4520;
+      border: none; font-size: 1rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 12px rgba(255,215,0,0.4);
+      flex-shrink: 0;
+    }
+    .pl-play-lg {
+      width: 46px; height: 46px; font-size: 1.2rem;
+    }
+    /* Progress */
+    .pl-time { font-size: 0.68rem; color: rgba(255,255,255,0.55); flex-shrink: 0; }
+    .pl-range {
+      -webkit-appearance: none; appearance: none;
+      height: 4px; border-radius: 2px; flex: 1; min-width: 0;
+      background: linear-gradient(to right, #FFD700 35%, rgba(255,255,255,0.18) 35%);
+      cursor: pointer;
+    }
+    .pl-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: #FFD700;
+      box-shadow: 0 0 6px rgba(255,215,0,0.7);
+    }
+    .pl-vol-range {
+      -webkit-appearance: none; appearance: none;
+      height: 3px; border-radius: 2px;
+      background: linear-gradient(to right, rgba(255,255,255,0.7) 70%, rgba(255,255,255,0.18) 70%);
+      cursor: pointer;
+    }
+    .pl-vol-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: rgba(255,255,255,0.85);
+    }
+    .pl-vol-icon { font-size: 0.72rem; color: rgba(255,255,255,0.6); flex-shrink: 0; }
+    .gold-row { height: 1px; background: rgba(255,215,0,0.18); margin: 7px 0; }
+
+    /* Equalizer bars */
+    .pl-eq { display:flex; align-items:flex-end; gap:2px; height:18px; flex-shrink:0; }
+    .pl-eq i { display:block; width:3px; background:#FFD700; border-radius:2px;
+      animation: eq-bar 0.7s ease-in-out infinite alternate; }
+    .pl-eq i:nth-child(1) { height:8px;  animation-duration:0.55s; }
+    .pl-eq i:nth-child(2) { height:14px; animation-duration:0.80s; animation-delay:0.18s; }
+    .pl-eq i:nth-child(3) { height:10px; animation-duration:0.62s; animation-delay:0.32s; }
+    @keyframes eq-bar { from { height:4px; opacity:0.55; } to { height:18px; opacity:1; } }
+
+    /* ══════════════════════════════════
+       OPTION A — Progress full width row
+    ══════════════════════════════════ */
+    .opt-a .row1 { display:flex; align-items:center; gap:10px; margin-bottom:0; }
+    .opt-a .row2 { display:flex; align-items:center; gap:8px; margin-top:7px; }
+    .opt-a .row3 { display:flex; align-items:center; gap:8px; margin-top:7px; }
+    .opt-a .row3 .controls { display:flex; align-items:center; gap:2px; flex-shrink:0; }
+    .opt-a .row3 .vol-wrap  { display:flex; align-items:center; gap:6px; flex:1; min-width:0; }
+    .opt-a .pl-vol-range    { flex:1; }
+
+    /* ══════════════════════════════════
+       OPTION B — Big centered play button
+    ══════════════════════════════════ */
+    .opt-b .row1 { display:flex; align-items:center; gap:10px; }
+    .opt-b .row2 { display:flex; align-items:center; justify-content:center; gap:16px; margin-top:8px; }
+    .opt-b .row3 { display:flex; align-items:center; gap:8px; margin-top:8px; }
+    .opt-b .pl-vol-range { flex:1; }
+
+    /* ══════════════════════════════════
+       OPTION C — Spotify style centered title
+    ══════════════════════════════════ */
+    .opt-c .row1 { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .opt-c .row1 .pl-title { text-align:center; }
+    .opt-c .row2 { display:flex; align-items:center; gap:8px; margin-top:7px; }
+    .opt-c .row3 { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:8px; }
+    .opt-c .row3 .vol-left  { display:flex; align-items:center; gap:5px; width:90px; }
+    .opt-c .row3 .controls  { display:flex; align-items:center; gap:4px; }
+    .opt-c .vol-left .pl-vol-range { flex:1; width:60px; }
+  </style>
+</head>
+<body>
+
+<h1>Mobile Player Bar — Design Preview</h1>
+<p class="subtitle">3-row layout options — all sized to phone width (390px)</p>
+
+<!-- ══ OPTION A ══ -->
+<div class="phone-wrap">
+  <div class="option-label">Option A — Progress Full Width (Recommended)</div>
+  <div class="option-note">Row 1: icon + title + ✕ &nbsp;|&nbsp; Row 2: full-width scrubber &nbsp;|&nbsp; Row 3: controls + horizontal volume</div>
+  <div class="player-bar opt-a">
+    <!-- Row 1 -->
+    <div class="row1">
+      <div class="pl-eq"><i></i><i></i><i></i></div>
+      <span class="pl-title">Pallandu Pallandu Vazhiye Vazhiye</span>
+      <button class="pl-close">✕</button>
+    </div>
+    <div class="gold-row"></div>
+    <!-- Row 2: full width progress -->
+    <div class="row2">
+      <span class="pl-time">0:09</span>
+      <input class="pl-range" type="range" value="4" min="0" max="100" style="flex:1;" />
+      <span class="pl-time">3:46</span>
+    </div>
+    <!-- Row 3: controls + volume -->
+    <div class="row3">
+      <div class="controls">
+        <button class="pl-btn">⏮</button>
+        <button class="pl-play">⏸</button>
+        <button class="pl-btn">⏭</button>
+      </div>
+      <div class="vol-wrap">
+        <span class="pl-vol-icon">🔊</span>
+        <input class="pl-vol-range" type="range" value="80" min="0" max="100" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ OPTION B ══ -->
+<div class="phone-wrap">
+  <div class="option-label">Option B — Big Centered Play Button</div>
+  <div class="option-note">Row 1: icon + title + ✕ &nbsp;|&nbsp; Row 2: big centered ⏮ ▶ ⏭ &nbsp;|&nbsp; Row 3: progress + volume</div>
+  <div class="player-bar opt-b">
+    <!-- Row 1 -->
+    <div class="row1">
+      <div class="pl-eq"><i></i><i></i><i></i></div>
+      <span class="pl-title">Pallandu Pallandu Vazhiye Vazhiye</span>
+      <button class="pl-close">✕</button>
+    </div>
+    <div class="gold-row"></div>
+    <!-- Row 2: big centered controls -->
+    <div class="row2">
+      <button class="pl-btn" style="font-size:1.4rem;">⏮</button>
+      <button class="pl-play pl-play-lg">⏸</button>
+      <button class="pl-btn" style="font-size:1.4rem;">⏭</button>
+    </div>
+    <!-- Row 3: progress + vol -->
+    <div class="row3">
+      <span class="pl-time">0:09</span>
+      <input class="pl-range" type="range" value="4" min="0" max="100" />
+      <span class="pl-time">3:46</span>
+      <span class="pl-vol-icon" style="margin-left:4px;">🔊</span>
+      <input class="pl-vol-range" type="range" value="80" min="0" max="100" style="width:52px;" />
+    </div>
+  </div>
+</div>
+
+<!-- ══ OPTION C ══ -->
+<div class="phone-wrap">
+  <div class="option-label">Option C — Spotify Style</div>
+  <div class="option-note">Row 1: centered title + ✕ &nbsp;|&nbsp; Row 2: full-width progress &nbsp;|&nbsp; Row 3: volume left · controls center</div>
+  <div class="player-bar opt-c">
+    <!-- Row 1: centered title -->
+    <div class="row1">
+      <div class="pl-eq"><i></i><i></i><i></i></div>
+      <span class="pl-title">Pallandu Pallandu Vazhiye Vazhiye</span>
+      <button class="pl-close">✕</button>
+    </div>
+    <div class="gold-row"></div>
+    <!-- Row 2: full progress -->
+    <div class="row2">
+      <span class="pl-time">0:09</span>
+      <input class="pl-range" type="range" value="4" min="0" max="100" style="flex:1;" />
+      <span class="pl-time">3:46</span>
+    </div>
+    <!-- Row 3: vol left · controls center -->
+    <div class="row3">
+      <div class="vol-left">
+        <span class="pl-vol-icon">🔊</span>
+        <input class="pl-vol-range" type="range" value="80" min="0" max="100" />
+      </div>
+      <div class="controls">
+        <button class="pl-btn">⏮</button>
+        <button class="pl-play">⏸</button>
+        <button class="pl-btn">⏭</button>
+      </div>
+      <div style="width:90px;"></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
