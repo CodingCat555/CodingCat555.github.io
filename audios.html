@@ -97,13 +97,36 @@
       background: rgba(0,0,0,0.55); color: var(--gold);
       padding: 3px 9px; border-radius: 50px; font-size: 0.72rem; font-weight: 700;
     }
-    .audio-cat-badge {
-      position: absolute; top: 10px; right: 10px;
-      background: rgba(255,215,0,0.18); color: var(--gold);
-      border: 1px solid rgba(255,215,0,0.35);
-      padding: 3px 9px; border-radius: 50px; font-size: 0.7rem; font-weight: 700;
-      text-transform: capitalize;
+    /* Audio card wrapper — share menu sits here so it isn't clipped by card's overflow:hidden */
+    .audio-card-wrap { position: relative; }
+    .audio-card-wrap.share-open { z-index: 200; }
+
+    /* ── Share button & dropdown (matches photo gallery design) ── */
+    .gallery-share { position:absolute; top:11px; right:11px; z-index:10; }
+    .share-toggle {
+      width:34px; height:34px; border-radius:50%; border:none; cursor:pointer;
+      background:rgba(15,69,32,0.88); color:#FFD700; font-size:1rem;
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:0 2px 10px rgba(0,0,0,0.22); transition:all 0.2s;
     }
+    .share-toggle:hover { background:var(--green); transform:scale(1.12); }
+    .share-menu {
+      position:absolute; top:38px; right:0; background:white;
+      border-radius:8px; box-shadow:0 4px 20px rgba(0,0,0,0.18);
+      border:1px solid #ddd; padding:4px; min-width:150px; display:none; z-index:99;
+    }
+    .share-menu.open { display:block; }
+    .share-option {
+      display:flex; align-items:center; gap:7px; padding:6px 10px; border-radius:6px;
+      cursor:pointer; font-size:0.8rem; font-weight:600; color:#333;
+      border:none; background:none; width:100%; text-align:left; transition:background 0.15s;
+    }
+    .share-option:hover { background:#f4f4f4; }
+    .share-option .sh-icon { width:18px; height:18px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; flex-shrink:0; }
+    .sh-native { background:var(--green); color:white; }
+    .sh-wa     { background:#25d366;      color:white; }
+    .sh-dl     { background:#e67e22;      color:white; }
+    .share-divider { height:1px; background:#eee; margin:3px 0; }
 
     /* ── Audio Info ── */
     .audio-info {
@@ -212,13 +235,29 @@
 
     /* Track info */
     .pl-info { display:flex; align-items:center; gap:10px; flex:1; min-width:0; }
-    .pl-icon  { font-size:1.9rem; flex-shrink:0; line-height:1; }
+    .pl-icon-wrap { flex-shrink:0; width:2rem; height:2rem; display:flex; align-items:center; justify-content:center; }
+    .pl-icon  { font-size:1.9rem; line-height:1; }
     .pl-meta  { min-width:0; }
     .pl-title {
-      color:white; font-size:0.88rem; font-weight:700;
+      color:white; font-size:0.95rem; font-weight:700;
       white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:240px;
     }
-    .pl-cat { color:rgba(255,215,0,0.72); font-size:0.7rem; text-transform:capitalize; margin-top:2px; }
+
+    /* Equalizer bars — shown when #audioPlayer has .playing class */
+    .pl-eq { display:none; align-items:flex-end; gap:2px; height:22px; }
+    .pl-eq i {
+      display:block; width:3px; background:#FFD700; border-radius:2px;
+      animation: eq-bar 0.7s ease-in-out infinite alternate;
+    }
+    .pl-eq i:nth-child(1) { animation-duration:0.55s; animation-delay:0s;    }
+    .pl-eq i:nth-child(2) { animation-duration:0.80s; animation-delay:0.18s; }
+    .pl-eq i:nth-child(3) { animation-duration:0.62s; animation-delay:0.32s; }
+    @keyframes eq-bar {
+      from { height:4px;  opacity:0.55; }
+      to   { height:20px; opacity:1;    }
+    }
+    #audioPlayer.playing .pl-icon { display:none; }
+    #audioPlayer.playing .pl-eq   { display:flex; }
 
     /* Controls */
     .pl-controls { display:flex; align-items:center; gap:6px; flex-shrink:0; }
@@ -244,7 +283,7 @@
     .pl-bar::-webkit-slider-thumb {
       -webkit-appearance:none; width:14px; height:14px;
       background:#FFD700; border-radius:50%; cursor:pointer;
-      box-shadow:0 0 4px rgba(0,0,0,0.4);
+      box-shadow:0 0 4px rgba(0,0,0,0.4), 0 0 8px 2px rgba(255,215,0,0.5);
     }
     .pl-bar::-moz-range-thumb {
       width:14px; height:14px; background:#FFD700;
@@ -268,13 +307,14 @@
       border:none; border-radius:50%; cursor:pointer;
     }
 
-    /* Close */
+    /* Close — pill style */
     .pl-close {
-      background:none; border:none; color:rgba(255,255,255,0.4);
-      font-size:1rem; cursor:pointer; padding:5px 7px;
-      border-radius:5px; transition:all 0.15s; flex-shrink:0;
+      background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18);
+      color:rgba(255,255,255,0.55); font-size:0.82rem; cursor:pointer;
+      padding:4px 9px; border-radius:20px; transition:all 0.18s; flex-shrink:0;
+      line-height:1;
     }
-    .pl-close:hover { background:rgba(255,255,255,0.13); color:white; }
+    .pl-close:hover { background:rgba(255,255,255,0.2); color:white; border-color:rgba(255,255,255,0.4); }
 
     /* Card — now playing highlight */
     .audio-card.now-playing {
@@ -325,7 +365,11 @@
         /* position: fixed is kept from base style — do NOT override */
       }
       /* Row 1: title flush left, spans both columns */
-      .pl-info  { grid-area: info; min-width: 0; }
+      .pl-info  {
+        grid-area: info; min-width: 0;
+        border-bottom: 1px solid rgba(255,215,0,0.18);
+        padding-bottom: 4px;
+      }
       /* Row 2: controls auto, progress fills */
       .pl-controls { grid-area: ctrl; }
       .pl-progress { grid-area: prog; display: flex; min-width: 0; }
@@ -423,10 +467,12 @@
 <!-- ===== GLOBAL AUDIO PLAYER BAR ===== -->
 <div id="audioPlayer">
   <div class="pl-info">
-    <span class="pl-icon" id="plIcon">🎵</span>
+    <div class="pl-icon-wrap">
+      <span class="pl-icon" id="plIcon">🎵</span>
+      <span class="pl-eq"><i></i><i></i><i></i></span>
+    </div>
     <div class="pl-meta">
       <div class="pl-title" id="plTitle">No track selected</div>
-      <div class="pl-cat"  id="plCat"></div>
     </div>
   </div>
   <div class="pl-controls">
@@ -460,6 +506,9 @@ $(function () {
   var loadedCount     = 0;
   var scrollObserver  = null;
 
+  var SVG_SHARE = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>';
+  var isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
   /* Audio category icon map */
   var CAT_ICONS = {
     discourse : '🎙',
@@ -486,6 +535,7 @@ $(function () {
 
   function setPlayIcon(playing) {
     $('#plPlayPause').html(playing ? '⏸' : '▶');
+    $('#audioPlayer').toggleClass('playing', playing);
   }
 
   function updateProgressBar() {
@@ -512,7 +562,6 @@ $(function () {
 
     /* Update player UI */
     $('#plTitle').text(a.name  || 'Unknown Track');
-    $('#plCat').text(a.category || '');
     $('#plIcon').text(CAT_ICONS[(a.category || '').toLowerCase()] || '🎵');
     $('#plCurrent').text('0:00');
     $('#plTotal').text(a.duration || '--:--');
@@ -619,6 +668,87 @@ $(function () {
     setPlayIcon(false);
   });
 
+  /* ══════════════════════════════════════════════════════════
+     Share / Download handlers
+  ══════════════════════════════════════════════════════════ */
+  function getAudioShareData($el) {
+    var $s = $el.closest('.gallery-share');
+    return { audio: $s.data('audio'), name: $s.data('name') };
+  }
+
+  function fetchAudioFile(src, name) {
+    return fetch(src)
+      .then(function (r) { return r.blob(); })
+      .then(function (blob) {
+        var ext = (blob.type.split('/')[1] || 'mp3').split(';')[0];
+        return new File([blob], 'yogi-ramsuratkumar-' + name.replace(/\s+/g, '-') + '.' + ext, { type: blob.type });
+      });
+  }
+
+  function closeAllShareMenus() {
+    $('.share-menu').removeClass('open');
+    $('.audio-card-wrap.share-open').removeClass('share-open');
+  }
+
+  /* Toggle share dropdown */
+  $(document).on('click', '.share-toggle', function (e) {
+    e.stopPropagation();
+    var $menu = $(this).next('.share-menu');
+    var $wrap = $(this).closest('.audio-card-wrap');
+    var isOpen = $menu.hasClass('open');
+    closeAllShareMenus();
+    if (!isOpen) { $menu.addClass('open'); $wrap.addClass('share-open'); }
+  });
+
+  /* 📤 Share Audio — Web Share API */
+  $(document).on('click', '.share-audio-native', function (e) {
+    e.stopPropagation();
+    closeAllShareMenus();
+    var d = getAudioShareData($(this));
+    var $icon = $(this).find('.sh-icon');
+    $icon.text('⏳');
+    fetchAudioFile(d.audio, d.name).then(function (file) {
+      var sd = { title: 'Yogi Ramsuratkumar — ' + d.name, files: [file] };
+      if (navigator.canShare && navigator.canShare(sd)) return navigator.share(sd);
+      if (navigator.share) return navigator.share({ title: sd.title, url: window.location.href });
+      /* Desktop fallback: download */
+      var a = document.createElement('a'); a.href = d.audio; a.download = file.name; a.click();
+    }).catch(function (err) {
+      if (err.name !== 'AbortError') console.warn('Share failed:', err);
+    }).finally(function () { $icon.text('📤'); });
+  });
+
+  /* 💬 WhatsApp */
+  $(document).on('click', '.share-audio-whatsapp', function (e) {
+    e.stopPropagation();
+    closeAllShareMenus();
+    var d = getAudioShareData($(this));
+    var $icon = $(this).find('.sh-icon');
+    $icon.text('⏳');
+    fetchAudioFile(d.audio, d.name).then(function (file) {
+      var sd = { title: 'Yogi Ramsuratkumar — ' + d.name, files: [file] };
+      if (navigator.canShare && navigator.canShare(sd)) return navigator.share(sd);
+      if (navigator.share) return navigator.share({ title: sd.title, url: window.location.href.split('?')[0] });
+    }).catch(function (err) {
+      if (err.name !== 'AbortError') console.warn('WhatsApp share failed:', err);
+    }).finally(function () { $icon.html('&#128172;'); });
+  });
+
+  /* ⬇ Download Audio */
+  $(document).on('click', '.share-audio-download', function (e) {
+    e.stopPropagation();
+    closeAllShareMenus();
+    var d = getAudioShareData($(this));
+    var a = document.createElement('a');
+    a.href = d.audio;
+    a.download = 'yogi-ramsuratkumar-' + d.name.replace(/\s+/g, '-') + '.mp3';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  });
+
+  /* Close menus on outside click */
+  $(document).on('click', function () { closeAllShareMenus(); });
+  $(document).on('click', '.share-menu', function (e) { e.stopPropagation(); });
+
   /* ── Card play button click ── */
   $(document).on('click', '.audio-play-btn', function () {
     var serial = parseInt($(this).closest('.audio-card').data('serial'), 10);
@@ -669,11 +799,10 @@ $(function () {
       'data-serial'  : a.serial
     });
 
-    /* Thumb strip */
+    /* Thumb strip — no category badge */
     var $thumb = $('<div class="audio-thumb">').append(
       '<span class="audio-thumb-icon">' + icon + '</span>',
-      '<span class="serial-badge audio-serial">' + serial + '</span>',
-      '<span class="audio-cat-badge">' + (a.category || '') + '</span>'
+      '<span class="serial-badge audio-serial">' + serial + '</span>'
     );
 
     /* Info */
@@ -693,7 +822,23 @@ $(function () {
     }
 
     $card.append($thumb, $info);
-    return $card;
+
+    /* Wrap with share menu (outside card so dropdown isn't clipped) */
+    return $('<div class="audio-card-wrap">').append($card, makeAudioShareMenu(a));
+  }
+
+  function makeAudioShareMenu(a) {
+    if (!a.audioFile) return '';
+    return '<div class="gallery-share" data-audio="' + a.audioFile +
+        '" data-name="' + (a.name || '').replace(/"/g, '&quot;') + '">' +
+      '<button class="share-toggle" title="Share Audio">' + SVG_SHARE + '</button>' +
+      '<div class="share-menu">' +
+        '<button class="share-option share-audio-native"><span class="sh-icon sh-native">📤</span> Share Audio</button>' +
+        '<button class="share-option share-audio-whatsapp"><span class="sh-icon sh-wa">💬</span> WhatsApp</button>' +
+        '<div class="share-divider"></div>' +
+        '<button class="share-option share-audio-download"><span class="sh-icon sh-dl">⬇</span> Download Audio</button>' +
+      '</div>' +
+    '</div>';
   }
 
   function appendBatch() {
