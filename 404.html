@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Page Not Found — Yogi Ramsuratkumar</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .not-found-section {
+      min-height: 80vh;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; padding: 80px 24px;
+    }
+    .not-found-inner { max-width: 560px; }
+    .nf-code {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(5rem, 18vw, 9rem);
+      font-weight: 700; line-height: 1;
+      background: linear-gradient(135deg, var(--green), var(--gold));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; display: block; margin-bottom: 8px;
+    }
+    .nf-icon { font-size: 3rem; margin-bottom: 16px; display: block; animation: float 4s ease-in-out infinite; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    .nf-title { font-family: 'Cinzel', serif; font-size: 1.5rem; color: var(--text-dark); margin-bottom: 12px; }
+    .nf-msg { font-size: 0.95rem; color: var(--text-light); line-height: 1.75; margin-bottom: 28px; }
+    .nf-quote {
+      background: rgba(26,107,46,0.07); border-left: 4px solid var(--green);
+      padding: 16px 20px; border-radius: var(--radius);
+      font-style: italic; font-size: 0.88rem; color: var(--text-body);
+      line-height: 1.7; margin-bottom: 32px; text-align: left;
+    }
+    .nf-quote cite { display: block; margin-top: 8px; font-size: 0.78rem; color: var(--green); font-style: normal; font-weight: 700; }
+    .nf-links { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  </style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="header" id="header"></header>
+<div class="menu-overlay" id="menuOverlay"></div>
+
+<!-- ===== 404 SECTION ===== -->
+<section class="not-found-section">
+  <div class="not-found-inner fade-in">
+
+    <span class="nf-icon">🪔</span>
+    <span class="nf-code">404</span>
+    <h1 class="nf-title">Page Not Found</h1>
+    <p class="nf-msg">
+      The page you are looking for may have been moved, renamed, or does not exist.<br>
+      But Swamiji's grace is always present — let us guide you back.
+    </p>
+
+    <div class="nf-quote">
+      "My Father's name is everything. Everything is His name.<br>
+      Repeat His name — that is all."
+      <cite>— Sri Yogi Ramsuratkumar</cite>
+    </div>
+
+    <div class="nf-links">
+      <a href="index.html" class="btn btn-saffron">🏠 Go Home</a>
+      <a href="about.html" class="btn btn-outline" style="color:var(--green);border-color:var(--green);">About Swamiji</a>
+      <a href="photos.html" class="btn btn-outline" style="color:var(--green);border-color:var(--green);">Photo Gallery</a>
+      <a href="contact.html" class="btn btn-outline" style="color:var(--green);border-color:var(--green);">Contact</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer"></footer>
+
+<button class="scroll-top" id="scrollTop" aria-label="Scroll to top">↑</button>
+<script src="js/nav.js"></script>
+<script src="js/main.js"></script>
+<script src="data/version.js"></script>
+<script src="js/footer.js"></script>
+<script src="data/lang/en.js"></script>
+<script src="data/lang/ta.js"></script>
+<script src="data/lang-loader.js"></script>
+</body>
+</html>

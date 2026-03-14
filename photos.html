@@ -5,6 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Photo Gallery — Yogi Ramsuratkumar</title>
   <link rel="stylesheet" href="css/style.css" />
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:site_name"   content="Yogi Ramsuratkumar" />
+  <meta property="og:url"         content="https://YOURDOMAIN.com/photos.html" />
+  <meta property="og:title"       content="Photo Gallery — Yogi Ramsuratkumar" />
+  <meta property="og:description" content="A visual journey through the divine life of Swamiji — darshan, ashram, festivals, and intimate moments with devotees." />
+  <meta property="og:image"       content="https://YOURDOMAIN.com/images/swami-main.jpg" />
+  <meta property="og:locale"      content="en_IN" />
+  <meta name="twitter:card"       content="summary_large_image" />
   <!-- SheetJS (reads Excel) + jQuery -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <!-- Static data files -->
@@ -278,6 +287,7 @@ $(function () {
       '<button class="share-toggle" title="Share Photo">' + SVG_SHARE + '</button>' +
       '<div class="share-menu">' +
         '<button class="share-option share-native"><span class="sh-icon sh-native">📤</span> Share Photo</button>' +
+        '<button class="share-option share-whatsapp"><span class="sh-icon sh-wa">💬</span> WhatsApp</button>' +
         '<div class="share-divider"></div>' +
         '<button class="share-option share-download"><span class="sh-icon sh-dl">⬇</span> Download Photo</button>' +
       '</div>' +

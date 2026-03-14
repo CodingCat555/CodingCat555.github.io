@@ -1,0 +1,13 @@
+# Yogi Ramsuratkumar Website — robots.txt
+# Replace YOURDOMAIN.com with your actual domain after deployment
+
+User-agent: *
+Allow: /
+
+# Block tools and raw data files from being indexed
+Disallow: /tools/
+Disallow: /data/
+Disallow: /functions/
+
+# Sitemap location
+Sitemap: https://YOURDOMAIN.com/sitemap.xml

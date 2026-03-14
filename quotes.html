@@ -6,6 +6,15 @@
   <title>Quotes — Yogi Ramsuratkumar</title>
   <meta name="description" content="Sacred words and divine quotes of Sri Yogi Ramsuratkumar." />
   <link rel="stylesheet" href="css/style.css" />
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:site_name"   content="Yogi Ramsuratkumar" />
+  <meta property="og:url"         content="https://YOURDOMAIN.com/quotes.html" />
+  <meta property="og:title"       content="Sacred Quotes — Yogi Ramsuratkumar" />
+  <meta property="og:description" content="Sacred words and divine quotes of Sri Yogi Ramsuratkumar — timeless wisdom for seekers of all faiths." />
+  <meta property="og:image"       content="https://YOURDOMAIN.com/images/swami-main.jpg" />
+  <meta property="og:locale"      content="en_IN" />
+  <meta name="twitter:card"       content="summary_large_image" />
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <!-- Static data files -->
   <script src="data/photos.js"></script>
@@ -149,6 +158,7 @@
     .share-option .sh-icon { width:18px; height:18px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; flex-shrink:0; }
     .sh-native { background:var(--green); color:white; }
     .sh-dl     { background:#e67e22; color:white; }
+    .sh-wa     { background:#25d366; color:white; }
     .share-divider { height:1px; background:#eee; margin:3px 0; }
 
     /* ── Fade-in ── */
@@ -277,6 +287,7 @@ $(function () {
       $('<button class="share-toggle" title="Share">').html('<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>'),
       $('<div class="share-menu">').append(
         $('<button class="share-option share-native">').attr('data-img', imgPath).attr('data-name', name).append('<span class="sh-icon sh-native">📤</span> Share Photo'),
+        $('<button class="share-option share-whatsapp">').attr('data-img', imgPath).attr('data-name', name).append('<span class="sh-icon sh-wa">💬</span> WhatsApp'),
         '<div class="share-divider"></div>',
         $('<button class="share-option share-download">').attr('data-img', imgPath).attr('data-name', name).append('<span class="sh-icon sh-dl">⬇</span> Download Photo')
       )
@@ -385,6 +396,18 @@ $(function () {
     }).catch(function () {
       var a = document.createElement('a'); a.href = img; a.download = img.split('/').pop(); a.click();
     }).finally(function () { $icon.text('⬇'); });
+  });
+
+  /* 💬 WhatsApp — share the quote text */
+  $(document).on('click', '.quote-share .share-whatsapp', function (e) {
+    e.stopPropagation(); closeAllShareMenus();
+    var $card = $(this).closest('.quote-card');
+    var lang  = curLang();
+    var text  = (lang === 'ta' && $card.data('ta')) ? $card.data('ta') : ($card.data('en') || '');
+    var src   = $card.data('source') ? '\n— ' + $card.data('source') : '';
+    var url   = '\n\n🙏 ' + window.location.href.split('?')[0];
+    var msg   = encodeURIComponent('"' + text + '"' + src + url);
+    window.open('https://wa.me/?text=' + msg, '_blank');
   });
 
   $(document).on('click', function () { closeAllShareMenus(); });
