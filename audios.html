@@ -59,10 +59,10 @@
       box-shadow: 0 8px 28px rgba(26,107,46,0.18);
     }
 
-    /* ── Audio Thumb (top coloured strip) ── */
+    /* ── Audio Thumb ── */
     .audio-thumb {
       position: relative;
-      height: 110px;
+      height: 130px;
       background: linear-gradient(135deg, #061A0E 0%, #0F4520 60%, #1A6B2E 100%);
       display: flex;
       align-items: center;
@@ -71,27 +71,46 @@
     }
     .audio-thumb::before {
       content: '';
-      position: absolute;
-      inset: 0;
+      position: absolute; inset: 0;
       background: repeating-linear-gradient(
-        45deg,
-        transparent,
-        transparent 10px,
-        rgba(255,215,0,0.04) 10px,
-        rgba(255,215,0,0.04) 20px
+        90deg,
+        transparent 0px, transparent 3px,
+        rgba(255,215,0,0.04) 3px, rgba(255,215,0,0.04) 4px
       );
     }
-    .audio-thumb-icon {
-      font-size: 3rem;
-      position: relative;
-      z-index: 1;
-      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
-      animation: pulse-icon 3s ease-in-out infinite;
+
+    /* Waveform bars at bottom of thumb */
+    .audio-wave {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      display: flex; align-items: flex-end; justify-content: center;
+      gap: 2px; padding: 0 10px;
+      height: 50px; opacity: 0.28;
+      transform-origin: bottom;
     }
-    @keyframes pulse-icon {
-      0%, 100% { transform: scale(1); opacity: 0.85; }
-      50%       { transform: scale(1.08); opacity: 1; }
+    .audio-wave span {
+      display: block; width: 3px;
+      background: #FFD700; border-radius: 2px 2px 0 0;
+      flex-shrink: 0;
     }
+
+    /* Circular play button — centred on thumb */
+    .audio-play-circle {
+      position: relative; z-index: 2;
+      width: 52px; height: 52px; border-radius: 50%;
+      background: rgba(255,215,0,0.92);
+      border: 3px solid rgba(255,255,255,0.25);
+      cursor: pointer; color: #0F4520; font-size: 1.25rem;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      transition: all 0.2s;
+      padding-left: 3px; /* optical centre for ▶ */
+    }
+    .audio-play-circle:hover {
+      transform: scale(1.12);
+      background: #FFD700;
+      box-shadow: 0 4px 28px rgba(255,215,0,0.55);
+    }
+
     .serial-badge.audio-serial {
       position: absolute; top: 10px; left: 10px;
       background: rgba(0,0,0,0.55); color: var(--gold);
@@ -162,39 +181,11 @@
       flex-wrap: wrap;
     }
 
-    /* ── Audio Player ── */
-    .audio-player-wrap {
-      margin-top: 4px;
+    /* ── Category text in card info ── */
+    .audio-cat-text {
+      font-size: 0.7rem; color: var(--text-light);
+      text-transform: capitalize; font-style: italic;
     }
-    .audio-player-wrap audio {
-      width: 100%;
-      height: 36px;
-      border-radius: 8px;
-      outline: none;
-      accent-color: var(--green);
-    }
-    /* Custom play button for lazy load */
-    .audio-play-btn {
-      width: 100%;
-      padding: 9px 0;
-      background: linear-gradient(135deg, var(--green), var(--green-dark));
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
-      transition: all 0.2s;
-    }
-    .audio-play-btn:hover {
-      background: linear-gradient(135deg, var(--green-dark), #071a0a);
-      transform: translateY(-1px);
-    }
-    .audio-play-btn .play-icon { font-size: 1rem; }
 
     /* ── Gallery utilities ── */
     .gallery-counter { text-align:center; font-size:0.82rem; color:var(--text-light); margin-bottom:20px; }
@@ -316,7 +307,7 @@
     }
     .pl-close:hover { background:rgba(255,255,255,0.2); color:white; border-color:rgba(255,255,255,0.4); }
 
-    /* Card — now playing highlight */
+    /* Card — loaded / paused state: gold border + darker thumb */
     .audio-card.now-playing {
       border-color: #FFD700 !important;
       box-shadow: 0 0 0 2px rgba(255,215,0,0.35), 0 8px 28px rgba(26,107,46,0.2) !important;
@@ -324,26 +315,29 @@
     .audio-card.now-playing .audio-thumb {
       background: linear-gradient(135deg, #1a4a00 0%, #2D9148 100%) !important;
     }
-    .audio-card.now-playing .audio-thumb-icon { animation: spin-bounce 1.8s ease-in-out infinite; }
-    @keyframes spin-bounce {
-      0%,100% { transform: scale(1) rotate(-4deg); }
-      50%      { transform: scale(1.12) rotate(4deg); }
-    }
+    /* Waveform visible but frozen when paused */
+    .audio-card.now-playing .audio-wave { opacity: 0.45; }
 
-    /* Play button on card */
-    .audio-play-btn {
-      width:100%; padding:9px 0;
-      background: linear-gradient(135deg, var(--green), var(--green-dark));
-      color:white; border:none; border-radius:8px; cursor:pointer;
-      font-size:0.85rem; font-weight:700;
-      display:flex; align-items:center; justify-content:center; gap:7px;
-      transition:all 0.2s;
+    /* Card — actively playing: waveform animates + circle pulses */
+    .audio-card.is-playing .audio-wave { opacity: 0.75; }
+    .audio-card.is-playing .audio-wave span {
+      animation: wave-bar 0.7s ease-in-out infinite alternate;
     }
-    .audio-play-btn:hover {
-      background: linear-gradient(135deg, var(--green-dark), #071a0a);
-      transform:translateY(-1px);
+    .audio-card.is-playing .audio-wave span:nth-child(2n) { animation-duration: 0.55s; animation-delay: 0.1s; }
+    .audio-card.is-playing .audio-wave span:nth-child(3n) { animation-duration: 0.85s; animation-delay: 0.2s; }
+    .audio-card.is-playing .audio-wave span:nth-child(5n) { animation-duration: 0.65s; animation-delay: 0.35s; }
+    @keyframes wave-bar {
+      from { transform: scaleY(0.25); }
+      to   { transform: scaleY(1); }
     }
-    .audio-play-btn .play-icon { font-size:1rem; }
+    .audio-card.is-playing .audio-play-circle {
+      background: #FFD700; padding-left: 0;
+      animation: circle-pulse 2s ease-in-out infinite;
+    }
+    @keyframes circle-pulse {
+      0%,100% { box-shadow: 0 0 0 4px rgba(255,215,0,0.3), 0 4px 20px rgba(255,215,0,0.5); }
+      50%      { box-shadow: 0 0 0 9px rgba(255,215,0,0.12), 0 4px 28px rgba(255,215,0,0.7); }
+    }
 
     /* Responsive — mobile layout (CSS Grid):
        Col layout: [auto] [1fr]
@@ -536,6 +530,14 @@ $(function () {
   function setPlayIcon(playing) {
     $('#plPlayPause').html(playing ? '⏸' : '▶');
     $('#audioPlayer').toggleClass('playing', playing);
+    /* Sync active card circle + is-playing animation class */
+    if (gIdx >= 0 && gList[gIdx]) {
+      var $activeCard = $('.audio-card[data-serial="' + gList[gIdx].serial + '"]');
+      $activeCard.toggleClass('is-playing', playing);
+      $activeCard.find('.audio-play-circle')
+        .text(playing ? '⏸' : '▶')
+        .css('padding-left', playing ? '0' : '3px');
+    }
   }
 
   function updateProgressBar() {
@@ -567,8 +569,9 @@ $(function () {
     $('#plTotal').text(a.duration || '--:--');
     updateProgressBar();
 
-    /* Highlight active card */
-    $('.audio-card').removeClass('now-playing');
+    /* Reset all cards, then highlight active */
+    $('.audio-play-circle').text('▶').css('padding-left', '3px');
+    $('.audio-card').removeClass('now-playing is-playing');
     $('.audio-card[data-serial="' + a.serial + '"]').addClass('now-playing');
 
     /* Show player bar */
@@ -661,10 +664,11 @@ $(function () {
   $('#plClose').on('click', function () {
     gAudio.pause();
     gAudio.src = '';
+    $('.audio-play-circle').text('▶').css('padding-left', '3px');
     gIdx = -1;
     $('#audioPlayer').removeClass('visible');
     $('body').removeClass('player-open');
-    $('.audio-card').removeClass('now-playing');
+    $('.audio-card').removeClass('now-playing is-playing');
     setPlayIcon(false);
   });
 
@@ -749,12 +753,19 @@ $(function () {
   $(document).on('click', function () { closeAllShareMenus(); });
   $(document).on('click', '.share-menu', function (e) { e.stopPropagation(); });
 
-  /* ── Card play button click ── */
-  $(document).on('click', '.audio-play-btn', function () {
+  /* ── Card circular play button click ── */
+  $(document).on('click', '.audio-play-circle', function () {
     var serial = parseInt($(this).closest('.audio-card').data('serial'), 10);
     var idx    = -1;
     gList.forEach(function (a, i) { if (a.serial === serial) idx = i; });
-    if (idx >= 0) loadTrack(idx, true);
+    if (idx < 0) return;
+    /* If same track — toggle play/pause */
+    if (idx === gIdx) {
+      if (gAudio.paused) { gAudio.play().catch(function(){}); }
+      else               { gAudio.pause(); }
+    } else {
+      loadTrack(idx, true);
+    }
   });
 
   /* ══════════════════════════════════════════════════════════
@@ -787,39 +798,45 @@ $(function () {
     appendBatch();
   }
 
+  /* Waveform bars — unique pattern per serial number */
+  function makeWaveform(seed) {
+    var bars = '';
+    for (var i = 0; i < 28; i++) {
+      var h = 4 + Math.round(Math.abs(Math.sin(seed * 0.5 + i * 1.1) * 40));
+      bars += '<span style="height:' + h + 'px"></span>';
+    }
+    return '<div class="audio-wave">' + bars + '</div>';
+  }
+
   function makeCard(a) {
     var serial  = '#' + String(a.serial).padStart(2, '0');
-    var catKey  = (a.category || '').toLowerCase();
-    var icon    = CAT_ICONS[catKey] || '🎵';
     var durHtml = a.duration ? '<span class="dur-badge">⏱ ' + a.duration + '</span>' : '';
+    var catHtml = a.category ? '<span class="audio-cat-text">' + a.category + '</span>'  : '';
 
     var $card = $('<div>', {
-      'class'       : 'audio-card fade-in',
+      'class'        : 'audio-card fade-in',
       'data-category': a.category,
       'data-serial'  : a.serial
     });
 
-    /* Thumb strip — no category badge */
+    /* Thumb — waveform background + serial badge + circular play button */
     var $thumb = $('<div class="audio-thumb">').append(
-      '<span class="audio-thumb-icon">' + icon + '</span>',
+      makeWaveform(a.serial),
       '<span class="serial-badge audio-serial">' + serial + '</span>'
     );
+    if (a.audioFile) {
+      $thumb.append('<button class="audio-play-circle" title="Play">▶</button>');
+    }
 
-    /* Info */
+    /* Info — title, description, meta row */
+    var $meta = (durHtml || catHtml)
+      ? $('<div class="audio-meta">').append(durHtml + catHtml)
+      : null;
     var $info = $('<div class="audio-info">').append(
       '<h3 class="audio-title">' + $('<div>').text(a.name).html() + '</h3>',
-      a.description
-        ? '<p class="audio-desc">' + $('<div>').text(a.description).html() + '</p>'
-        : '',
-      durHtml ? '<div class="audio-meta">' + durHtml + '</div>' : ''
+      a.description ? '<p class="audio-desc">' + $('<div>').text(a.description).html() + '</p>' : '',
+      $meta
     );
-
-    /* Play button — loads track into global player */
-    if (a.audioFile) {
-      var $playBtn = $('<button class="audio-play-btn">')
-        .html('<span class="play-icon">▶</span> <span>' + t('btn_play') + '</span>');
-      $info.append($('<div class="audio-player-wrap">').append($playBtn));
-    }
 
     $card.append($thumb, $info);
 
