@@ -477,6 +477,14 @@ $(function () {
   /* ── Init ── */
   if (SITE_DATA.loaded && SITE_DATA.photos.length) {
     buildAndRender();
+    /* Auto-apply category filter from ?cat= URL param */
+    (function () {
+      var cat = new URLSearchParams(window.location.search).get('cat');
+      if (cat) {
+        var $btn = $('.filter-btn[data-filter="' + cat + '"]');
+        if ($btn.length) $btn.trigger('click');
+      }
+    })();
   } else {
     $('#galleryContainer').html(noDataMsg());
   }

@@ -15,6 +15,20 @@ document.addEventListener('DOMContentLoaded', function () {
   if (hamburger) hamburger.addEventListener('click', () => navMenu.classList.contains('open') ? closeMenu() : openMenu());
   if (overlay)   overlay.addEventListener('click', closeMenu);
 
+  /* Mobile sub-dropdown toggles (e.g. Photos categories inside Gallery dropdown) */
+  document.querySelectorAll('.nav-has-sub').forEach(subItem => {
+    const subLink = subItem.querySelector('a');
+    const subDrop = subItem.querySelector('.sub-dropdown');
+    if (subLink && subDrop) {
+      subLink.addEventListener('click', function (e) {
+        if (window.innerWidth <= 768) {
+          e.preventDefault();
+          subItem.classList.toggle('open');
+        }
+      });
+    }
+  });
+
   /* Mobile dropdown toggles */
   document.querySelectorAll('.nav-item').forEach(item => {
     const link     = item.querySelector('.nav-link');
@@ -226,6 +240,35 @@ document.addEventListener('DOMContentLoaded', function () {
     if (e.key === 'ArrowLeft')  openLightbox(lbIndex - 1);
     if (e.key === 'ArrowRight') openLightbox(lbIndex + 1);
   });
+
+  /* ---- Gallery Category Sub-dropdowns --------------------------- */
+  (function () {
+    var SD = (typeof SITE_DATA !== 'undefined') ? SITE_DATA : null;
+    if (!SD) return;
+
+    function fillDrop(ddId, items, page) {
+      var dd = document.getElementById(ddId);
+      if (!dd) return;
+      var cats = [];
+      (items || []).forEach(function (p) {
+        if (String(p.isActive || 'yes').toLowerCase() === 'no') return;
+        if (p.category && cats.indexOf(p.category) === -1) cats.push(p.category);
+      });
+      cats.forEach(function (cat) {
+        var li = document.createElement('li');
+        var a  = document.createElement('a');
+        a.href = page + '?cat=' + encodeURIComponent(cat);
+        a.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+        li.appendChild(a);
+        dd.appendChild(li);
+      });
+    }
+
+    fillDrop('photoCatDropdown', SD.photos, 'photos.html');
+    fillDrop('videoCatDropdown', SD.videos, 'videos.html');
+    fillDrop('audioCatDropdown', SD.audios, 'audios.html');
+    fillDrop('pdfCatDropdown',   SD.pdfs,   'pdfs.html');
+  })();
 
   /* ---- Smooth scroll for anchor links ---------------------------- */
   document.querySelectorAll('a[href^="#"]').forEach(a => {

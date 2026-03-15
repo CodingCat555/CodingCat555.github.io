@@ -1031,6 +1031,10 @@ $(function () {
   /* ── Init ── */
   if (SITE_DATA.loaded && SITE_DATA.audios && SITE_DATA.audios.length) {
     buildAndRender();
+    (function () {
+      var cat = new URLSearchParams(window.location.search).get('cat');
+      if (cat) { var $btn = $('.filter-btn[data-filter="' + cat + '"]'); if ($btn.length) $btn.trigger('click'); }
+    })();
   } else {
     $('#audioContainer').html(noDataMsg());
   }

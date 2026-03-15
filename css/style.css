@@ -53,9 +53,14 @@ h1, h2, h3, h4, h5, h6 { font-family: 'Cinzel', 'Georgia', serif; color: var(--t
   position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
   background: rgba(240, 255, 244, 0.96);
   backdrop-filter: blur(12px);
-  border-bottom: 2px solid rgba(26, 107, 46, 0.3);
+  border-bottom: 1px solid rgba(26, 107, 46, 0.18);
   box-shadow: 0 2px 20px rgba(15, 69, 32, 0.1);
   transition: var(--transition);
+}
+.header::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold) 20%, var(--green) 50%, var(--gold) 80%, transparent);
+  opacity: 0.55;
 }
 .header.scrolled { box-shadow: 0 4px 30px rgba(15, 69, 32, 0.15); }
 
@@ -85,35 +90,71 @@ h1, h2, h3, h4, h5, h6 { font-family: 'Cinzel', 'Georgia', serif; color: var(--t
   padding: 8px 14px; font-weight: 600; font-size: 0.92rem;
   color: var(--text-dark); border-radius: var(--radius);
   transition: var(--transition); white-space: nowrap; cursor: pointer;
+  position: relative;
 }
-.nav-link:hover, .nav-link.active { color: var(--green); background: rgba(26, 107, 46, 0.08); }
+.nav-link::after {
+  content: ''; position: absolute; bottom: 4px; left: 50%; right: 50%;
+  height: 2px; background: var(--green); border-radius: 2px;
+  transition: left 0.3s ease, right 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+}
+.nav-link:hover::after { left: 14px; right: 14px; opacity: 1; }
+.nav-link.active {
+  color: var(--green-dark);
+}
+.nav-link.active::after { left: 14px; right: 14px; opacity: 1; }
+.nav-link:hover { color: var(--green); background: rgba(26, 107, 46, 0.07); }
 .nav-link .arrow { font-size: 0.65rem; transition: transform 0.3s ease; }
 .nav-item:hover .arrow { transform: rotate(180deg); }
 
 /* Dropdown */
 .dropdown {
   position: absolute; top: calc(100% + 6px); left: 0;
-  min-width: 210px; background: var(--card-bg);
-  border: 1px solid var(--border); border-radius: var(--radius);
-  box-shadow: var(--shadow-hover); opacity: 0; visibility: hidden;
+  min-width: 150px; background: #fff;
+  border: 1px solid rgba(26, 107, 46, 0.15); border-radius: var(--radius);
+  box-shadow: 0 12px 40px rgba(15, 69, 32, 0.15); opacity: 0; visibility: hidden;
   transform: translateY(-8px); transition: all 0.25s ease; z-index: 200;
   padding: 6px;
 }
 .nav-item:hover .dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
 .dropdown li a {
   display: block; padding: 9px 14px; color: var(--text-body);
+  font-size: 0.88rem; transition: var(--transition); border-radius: 5px; font-weight: 500;
+}
+.dropdown li a:hover { color: var(--green); background: rgba(26, 107, 46, 0.07); padding-left: 18px; }
+.dropdown li a::before { content: ''; }
+
+/* Sub-dropdown (nested inside Gallery dropdown) */
+.nav-has-sub { position: relative; }
+.sub-arrow { font-size: 0.65rem; margin-left: 4px; display: inline-block; transition: transform 0.25s ease; }
+.nav-has-sub:hover .sub-arrow { transform: rotate(90deg); }
+.sub-dropdown {
+  position: absolute; left: 100%; top: -6px;
+  min-width: 130px; background: var(--card-bg);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow-hover); opacity: 0; visibility: hidden;
+  transform: translateX(-6px); transition: all 0.22s ease; z-index: 300;
+  padding: 6px;
+}
+.nav-has-sub:hover .sub-dropdown { opacity: 1; visibility: visible; transform: translateX(0); }
+.sub-dropdown li a {
+  display: block; padding: 9px 14px; color: var(--text-body);
   font-size: 0.88rem; transition: var(--transition); border-radius: 5px;
 }
-.dropdown li a:hover { color: var(--green); background: rgba(26, 107, 46, 0.07); }
-.dropdown li a::before { content: '🪔 '; font-size: 0.75rem; }
+.sub-dropdown li a:hover { color: var(--green); background: rgba(26, 107, 46, 0.07); }
 
-/* Nav Share Button — styled as a nav-link */
+/* Nav Share Button */
 .nav-share-btn {
-  background: none; border: none; cursor: pointer;
-  display: flex; align-items: center; gap: 5px;
-  font-size: inherit; font-family: inherit; white-space: nowrap;
+  background: linear-gradient(135deg, var(--green), var(--green-light));
+  border: none; cursor: pointer; color: #fff;
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.85rem; font-family: inherit; font-weight: 600;
+  white-space: nowrap; padding: 7px 16px; border-radius: 50px;
+  box-shadow: 0 3px 10px rgba(26, 107, 46, 0.3);
+  transition: var(--transition);
   justify-content: flex-start !important;
 }
+.nav-share-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(26, 107, 46, 0.4); }
 
 /* Hamburger */
 .hamburger { display: none; flex-direction: column; cursor: pointer; padding: 5px; gap: 5px; background: none; border: none; z-index: 1002; }
@@ -143,7 +184,81 @@ h1, h2, h3, h4, h5, h6 { font-family: 'Cinzel', 'Georgia', serif; color: var(--t
   .nav-item.open .dropdown { display: block; }
   .dropdown li a { padding-left: 32px; }
   .dropdown li a::before { content: ''; }
+  /* Sub-dropdown on mobile */
+  .sub-arrow { font-size: 0.65rem; transition: transform 0.25s ease; }
+  .nav-has-sub.open .sub-arrow { transform: rotate(90deg); }
+  .sub-dropdown {
+    position: static; box-shadow: none; border: none;
+    background: rgba(26,107,46,0.06); opacity: 1; visibility: visible;
+    transform: none; display: none; padding: 0;
+  }
+  .nav-has-sub.open .sub-dropdown { display: block; }
+  .sub-dropdown li a { padding-left: 48px; }
 }
+
+/* ============================================================
+   SHARE MODAL
+   ============================================================ */
+.share-modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px); z-index: 2000;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; visibility: hidden; transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+.share-modal-overlay.active { opacity: 1; visibility: visible; }
+.share-modal {
+  background: #fff; border-radius: 20px; padding: 32px 28px 26px;
+  width: min(420px, 92vw); position: relative;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.28);
+  transform: scale(0.88) translateY(16px);
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.25s ease;
+  opacity: 0;
+}
+.share-modal-overlay.active .share-modal { transform: scale(1) translateY(0); opacity: 1; }
+.share-modal-close {
+  position: absolute; top: 14px; right: 14px;
+  width: 32px; height: 32px; border-radius: 50%;
+  border: none; background: #f0f0f0; color: #888;
+  font-size: 1rem; cursor: pointer; display: flex;
+  align-items: center; justify-content: center; transition: all 0.2s;
+}
+.share-modal-close:hover { background: #e0e0e0; color: #333; }
+.share-modal-header { text-align: center; margin-bottom: 20px; }
+.share-modal-icon {
+  width: 56px; height: 56px; border-radius: 50%; margin: 0 auto 12px;
+  background: linear-gradient(135deg, var(--green), var(--gold));
+  display: flex; align-items: center; justify-content: center; font-size: 24px;
+  box-shadow: 0 6px 20px rgba(26,107,46,0.3);
+}
+.share-modal-header h3 { font-family: 'Cinzel', serif; font-size: 1.1rem; color: var(--text-dark); }
+.share-modal-header p { font-size: 0.78rem; color: var(--text-light); margin-top: 4px; }
+.share-url-box {
+  display: flex; align-items: center; gap: 8px;
+  background: #f7fdf9; border: 1.5px solid rgba(26,107,46,0.2);
+  border-radius: 10px; padding: 10px 14px; margin-bottom: 20px;
+}
+.share-url-box span { flex: 1; font-size: 0.78rem; color: var(--text-light); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.share-url-copy-btn {
+  background: var(--green); color: #fff; border: none; border-radius: 7px;
+  padding: 5px 12px; font-size: 0.75rem; font-weight: 700;
+  cursor: pointer; font-family: inherit; transition: background 0.2s; flex-shrink: 0;
+}
+.share-url-copy-btn:hover { background: var(--green-dark); }
+.share-platforms {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px;
+}
+.share-plat-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
+  padding: 13px 8px; border-radius: 12px; border: 1.5px solid #eee;
+  background: #fff; cursor: pointer; font-size: 0.72rem; font-weight: 600;
+  font-family: inherit; color: #555; transition: all 0.22s;
+}
+.share-plat-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 18px rgba(0,0,0,0.1); border-color: var(--plat-color, #ccc); color: var(--plat-color, #333); }
+.share-plat-icon {
+  width: 42px; height: 42px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+}
+.share-modal-footer { text-align: center; font-size: 0.72rem; color: #ccc; }
 
 /* ============================================================
    HERO SECTION

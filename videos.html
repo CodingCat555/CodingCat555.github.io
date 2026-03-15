@@ -312,6 +312,10 @@ $(function () {
   /* ── Init ── */
   if (SITE_DATA.loaded && SITE_DATA.videos.length) {
     buildAndRender();
+    (function () {
+      var cat = new URLSearchParams(window.location.search).get('cat');
+      if (cat) { var $btn = $('.filter-btn[data-filter="' + cat + '"]'); if ($btn.length) $btn.trigger('click'); }
+    })();
   } else {
     $('#videoContainer').html(noDataMsg());
   }

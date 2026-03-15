@@ -28,10 +28,30 @@
         '<li class="nav-item">' +
           '<a href="photos.html" class="nav-link"><span data-i18n="nav_gallery">Gallery</span> <span class="arrow">▾</span></a>' +
           '<ul class="dropdown">' +
-            '<li><a href="photos.html" data-i18n="nav_gallery_photos">Photo Gallery</a></li>' +
-            '<li><a href="videos.html" data-i18n="nav_gallery_videos">Video Gallery</a></li>' +
-            '<li><a href="audios.html" data-i18n="nav_gallery_audios">Audio Gallery</a></li>' +
-            '<li><a href="pdfs.html" data-i18n="nav_gallery_pdfs">PDF Downloads</a></li>' +
+            '<li class="nav-has-sub">' +
+            '<a href="photos.html">📷 Photos <span class="sub-arrow">▸</span></a>' +
+            '<ul class="sub-dropdown" id="photoCatDropdown">' +
+              '<li><a href="photos.html">All Photos</a></li>' +
+            '</ul>' +
+          '</li>' +
+            '<li class="nav-has-sub">' +
+              '<a href="videos.html">🎬 Videos <span class="sub-arrow">▸</span></a>' +
+              '<ul class="sub-dropdown" id="videoCatDropdown">' +
+                '<li><a href="videos.html">All Videos</a></li>' +
+              '</ul>' +
+            '</li>' +
+            '<li class="nav-has-sub">' +
+              '<a href="audios.html">🎵 Audios <span class="sub-arrow">▸</span></a>' +
+              '<ul class="sub-dropdown" id="audioCatDropdown">' +
+                '<li><a href="audios.html">All Audios</a></li>' +
+              '</ul>' +
+            '</li>' +
+            '<li class="nav-has-sub">' +
+              '<a href="pdfs.html">📄 PDFs <span class="sub-arrow">▸</span></a>' +
+              '<ul class="sub-dropdown" id="pdfCatDropdown">' +
+                '<li><a href="pdfs.html">All PDFs</a></li>' +
+              '</ul>' +
+            '</li>' +
             '<li><a href="quotes.html">✨ Quotes</a></li>' +
           '</ul>' +
         '</li>' +
