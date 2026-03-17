@@ -241,10 +241,15 @@
     .pl-info { display:flex; align-items:center; gap:10px; flex:1; min-width:0; }
     .pl-icon-wrap { flex-shrink:0; width:2rem; height:2rem; display:flex; align-items:center; justify-content:center; }
     .pl-icon  { font-size:1.9rem; line-height:1; }
-    .pl-meta  { min-width:0; }
+    .pl-meta  { min-width:0; overflow:hidden; max-width:240px; }
     .pl-title {
       color:white; font-size:0.95rem; font-weight:700;
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:240px;
+      white-space:nowrap; display:inline-block;
+    }
+    .pl-title.marquee { animation: plMarquee 14s linear infinite; }
+    @keyframes plMarquee {
+      0%        { transform: translateX(100%); }
+      100%      { transform: translateX(-100%); }
     }
 
     /* Equalizer bars — shown when #audioPlayer has .playing class */
@@ -265,6 +270,8 @@
 
     /* Controls */
     .pl-controls { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+    .pl-btn-shuffle { opacity: 0.45; transition: opacity 0.2s, color 0.2s; }
+    .pl-btn-shuffle.active { opacity: 1; color: #FFD700; }
     .pl-btn {
       background:none; border:none; color:rgba(255,255,255,0.85); cursor:pointer;
       font-size:1.25rem; padding:5px 9px; border-radius:7px;
@@ -412,6 +419,7 @@
         padding: 6px 0 4px;
         margin-right: -28px; /* 42-28=14px right gap matches left padding */
         border-bottom: 1px solid rgba(255,215,0,0.1);
+        position: relative;
       }
       .pl-controls .pl-btn { font-size: 1.4rem; padding: 4px 8px; }
 
@@ -457,7 +465,7 @@
         height: 4px;
       }
 
-      .pl-title { max-width: none; }
+      .pl-meta { max-width: none; }
     }
 
     /* ── Audio unavailable toast ── */
@@ -543,6 +551,9 @@
     <button class="pl-btn" id="plPrev"      title="Previous">⏮</button>
     <button class="pl-btn" id="plPlayPause" title="Play / Pause">▶</button>
     <button class="pl-btn" id="plNext"      title="Next">⏭</button>
+    <button class="pl-btn pl-btn-shuffle" id="plShuffle" title="Shuffle">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18h1.5a4 4 0 0 0 3.3-1.75L13 7.75A4 4 0 0 1 16.3 6H22"/><path d="M19 3l3 3-3 3"/><path d="M2 6h1.5a4 4 0 0 1 3 1.38"/><path d="M19 15l3 3-3 3"/><path d="M22 18h-5.7a4 4 0 0 1-3.3-1.75l-.4-.57"/></svg>
+    </button>
   </div>
   <div class="pl-progress">
     <span class="pl-time" id="plCurrent">0:00</span>
@@ -591,6 +602,13 @@ $(function () {
   var gMuted        = false;
   var gPrevVol      = 1;
   var gShowRemaining = false;  /* toggle: total duration ↔ remaining time */
+  var gShuffle       = false;  /* shuffle mode */
+
+  function randomNext() {
+    if (gList.length <= 1) return 0;
+    var r; do { r = Math.floor(Math.random() * gList.length); } while (r === gIdx);
+    return r;
+  }
 
   /* ── Toast notification ── */
   function showAudioToast(msg) {
@@ -643,7 +661,14 @@ $(function () {
     gAudio.load();
 
     /* Update player UI */
-    $('#plTitle').text(a.name  || 'Unknown Track');
+    var $plTitle = $('#plTitle');
+    $plTitle.removeClass('marquee').text(a.name || 'Unknown Track');
+    /* Restart marquee — only if text overflows its container */
+    setTimeout(function () {
+      if ($plTitle[0].scrollWidth > $plTitle.parent()[0].offsetWidth) {
+        $plTitle.addClass('marquee');
+      }
+    }, 50);
     $('#plIcon').text(CAT_ICONS[(a.category || '').toLowerCase()] || '🎵');
     $('#plCurrent').text('0:00');
     $('#plTotal').text(a.duration || '--:--');
@@ -692,8 +717,8 @@ $(function () {
 
   gAudio.addEventListener('ended', function () {
     /* Auto-advance */
-    var next = gIdx + 1;
-    if (next < gList.length) {
+    var next = gShuffle ? randomNext() : gIdx + 1;
+    if (gShuffle || next < gList.length) {
       loadTrack(next, true);
     } else {
       /* End of playlist */
@@ -706,18 +731,24 @@ $(function () {
   gAudio.addEventListener('play',  function () { setPlayIcon(true);  });
   gAudio.addEventListener('pause', function () { setPlayIcon(false); });
 
-  /* ── Audio file not found / network error ── */
+  /* ── Audio file not found / network error — auto-skip to next ── */
   gAudio.addEventListener('error', function () {
     if (gIdx < 0 || !gAudio.src) return;  /* ignore errors from intentional close/reset */
     setPlayIcon(false);
-    /* Mark the active card as unavailable */
-    if (gIdx >= 0 && gList[gIdx]) {
+    /* Mark the failed card as unavailable */
+    if (gList[gIdx]) {
       var $card = $('.audio-card[data-serial="' + gList[gIdx].serial + '"]');
       $card.removeClass('now-playing is-playing');
       $card.find('.audio-play-circle').html('✕').css({ 'padding-left': '0', 'background': 'rgba(200,0,0,0.75)', 'cursor': 'not-allowed' });
     }
-    /* Show toast */
-    showAudioToast('Audio file not available');
+    showAudioToast('File not available — skipping…');
+    /* Auto-advance to next track after short delay */
+    setTimeout(function () {
+      var nextIdx = gShuffle ? randomNext() : (gIdx < gList.length - 1 ? gIdx + 1 : -1);
+      if (nextIdx >= 0 && nextIdx !== gIdx) {
+        loadTrack(nextIdx, true);
+      }
+    }, 1200);
   });
 
   /* ── Player controls ── */
@@ -727,15 +758,21 @@ $(function () {
     else               { gAudio.pause(); }
   });
 
+  $('#plShuffle').on('click', function () {
+    gShuffle = !gShuffle;
+    $(this).toggleClass('active', gShuffle);
+    showAudioToast(gShuffle ? 'Shuffle ON' : 'Shuffle OFF');
+  });
+
   $('#plPrev').on('click', function () {
     if (!gList.length) return;
-    var prevIdx = (gIdx > 0) ? gIdx - 1 : gList.length - 1;
+    var prevIdx = gShuffle ? randomNext() : (gIdx > 0 ? gIdx - 1 : gList.length - 1);
     loadTrack(prevIdx, !gAudio.paused);
   });
 
   $('#plNext').on('click', function () {
     if (!gList.length) return;
-    var nextIdx = (gIdx < gList.length - 1) ? gIdx + 1 : 0;
+    var nextIdx = gShuffle ? randomNext() : (gIdx < gList.length - 1 ? gIdx + 1 : 0);
     loadTrack(nextIdx, !gAudio.paused);
   });
 
