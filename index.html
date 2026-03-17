@@ -128,87 +128,33 @@
         <h3>Sacred Texts &amp; PDFs</h3>
         <p>Download books, transcribed talks, devotional songs, and scholarly works about Swamiji — freely available for all seekers.</p>
       </a>
-      <a href="about.html#teachings" class="highlight-card fade-in" style="text-decoration:none;">
-        <span class="highlight-icon">🙏</span>
-        <h3>His Teachings</h3>
-        <p>Explore the profound yet simple wisdom of Swamiji: surrender, the Name of God, and the eternal truth of divine love.</p>
-      </a>
     </div>
   </div>
 </section>
 
-<!-- ===== TEACHINGS PREVIEW ===== -->
-<section class="bg-light">
+
+<!-- ===== RANDOM QUOTE ===== -->
+<section class="bg-light" id="randomQuoteSection">
   <div class="container">
     <div class="section-header">
-      <span class="section-eyebrow" data-i18n="sec_wisdom_eyebrow">Timeless Wisdom</span>
-      <h2 class="section-title" data-i18n="sec_wisdom_title">Core Teachings</h2>
+      <h2 class="section-title">Words of the Master</h2>
       <div class="section-divider"></div>
     </div>
-
-    <div class="teachings-grid">
-      <div class="teaching-card fade-in">
-        <span class="teaching-icon">📿</span>
-        <h3>The Divine Name</h3>
-        <p>Yogi Ramsuratkumar taught that repeating the Divine Name — "Yogi Ramsuratkumar, Jaya Guru Raya" — purifies the mind and leads to liberation.</p>
+    <div class="rq-card fade-in" id="rqCard">
+      <div class="rq-img-wrap" id="rqImgWrap" style="display:none;">
+        <img id="rqImg" src="" alt="Quote" onerror="this.parentNode.style.display='none'" />
       </div>
-      <div class="teaching-card fade-in">
-        <span class="teaching-icon">🤲</span>
-        <h3>Total Surrender</h3>
-        <p>He embodied absolute surrender to the Divine Father, often saying "My Father does everything. This beggar does nothing." True surrender dissolves the ego.</p>
-      </div>
-      <div class="teaching-card fade-in">
-        <span class="teaching-icon">🌟</span>
-        <h3>Divine Grace</h3>
-        <p>Swamiji radiated grace effortlessly. He assured all who came to Him that God's grace is ever-present for those who open their hearts.</p>
-      </div>
-      <div class="teaching-card fade-in">
-        <span class="teaching-icon">🕊</span>
-        <h3>Universal Love</h3>
-        <p>He embraced devotees of all faiths, castes, and nations, demonstrating that God's love knows no boundaries and belongs to all.</p>
+      <div class="rq-divider" id="rqDivider" style="display:none;"></div>
+      <div class="rq-body">
+        <div class="rq-quote-icon">"</div>
+        <p class="rq-text" id="rqText"></p>
+        <p class="rq-text rq-ta" id="rqTa" style="display:none;"></p>
+        <span class="rq-source" id="rqSource"></span>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ===== GALLERY PREVIEW ===== -->
-<section>
-  <div class="container">
-    <div class="section-header">
-      <span class="section-eyebrow" data-i18n="sec_gallery_eyebrow">Photo Gallery Preview</span>
-      <h2 class="section-title" data-i18n="sec_gallery_title">Glimpses of Divine Grace</h2>
-      <div class="section-divider"></div>
-    </div>
-
-    <div class="gallery-grid" style="grid-template-columns: repeat(auto-fill, minmax(240px,1fr));">
-      <!-- Replace data-img and src with actual photos -->
-      <div class="gallery-item fade-in" data-category="darshan" data-img="photos/images/darshan-1.jpg" data-caption="Swamiji in Darshan">
-        <div class="gallery-placeholder"><span class="ph-icon">🪔</span><span class="ph-text">Darshan Photo 1</span></div>
-        <div class="gallery-overlay"><span class="gallery-caption">Swamiji in Darshan</span></div>
-        <div class="gallery-zoom">🔍</div>
-      </div>
-      <div class="gallery-item fade-in" data-category="ashram" data-img="photos/images/ashram-1.jpg" data-caption="The Sacred Ashram">
-        <div class="gallery-placeholder"><span class="ph-icon">🏛</span><span class="ph-text">Ashram View</span></div>
-        <div class="gallery-overlay"><span class="gallery-caption">The Sacred Ashram</span></div>
-        <div class="gallery-zoom">🔍</div>
-      </div>
-      <div class="gallery-item fade-in" data-category="darshan" data-img="photos/images/darshan-2.jpg" data-caption="Swamiji with Devotees">
-        <div class="gallery-placeholder"><span class="ph-icon">🌺</span><span class="ph-text">With Devotees</span></div>
-        <div class="gallery-overlay"><span class="gallery-caption">Swamiji with Devotees</span></div>
-        <div class="gallery-zoom">🔍</div>
-      </div>
-      <div class="gallery-item fade-in" data-category="festival" data-img="photos/images/festival-1.jpg" data-caption="Festival Celebration">
-        <div class="gallery-placeholder"><span class="ph-icon">🎊</span><span class="ph-text">Festival</span></div>
-        <div class="gallery-overlay"><span class="gallery-caption">Festival Celebration</span></div>
-        <div class="gallery-zoom">🔍</div>
-      </div>
-    </div>
-
-    <div style="text-align:center; margin-top:36px;">
-      <a href="photos.html" class="btn btn-saffron" data-i18n="btn_full_gallery">View Full Gallery →</a>
-    </div>
-  </div>
-</section>
 
 <!-- ===== FOOTER ===== -->
 <footer class="footer"></footer>
@@ -242,5 +188,20 @@
 <script src="data/lang/en.js"></script>
 <script src="data/lang/ta.js"></script>
 <script src="data/lang-loader.js"></script>
+<script>
+(function () {
+  var pool = (window.QUOTES_DATA && QUOTES_DATA.length) ? QUOTES_DATA : [];
+  if (window.SITE_DATA && SITE_DATA.quotes && SITE_DATA.quotes.length) pool = SITE_DATA.quotes;
+  var active = pool.filter(function (q) { return String(q.isActive || 'yes').toLowerCase() !== 'no'; });
+  if (!active.length) { document.getElementById('randomQuoteSection').style.display = 'none'; return; }
+  var q    = active[Math.floor(Math.random() * active.length)];
+  var lang = localStorage.getItem('siteLang') || 'en';
+  document.getElementById('rqText').textContent = (lang === 'ta' && q.ta) ? q.ta : (q.en || '');
+  var rqTa = document.getElementById('rqTa');
+  if (lang === 'en' && q.ta) { rqTa.textContent = q.ta; rqTa.style.display = 'block'; }
+  if (q.source) document.getElementById('rqSource').textContent = '\u2014 ' + q.source;
+  if (q.image) { document.getElementById('rqImg').src = q.image; document.getElementById('rqImgWrap').style.display = 'flex'; document.getElementById('rqDivider').style.display = 'block'; }
+})();
+</script>
 </body>
 </html>

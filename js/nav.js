@@ -6,6 +6,23 @@
 
   var SVG_SHARE = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>';
 
+  var SVG_PLAY  = '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>';
+  var SVG_PAUSE = '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="3" width="4" height="18" rx="1"/><rect x="15" y="3" width="4" height="18" rx="1"/></svg>';
+  var SVG_VOL   = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11,5 6,9 2,9 2,15 6,15 11,19"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>';
+
+  /* ── Mini player HTML ── */
+  var NMP_HTML =
+    '<div class="nmp" id="navMiniPlayer">' +
+      '<button class="nmp-btn" id="nmpPlayBtn" title="Play / Pause">' + SVG_PLAY + '</button>' +
+      '<div class="nmp-title-wrap"><span class="nmp-title" id="nmpTitle">Loading…</span></div>' +
+      '<div class="nmp-vol-wrap">' +
+        '<button class="nmp-vol-btn" id="nmpVolBtn" title="Volume">' + SVG_VOL + '</button>' +
+        '<div class="nmp-vol-popup" id="nmpVolPopup">' +
+          '<input type="range" class="nmp-vol-slider" id="nmpVolSlider" min="0" max="100" value="80" />' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
   var html =
     '<nav class="nav-wrapper">' +
       '<a href="index.html" class="nav-logo">' +
@@ -15,6 +32,7 @@
           '<span class="nav-logo-subtitle">Tiruvannamalai · 1918–2001</span>' +
         '</div>' +
       '</a>' +
+      '<div class="nmp-logo-wrap">' + NMP_HTML + '</div>' +
       '<ul class="nav-menu" id="navMenu">' +
         '<li class="nav-item"><a href="index.html" class="nav-link" data-i18n="nav_home">Home</a></li>' +
         '<li class="nav-item">' +
@@ -75,8 +93,82 @@
     var header = document.querySelector('header.header');
     if (!header) return;
     header.innerHTML = html;
-    /* Re-apply i18n if lang-loader already ran */
     if (typeof window.applyLang === 'function') window.applyLang();
+    initMiniPlayer();
+  }
+
+  /* ── Mini Player Logic ── */
+  function initMiniPlayer() {
+    var audio   = new Audio();
+    audio.loop  = true;
+    audio.preload = 'none';
+    audio.volume  = 0.8;
+
+    var playing  = false;
+    var volOpen  = false;
+
+    /* ── Load 1st audio from SITE_DATA ── */
+    function loadFirstTrack() {
+      var list = (typeof SITE_DATA !== 'undefined' && SITE_DATA.audios && SITE_DATA.audios.length)
+        ? SITE_DATA.audios : [];
+      var first = list[0];
+      if (!first) return;
+      audio.src = first.file || first.url || '';
+      var title = first.name || first.title || 'Chant';
+      var $t = document.getElementById('nmpTitle');
+      if ($t) {
+        $t.textContent = title;
+        /* start marquee only when text overflows */
+        setTimeout(function () {
+          var wrap = $t.parentElement;
+          if (wrap && $t.scrollWidth > wrap.offsetWidth) $t.classList.add('nmp-marquee');
+        }, 100);
+      }
+    }
+
+    /* Try immediately, else wait for data */
+    if (typeof SITE_DATA !== 'undefined' && SITE_DATA.loaded) {
+      loadFirstTrack();
+    } else {
+      document.addEventListener('siteDataReady', loadFirstTrack);
+      setTimeout(loadFirstTrack, 1500); /* fallback */
+    }
+
+    /* ── Play state ── */
+    function setPlaying(state) {
+      playing = state;
+      var btn = document.getElementById('nmpPlayBtn');
+      if (btn) btn.innerHTML = state ? SVG_PAUSE : SVG_PLAY;
+      var el = document.getElementById('navMiniPlayer');
+      if (el) el.classList.toggle('nmp-playing', state);
+    }
+
+    function toggle() {
+      if (!audio.src) return;
+      if (playing) { audio.pause(); setPlaying(false); }
+      else { audio.play().then(function () { setPlaying(true); }).catch(function () {}); }
+    }
+
+    /* ── Volume popup ── */
+    function setVolOpen(state) {
+      volOpen = state;
+      var popup = document.getElementById('nmpVolPopup');
+      if (popup) popup.classList.toggle('nmp-vol-open', state);
+    }
+
+    document.addEventListener('click', function (e) {
+      if (e.target.closest('#nmpPlayBtn')) { toggle(); return; }
+      if (e.target.closest('#nmpVolBtn'))  { setVolOpen(!volOpen); return; }
+      if (!e.target.closest('#nmpVolPopup') && volOpen) setVolOpen(false);
+    });
+
+    document.addEventListener('input', function (e) {
+      if (e.target.id === 'nmpVolSlider') {
+        audio.volume = e.target.value / 100;
+      }
+    });
+
+    audio.addEventListener('ended', function () { setPlaying(false); });
   }
 
   if (document.readyState === 'loading') {
