@@ -724,8 +724,17 @@ $(function () {
     }
   });
 
-  gAudio.addEventListener('play',  function () { setPlayIcon(true);  });
+  gAudio.addEventListener('play',  function () {
+    setPlayIcon(true);
+    document.dispatchEvent(new CustomEvent('siteAudioPlay'));
+  });
   gAudio.addEventListener('pause', function () { setPlayIcon(false); });
+
+  /* ── Stop audio screen + close player bar when nav mini player starts ── */
+  document.addEventListener('navAudioPlay', function () {
+    if (!gAudio.paused) { gAudio.pause(); }
+    $('#audioPlayer').removeClass('visible');
+  });
 
   /* ── Audio file not found / network error — auto-skip to next ── */
   gAudio.addEventListener('error', function () {

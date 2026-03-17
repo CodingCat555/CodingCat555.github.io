@@ -14,25 +14,25 @@
   var NMP_HTML =
     '<div class="nmp" id="navMiniPlayer">' +
       '<button class="nmp-btn" id="nmpPlayBtn" title="Play / Pause">' + SVG_PLAY + '</button>' +
-      '<div class="nmp-title-wrap"><span class="nmp-title" id="nmpTitle">Loading…</span></div>' +
-      '<div class="nmp-vol-wrap">' +
-        '<button class="nmp-vol-btn" id="nmpVolBtn" title="Volume">' + SVG_VOL + '</button>' +
-        '<div class="nmp-vol-popup" id="nmpVolPopup">' +
-          '<input type="range" class="nmp-vol-slider" id="nmpVolSlider" min="0" max="100" value="80" />' +
-        '</div>' +
+      '<button class="nmp-vol-btn" id="nmpVolBtn" title="Volume">' + SVG_VOL + '</button>' +
+      '<div class="nmp-middle">' +
+        '<div class="nmp-title-wrap" id="nmpTitleWrap"><span class="nmp-title" id="nmpTitle">Loading…</span></div>' +
+        '<input type="range" class="nmp-vol-slider" id="nmpVolSlider" min="0" max="100" value="80" style="display:none" />' +
       '</div>' +
     '</div>';
 
   var html =
     '<nav class="nav-wrapper">' +
-      '<a href="index.html" class="nav-logo">' +
-        '<div class="nav-logo-icon">🪔</div>' +
-        '<div class="nav-logo-text">' +
-          '<span class="nav-logo-name">Yogi Ramsuratkumar</span>' +
-          '<span class="nav-logo-subtitle">Tiruvannamalai · 1918–2001</span>' +
-        '</div>' +
-      '</a>' +
-      '<div class="nmp-logo-wrap">' + NMP_HTML + '</div>' +
+      '<div class="nav-left-group">' +
+        '<a href="index.html" class="nav-logo">' +
+          '<div class="nav-logo-icon">🪔</div>' +
+          '<div class="nav-logo-text">' +
+            '<span class="nav-logo-name">Yogi Ramsuratkumar</span>' +
+            '<span class="nav-logo-subtitle">Tiruvannamalai · 1918–2001</span>' +
+          '</div>' +
+        '</a>' +
+        '<div class="nmp-logo-wrap">' + NMP_HTML + '</div>' +
+      '</div>' +
       '<ul class="nav-menu" id="navMenu">' +
         '<li class="nav-item"><a href="index.html" class="nav-link" data-i18n="nav_home">Home</a></li>' +
         '<li class="nav-item">' +
@@ -98,73 +98,175 @@
   }
 
   /* ── Mini Player Logic ── */
+  var NMP_SS_KEY = 'nmpState'; /* sessionStorage key */
+
   function initMiniPlayer() {
     var audio   = new Audio();
     audio.loop  = true;
-    audio.preload = 'none';
+    audio.preload = 'auto';
     audio.volume  = 0.8;
 
     var playing  = false;
-    var volOpen  = false;
 
-    /* ── Load 1st audio from SITE_DATA ── */
-    function loadFirstTrack() {
-      var list = (typeof SITE_DATA !== 'undefined' && SITE_DATA.audios && SITE_DATA.audios.length)
-        ? SITE_DATA.audios : [];
-      var first = list[0];
-      if (!first) return;
-      audio.src = first.file || first.url || '';
-      var title = first.name || first.title || 'Chant';
-      var $t = document.getElementById('nmpTitle');
-      if ($t) {
-        $t.textContent = title;
-        /* start marquee only when text overflows */
-        setTimeout(function () {
-          var wrap = $t.parentElement;
-          if (wrap && $t.scrollWidth > wrap.offsetWidth) $t.classList.add('nmp-marquee');
-        }, 100);
-      }
+    /* ── Save / restore state across page navigation ── */
+    function saveState() {
+      try {
+        var $t = document.getElementById('nmpTitle');
+        sessionStorage.setItem(NMP_SS_KEY, JSON.stringify({
+          playing: playing,
+          src    : audio.src,
+          time   : audio.currentTime,
+          volume : audio.volume,
+          title  : $t ? $t.textContent : ''
+        }));
+      } catch(e) {}
     }
 
-    /* Try immediately, else wait for data */
-    if (typeof SITE_DATA !== 'undefined' && SITE_DATA.loaded) {
-      loadFirstTrack();
+    function restoreState() {
+      try {
+        var s = JSON.parse(sessionStorage.getItem(NMP_SS_KEY) || 'null');
+        if (!s || !s.src) return null;
+        return s;
+      } catch(e) { return null; }
+    }
+
+    /* Save every 500ms while playing for accurate resume position */
+    setInterval(function () { if (playing) saveState(); }, 500);
+
+    /* Save immediately before unload */
+    window.addEventListener('beforeunload', saveState);
+
+    var trackLoaded = false;
+
+    /* ── Step 1: Restore from sessionStorage immediately (works on ALL pages) ── */
+    function resumeFromSession() {
+      var saved = restoreState();
+      if (!saved || !saved.src) return false;
+      /* restore title immediately — no SITE_DATA needed */
+      var $t = document.getElementById('nmpTitle');
+      if ($t && saved.title) { $t.textContent = saved.title; }
+      audio.src    = saved.src;
+      audio.volume = saved.volume || 0.8;
+      if (saved.playing) {
+        audio.addEventListener('canplay', function resumeOnce() {
+          audio.removeEventListener('canplay', resumeOnce);
+          if (saved.time) audio.currentTime = saved.time;
+          audio.play().then(function () { setPlaying(true); }).catch(function () {});
+        });
+      }
+      return true;
+    }
+
+    /* ── Step 2: Load from SITE_DATA (first visit only, no saved state) ── */
+    function loadFirstTrack() {
+      if (trackLoaded) return; /* already loaded from session or previous call */
+      var list = (typeof SITE_DATA !== 'undefined' && SITE_DATA.audios && SITE_DATA.audios.length)
+        ? SITE_DATA.audios : [];
+      var track = null;
+      for (var i = 0; i < list.length; i++) {
+        if (Number(list[i].serial) === 1) { track = list[i]; break; }
+      }
+      if (!track) track = list[0];
+      if (!track) return;
+      trackLoaded = true;
+      audio.src    = track.audioFile || track.file || track.url || '';
+      audio.volume = 0.8;
+      var $t = document.getElementById('nmpTitle');
+      if ($t) { $t.textContent = track.name || track.title || 'Chant'; }
+    }
+
+    /* Try session first — if no saved state, wait for SITE_DATA */
+    if (resumeFromSession()) {
+      trackLoaded = true;
+      /* update title from SITE_DATA when available */
+      function updateTitle() {
+        var list = (typeof SITE_DATA !== 'undefined' && SITE_DATA.audios && SITE_DATA.audios.length)
+          ? SITE_DATA.audios : [];
+        var track = null;
+        for (var i = 0; i < list.length; i++) {
+          if (Number(list[i].serial) === 1) { track = list[i]; break; }
+        }
+        if (!track) track = list[0];
+        if (!track) return;
+        var $t = document.getElementById('nmpTitle');
+        if ($t) { $t.textContent = track.name || track.title || 'Chant'; }
+      }
+      if (typeof SITE_DATA !== 'undefined' && SITE_DATA.loaded) { updateTitle(); }
+      else { document.addEventListener('siteDataReady', updateTitle); setTimeout(updateTitle, 2000); }
     } else {
+      /* No session — poll for SITE_DATA to load first track */
+      function tryLoad() {
+        if (typeof SITE_DATA !== 'undefined' && SITE_DATA.loaded && SITE_DATA.audios && SITE_DATA.audios.length) {
+          loadFirstTrack();
+        } else {
+          setTimeout(tryLoad, 500);
+        }
+      }
+      tryLoad();
       document.addEventListener('siteDataReady', loadFirstTrack);
-      setTimeout(loadFirstTrack, 1500); /* fallback */
     }
 
     /* ── Play state ── */
     function setPlaying(state) {
       playing = state;
-      var btn = document.getElementById('nmpPlayBtn');
-      if (btn) btn.innerHTML = state ? SVG_PAUSE : SVG_PLAY;
-      var el = document.getElementById('navMiniPlayer');
-      if (el) el.classList.toggle('nmp-playing', state);
+      var btn   = document.getElementById('nmpPlayBtn');
+      var title = document.getElementById('nmpTitle');
+      var el    = document.getElementById('navMiniPlayer');
+      if (btn)   btn.innerHTML = state ? SVG_PAUSE : SVG_PLAY;
+      if (el)    el.classList.toggle('nmp-playing', state);
+      if (title) title.classList.toggle('nmp-marquee', state);
+      if (!state) saveState(); /* save stopped state immediately */
     }
 
     function toggle() {
       if (!audio.src) return;
       if (playing) { audio.pause(); setPlaying(false); }
-      else { audio.play().then(function () { setPlaying(true); }).catch(function () {}); }
+      else {
+        /* notify audio screen to stop before playing */
+        document.dispatchEvent(new CustomEvent('navAudioPlay'));
+        audio.play().then(function () { setPlaying(true); }).catch(function () {});
+      }
     }
 
-    /* ── Volume popup ── */
-    function setVolOpen(state) {
-      volOpen = state;
-      var popup = document.getElementById('nmpVolPopup');
-      if (popup) popup.classList.toggle('nmp-vol-open', state);
+    /* ── Stop mini player when audio page starts playing ── */
+    document.addEventListener('siteAudioPlay', function () {
+      if (playing) { audio.pause(); setPlaying(false); }
+    });
+
+    var volVisible = false;
+    var volRevertTimer = null;
+
+    function showTitle() {
+      volVisible = false;
+      var titleWrap = document.getElementById('nmpTitleWrap');
+      var slider    = document.getElementById('nmpVolSlider');
+      if (titleWrap) titleWrap.style.display = 'flex';
+      if (slider)    slider.style.display    = 'none';
+    }
+
+    function showSlider() {
+      volVisible = true;
+      var titleWrap = document.getElementById('nmpTitleWrap');
+      var slider    = document.getElementById('nmpVolSlider');
+      if (titleWrap) titleWrap.style.display = 'none';
+      if (slider)    slider.style.display    = 'block';
     }
 
     document.addEventListener('click', function (e) {
       if (e.target.closest('#nmpPlayBtn')) { toggle(); return; }
-      if (e.target.closest('#nmpVolBtn'))  { setVolOpen(!volOpen); return; }
-      if (!e.target.closest('#nmpVolPopup') && volOpen) setVolOpen(false);
+      if (e.target.closest('#nmpVolBtn')) {
+        if (volVisible) { clearTimeout(volRevertTimer); showTitle(); }
+        else { showSlider(); }
+        return;
+      }
     });
 
     document.addEventListener('input', function (e) {
       if (e.target.id === 'nmpVolSlider') {
         audio.volume = e.target.value / 100;
+        /* auto-revert to title 2.5s after last slider move */
+        clearTimeout(volRevertTimer);
+        volRevertTimer = setTimeout(showTitle, 2500);
       }
     });
 
