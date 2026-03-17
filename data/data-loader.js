@@ -124,6 +124,16 @@
         isActive    : 'Is Active'
       });
 
+      this.quotes = rows('Quotes', {
+        serial   : 'Serial No',
+        en       : 'Quote (English)',
+        ta       : 'Quote (Tamil)',
+        source   : 'Source',
+        category : 'Category',
+        image    : 'Image File',
+        isActive : 'Is Active'
+      });
+
       this.loaded = true;
       this.saveToStorage();
     },
