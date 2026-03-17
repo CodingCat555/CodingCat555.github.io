@@ -118,11 +118,13 @@
       font-size: 0.83rem; color: var(--text);
       line-height: 1.65; font-weight: 500;
       margin: 0 0 6px;
+      overflow-wrap: break-word; word-break: normal;
     }
     .quote-ta {
       font-size: 0.76rem; color: #555;
       line-height: 1.5; font-style: italic;
       margin: 0 0 10px;
+      overflow-wrap: break-word; word-break: normal;
     }
     .quote-footer {
       display: flex; align-items: center;
@@ -294,10 +296,9 @@ $(function () {
   }
 
   function makeCard(q, idx) {
-    var lang    = curLang();
-    var text    = (lang === 'ta' && q.ta) ? q.ta : q.en;
-    var altText = (lang === 'ta' && q.en) ? q.en : (q.ta || '');
-    var source  = q.source ? '— ' + q.source : '';
+    var lang   = curLang();
+    var text   = (lang === 'ta' && q.ta) ? q.ta : q.en;
+    var source = q.source ? '— ' + q.source : '';
     var sn      = '#' + String(q.serial || (idx + 1)).padStart(2, '0');
 
     var $card = $('<div>', {
@@ -327,8 +328,7 @@ $(function () {
     /* ── Text body side ── */
     var $body = $('<div class="quote-body">');
     var $top  = $('<div>').append(
-      $('<p class="quote-text">').text(text),
-      altText ? $('<p class="quote-ta">').text(altText) : null
+      $('<p class="quote-text">').text(text)
     );
 
     var $footer = $('<div class="quote-footer">').append(
@@ -473,9 +473,8 @@ $(function () {
       var ta  = $c.data('ta')     || '';
       var src = $c.data('source') || '';
       var main = (lang === 'ta' && ta) ? ta : en;
-      var alt  = (lang === 'ta' && en) ? en : ta;
       $c.find('.quote-text').text(main);
-      $c.find('.quote-ta').text(alt || '');
+      $c.find('.quote-ta').hide().text('');
       $c.find('.quote-source').text(src ? '— ' + src : '');
     });
   }

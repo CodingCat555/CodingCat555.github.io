@@ -496,7 +496,7 @@ section { padding: 80px 0; }
   width: 62px; height: 62px; background: rgba(255,255,255,0.92);
   border-radius: 50%; display: flex; align-items: center; justify-content: center;
   font-size: 1.7rem; color: var(--green); transition: var(--transition);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3); padding-left: 4px;
 }
 .video-thumb:hover .video-play-btn { background: white; transform: translate(-50%, -50%) scale(1.1); }
 .video-duration {
@@ -509,6 +509,9 @@ section { padding: 80px 0; }
 .video-title { font-family: 'Cinzel', serif; font-size: 1rem; color: var(--text-dark); margin-bottom: 6px; line-height: 1.4; }
 .video-desc { font-size: 0.85rem; color: var(--text-light); line-height: 1.55; }
 .video-meta { display: flex; gap: 14px; margin-top: 10px; font-size: 0.78rem; color: var(--text-light); }
+.yt-open-link { display: inline-block; margin-top: 10px; font-size: 0.78rem; font-weight: 600; color: #c00; text-decoration: none; letter-spacing: 0.01em; }
+.yt-open-link:hover { text-decoration: underline; color: #e00; }
+.yt-only-badge { position: absolute; bottom: 10px; left: 10px; background: rgba(0,0,0,0.75); color: #fff; font-size: 0.7rem; font-weight: 700; padding: 3px 8px; border-radius: 4px; pointer-events: none; letter-spacing: 0.04em; }
 
 /* ============================================================
    PDF GALLERY
@@ -655,6 +658,68 @@ section { padding: 80px 0; }
 @media (max-width: 640px) {
   .contact-form-wrap { padding: 24px 18px; }
   .form-row { grid-template-columns: 1fr; gap: 0; }
+}
+
+/* ============================================================
+   RANDOM QUOTE CARD
+   ============================================================ */
+#randomQuoteSection { padding-left: 0; padding-right: 0; }
+#randomQuoteSection .container { max-width: 100%; padding: 0; }
+#randomQuoteSection .section-header { padding: 0 60px; }
+.rq-card {
+  display: flex; align-items: stretch; gap: 0;
+  background: #fff;
+  box-shadow: 0 0 0 1px #90c9a6, 0 8px 32px rgba(0,0,0,0.10);
+  overflow: hidden; margin: 0 60px; border-radius: 28px;
+}
+.rq-img-wrap {
+  flex: 0 0 38%; min-height: 420px;
+  display: flex; align-items: center; justify-content: center;
+  background: #111; overflow: hidden;
+}
+.rq-img-wrap img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.rq-divider {
+  width: 2px; align-self: stretch; flex-shrink: 0; margin: 40px 0;
+  background: linear-gradient(180deg, transparent 0%, #2d8a47 25%, #1a6b2e 50%, #2d8a47 75%, transparent 100%);
+  position: relative;
+}
+.rq-divider::before {
+  content: '✦'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  background: #fff; color: #1a6b2e; font-size: 0.75rem;
+  padding: 8px 0; line-height: 1;
+}
+.rq-body {
+  flex: 1; min-width: 0; padding: 60px 64px; position: relative;
+  display: flex; flex-direction: column; justify-content: center;
+  overflow: hidden; overflow-wrap: break-word; word-break: normal;
+}
+.rq-quote-icon {
+  font-family: 'Cinzel', Georgia, serif; font-size: 8rem; line-height: 0.6;
+  color: var(--green-light); opacity: 0.25; position: absolute; top: 32px; left: 40px;
+  pointer-events: none; user-select: none;
+}
+.rq-text {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 1.45rem; line-height: 1.9; color: var(--text-dark);
+  font-style: italic; margin-bottom: 12px; position: relative; z-index: 1;
+}
+.rq-ta {
+  font-size: 1.1rem; color: var(--text-light); margin-top: 8px; line-height: 1.75;
+}
+.rq-source {
+  display: block; margin-top: 24px; font-size: 0.85rem; font-weight: 700;
+  color: var(--green-dark); letter-spacing: 0.08em; text-transform: uppercase;
+}
+@media (max-width: 900px) {
+  #randomQuoteSection .section-header { padding: 0 20px; }
+  .rq-card { flex-direction: column; margin: 0 20px; }
+  .rq-img-wrap { flex: none; width: 100%; min-height: 260px; }
+  .rq-divider { width: auto; height: 2px; align-self: auto; margin: 0 40px;
+    background: linear-gradient(90deg, transparent 0%, #2d8a47 25%, #1a6b2e 50%, #2d8a47 75%, transparent 100%); }
+  .rq-divider::before { top: 50%; left: 50%; padding: 0 8px; }
+  .rq-body { padding: 32px 28px 36px; }
+  .rq-quote-icon { font-size: 4rem; top: 16px; left: 16px; }
+  .rq-text { font-size: 1.15rem; }
 }
 
 /* ============================================================

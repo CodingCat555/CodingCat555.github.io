@@ -202,7 +202,8 @@ $(function () {
     var serial = '#' + String(v.serial).padStart(2, '0');
     var dur    = v.duration ? '<span>⏱ ' + v.duration + '</span>' : '';
     var thumb  = getYouTubeThumb(v.youtubeUrl);
-    var $thumbArea = $('<div>', { 'class': 'video-thumb', 'data-src': v.youtubeUrl });
+    var embedOk = String(v.embedAllowed || 'yes').toLowerCase().trim() !== 'no';
+    var $thumbArea = $('<div>', { 'class': 'video-thumb', 'data-src': v.youtubeUrl, 'data-embed': embedOk ? 'yes' : 'no' });
     if (thumb) {
       $thumbArea.append(
         $('<img>', { 'data-src': thumb, alt: v.name, 'class': 'video-thumb-img' })
@@ -232,7 +233,7 @@ $(function () {
       $('<div class="video-info">').append(
         '<h3 class="video-title">' + v.name + '</h3>',
         '<p class="video-desc">' + v.description + '</p>',
-        '<div class="video-meta"><span>📂 ' + v.category + '</span>' + dur + '</div>'
+        dur ? '<div class="video-meta">' + dur + '</div>' : ''
       )
     );
   }
@@ -305,8 +306,13 @@ $(function () {
       alert('YouTube URL not set for this video.\nPlease update it in content-manager.xlsx via tools/excel-manager.html');
       return;
     }
-    var autoSrc = src + (src.indexOf('?') !== -1 ? '&' : '?') + 'autoplay=1&rel=0';
-    $thumb.empty().append('<iframe src="' + autoSrc + '" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>');
+    /* If embed not allowed, open YouTube directly in new tab */
+    if ($thumb.data('embed') === 'no') { window.open(src, '_blank'); return; }
+    /* Always convert any YouTube URL format to the required embed URL */
+    var vidMatch = src.match(/(?:embed\/|watch\?v=|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+    if (!vidMatch) { alert('Could not extract YouTube video ID from:\n' + src); return; }
+    var embedSrc = 'https://www.youtube.com/embed/' + vidMatch[1] + '?autoplay=1&rel=0';
+    $thumb.empty().append('<iframe src="' + embedSrc + '" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>');
   });
 
   /* ── Init ── */

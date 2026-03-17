@@ -51,6 +51,7 @@
 
   var STORAGE_KEY = 'yrk_lang';
   var currentLang = localStorage.getItem(STORAGE_KEY) || 'en';
+  window.currentLang = currentLang;
 
   /* ── Public: translate a key ── */
   window.t = function (key) {
@@ -92,8 +93,10 @@
   window.setLang = function (code) {
     if (!LANGUAGES[code]) return;
     currentLang = code;
+    window.currentLang = code;
     localStorage.setItem(STORAGE_KEY, code);
     window.applyLang();
+    document.dispatchEvent(new CustomEvent('langChanged', { detail: { lang: code } }));
   };
 
   /* ── Wire up switcher buttons ── */

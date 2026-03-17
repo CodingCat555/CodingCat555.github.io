@@ -663,12 +663,8 @@ $(function () {
     /* Update player UI */
     var $plTitle = $('#plTitle');
     $plTitle.removeClass('marquee').text(a.name || 'Unknown Track');
-    /* Restart marquee — only if text overflows its container */
-    setTimeout(function () {
-      if ($plTitle[0].scrollWidth > $plTitle.parent()[0].offsetWidth) {
-        $plTitle.addClass('marquee');
-      }
-    }, 50);
+    /* Always run marquee */
+    setTimeout(function () { $plTitle.addClass('marquee'); }, 50);
     $('#plIcon').text(CAT_ICONS[(a.category || '').toLowerCase()] || '🎵');
     $('#plCurrent').text('0:00');
     $('#plTotal').text(a.duration || '--:--');

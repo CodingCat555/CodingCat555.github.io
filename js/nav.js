@@ -21,7 +21,6 @@
           '<a href="about.html" class="nav-link"><span data-i18n="nav_about">About</span> <span class="arrow">▾</span></a>' +
           '<ul class="dropdown">' +
             '<li><a href="about.html#life" data-i18n="nav_about_life">Life &amp; Journey</a></li>' +
-            '<li><a href="about.html#teachings" data-i18n="nav_about_teachings">Teachings</a></li>' +
             '<li><a href="about.html#timeline" data-i18n="nav_about_timeline">Timeline</a></li>' +
           '</ul>' +
         '</li>' +

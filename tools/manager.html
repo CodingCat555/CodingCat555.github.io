@@ -387,6 +387,7 @@
             <th style="min-width:110px">Category</th>
             <th style="min-width:260px">YouTube URL</th>
             <th style="min-width:80px">Duration</th>
+            <th style="min-width:110px">Embed Allowed</th>
             <th class="active-th">Is Active</th>
             <th style="width:40px"></th>
           </tr></thead>
@@ -816,6 +817,7 @@ $(function () {
         $('<td>').html(catSelect(CAT.videos, r.category)),
         $('<td>').html(cell(r.youtubeUrl)),
         $('<td>').html(cell(r.duration)),
+        $('<td class="active-td">').html(activeSelect(r.embedAllowed)),
         $('<td class="active-td">').html(activeSelect(r.isActive)),
         $('<td>').html(delBtn())
       );
@@ -891,7 +893,7 @@ $(function () {
   function readVideos() {
     return $('#videosBody tr').map(function (i) {
       var $t = $(this).find('td');
-      return { serial: i+1, name: $t.eq(1).find('.editable').val().trim(), description: $t.eq(2).find('.editable').val().trim(), category: $t.eq(3).find('.editable').val(), youtubeUrl: $t.eq(4).find('.editable').val().trim(), duration: $t.eq(5).find('.editable').val().trim(), isActive: $t.eq(6).find('.editable').val() };
+      return { serial: i+1, name: $t.eq(1).find('.editable').val().trim(), description: $t.eq(2).find('.editable').val().trim(), category: $t.eq(3).find('.editable').val(), youtubeUrl: $t.eq(4).find('.editable').val().trim(), duration: $t.eq(5).find('.editable').val().trim(), embedAllowed: $t.eq(6).find('.editable').val(), isActive: $t.eq(7).find('.editable').val() };
     }).get();
   }
   function readPdfs() {
@@ -1025,7 +1027,7 @@ $(function () {
         }
         if (wb.Sheets['Videos']) {
           renderVideos(XLSX.utils.sheet_to_json(wb.Sheets['Videos'], {defval:''}).map(function(r,i){
-            return { serial: Number(r['Serial No'])||(i+1), name: String(r['Name']||''), description: String(r['Description']||''), category: String(r['Category']||'discourse'), youtubeUrl: String(r['YouTube URL']||''), duration: String(r['Duration']||''), isActive: parseActive(r['Is Active']) };
+            return { serial: Number(r['Serial No'])||(i+1), name: String(r['Name']||''), description: String(r['Description']||''), category: String(r['Category']||'discourse'), youtubeUrl: String(r['YouTube URL']||''), duration: String(r['Duration']||''), embedAllowed: parseActive(r['Embed Allowed']), isActive: parseActive(r['Is Active']) };
           }).sort(sortBySerial));
         }
         if (wb.Sheets['Audios']) {
@@ -1040,11 +1042,26 @@ $(function () {
         }
         if (wb.Sheets['Quotes']) {
           renderQuotes(XLSX.utils.sheet_to_json(wb.Sheets['Quotes'], {defval:''}).map(function(r,i){
-            return { serial: Number(r['Serial No'])||(i+1), en: String(r['English']||''), ta: String(r['Tamil']||''), source: String(r['Source']||''), category: String(r['Category']||'general').toLowerCase(), image: String(r['Image']||''), isActive: parseActive(r['Is Active']) };
+            /* Support both column name styles: "English"/"Tamil"/"Image" (template) and "Quote (English)"/"Quote (Tamil)"/"Image File" (data-loader) */
+            return { serial: Number(r['Serial No'])||(i+1), en: String(r['Quote (English)']||r['English']||''), ta: String(r['Quote (Tamil)']||r['Tamil']||''), source: String(r['Source']||''), category: String(r['Category']||'general').toLowerCase(), image: String(r['Image File']||r['Image']||''), isActive: parseActive(r['Is Active']) };
           }).sort(sortBySerial));
         }
         refreshGalleryOutputs();
-        showStatus('Excel uploaded! Review the data below, then click 💾 Save to Website.', 'success');
+
+        /* ── Immediately push parsed data into SITE_DATA + localStorage
+               so all website pages reflect the new Excel data right away.
+               Version stays the same — "Save to Website" will bump it
+               when it writes the JS files to disk. ── */
+        SITE_DATA.photos = readPhotos();
+        SITE_DATA.videos = readVideos();
+        SITE_DATA.pdfs   = readPdfs();
+        SITE_DATA.audios = readAudios();
+        SITE_DATA.quotes = readQuotes();
+        SITE_DATA.loaded = true;
+        try { SITE_DATA.saveToStorage(); } catch(e) {}
+        updateGalleryPill();
+
+        showStatus('✅ Excel uploaded &amp; saved! Data is now live on all pages. Click 💾 Save to Website to also update the permanent JS files.', 'success');
       } catch (err) { showStatus('Error reading Excel: ' + err.message, 'error'); }
       $(this).val('');
     };
@@ -1059,9 +1076,9 @@ $(function () {
     var pWs = XLSX.utils.aoa_to_sheet(pD); pWs['!cols'] = [{wch:9},{wch:28},{wch:28},{wch:28},{wch:44},{wch:14},{wch:32},{wch:10}];
     XLSX.utils.book_append_sheet(wb, pWs, 'Photos');
 
-    var vD = [['Serial No','Name','Description','Category','YouTube URL','Duration','Is Active']];
-    readVideos().forEach(function(r){ vD.push([r.serial,r.name,r.description,r.category,r.youtubeUrl,r.duration,r.isActive||'yes']); });
-    var vWs = XLSX.utils.aoa_to_sheet(vD); vWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:46},{wch:12},{wch:10}];
+    var vD = [['Serial No','Name','Description','Category','YouTube URL','Duration','Embed Allowed','Is Active']];
+    readVideos().forEach(function(r){ vD.push([r.serial,r.name,r.description,r.category,r.youtubeUrl,r.duration,r.embedAllowed||'yes',r.isActive||'yes']); });
+    var vWs = XLSX.utils.aoa_to_sheet(vD); vWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:46},{wch:12},{wch:13},{wch:10}];
     XLSX.utils.book_append_sheet(wb, vWs, 'Videos');
 
     var dD = [['Serial No','Name','Author','Category','PDF File','Pages','File Size','Thumbnail Image','Is Active']];
@@ -1090,8 +1107,8 @@ $(function () {
     pWs['!cols'] = [{wch:9},{wch:28},{wch:28},{wch:28},{wch:44},{wch:14},{wch:32},{wch:10}];
     XLSX.utils.book_append_sheet(wb, pWs, 'Photos');
 
-    var vWs = XLSX.utils.aoa_to_sheet([['Serial No','Name','Description','Category','YouTube URL','Duration','Is Active']]);
-    vWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:46},{wch:12},{wch:10}];
+    var vWs = XLSX.utils.aoa_to_sheet([['Serial No','Name','Description','Category','YouTube URL','Duration','Embed Allowed','Is Active']]);
+    vWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:46},{wch:12},{wch:13},{wch:10}];
     XLSX.utils.book_append_sheet(wb, vWs, 'Videos');
 
     var dWs = XLSX.utils.aoa_to_sheet([['Serial No','Name','Author','Category','PDF File','Pages','File Size','Thumbnail Image','Is Active']]);

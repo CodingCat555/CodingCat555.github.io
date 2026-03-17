@@ -8,47 +8,52 @@
 var VIDEOS_DATA = [
   {
     "serial": 1,
-    "name": "Satsang — The Power of Ram Nam",
+    "name": "The Importance Swami gave to Amla | நெல்லிக்காய்க்கு சுவாமி கொடுத்த முக்கியத்துவம்",
     "description": "A rare recording of Swamiji speaking about the supreme importance of repeating the Divine Name in daily life.",
     "category": "discourse",
-    "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_1",
+    "youtubeUrl": "https://www.youtube.com/embed/TQ5QSP47kYM?si=r6W9ywUEnqU_Bs0T",
     "duration": "",
+    "embedAllowed": "no",
     "isActive": "yes"
   },
   {
     "serial": 2,
-    "name": "Yogi Ramsuratkumar — Jaya Guru Raya",
+    "name": "Frog in Fangs of a Cobra | பாம்பின் வாயில் சிக்கிய தவளை",
     "description": "Devotional chanting of the sacred name mantra of Swamiji, performed at the Ashram by devoted followers.",
     "category": "bhajan",
-    "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_2",
+    "youtubeUrl": "https://www.youtube.com/embed/OSTIRLSmeug?si=ke7cVMvgrfrSAIZw",
     "duration": "",
+    "embedAllowed": "no",
     "isActive": "yes"
   },
   {
     "serial": 3,
-    "name": "The Beggar of God — A Documentary",
+    "name": "Swami Yogi Ramsuratkumar about Osho | ஓஷோ குறித்து சுவாமி யோகி ராம்சுரத்குமார்",
     "description": "A full documentary journey into the extraordinary life and timeless teachings of Sri Yogi Ramsuratkumar.",
     "category": "documentary",
-    "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_3",
+    "youtubeUrl": "https://www.youtube.com/embed/7hP5IHjlOf8?si=qDrplQ-d4QGHCwIc",
     "duration": "",
+    "embedAllowed": "no",
     "isActive": "yes"
   },
   {
     "serial": 4,
-    "name": "Rare Footage — Swamiji at Ashram (1990s)",
+    "name": "The Connection between Swami and Number 7 | ஏழு என்ற எண்ணும் சுவாமியும்",
     "description": "Precious rare footage of Swamiji interacting with devotees at the Yogi Ramsuratkumar Ashram in the 1990s.",
     "category": "rare",
-    "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_4",
+    "youtubeUrl": "https://www.youtube.com/embed/FMZSIDNBG7g?si=VMj0ZsM71UqnmKhI",
     "duration": "",
+    "embedAllowed": "no",
     "isActive": "yes"
   },
   {
     "serial": 5,
-    "name": "Swamiji on Surrender to the Divine Father",
+    "name": "Other Saints, Sadhus Meeting with Swami | பிற ஞானி, சாதுக்களுடன் சுவாமியின் சந்திப்பு",
     "description": "Swamiji eloquently explains the path of total surrender and how it leads to liberation and divine grace.",
     "category": "discourse",
-    "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_5",
+    "youtubeUrl": "https://www.youtube.com/embed/RT-e3ETo-s4?si=9G5dgtWr8oMlPWR1",
     "duration": "",
+    "embedAllowed": "no",
     "isActive": "yes"
   },
   {
@@ -56,8 +61,9 @@ var VIDEOS_DATA = [
     "name": "Songs in Praise of Yogi Ramsuratkumar",
     "description": "Beautiful Tamil devotional songs composed in praise of Swamiji, sung by His ardent and devoted followers.",
     "category": "bhajan",
-    "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_6",
+    "youtubeUrl": "https://youtu.be/RT-e3ETo-s4",
     "duration": "",
+    "embedAllowed": "no",
     "isActive": "yes"
   },
   {
@@ -67,6 +73,7 @@ var VIDEOS_DATA = [
     "category": "discourse",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_1",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -76,6 +83,7 @@ var VIDEOS_DATA = [
     "category": "bhajan",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_2",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -85,6 +93,7 @@ var VIDEOS_DATA = [
     "category": "documentary",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_3",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -94,6 +103,7 @@ var VIDEOS_DATA = [
     "category": "rare",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_4",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -103,6 +113,7 @@ var VIDEOS_DATA = [
     "category": "discourse",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_5",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -112,6 +123,7 @@ var VIDEOS_DATA = [
     "category": "bhajan",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_6",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -121,6 +133,7 @@ var VIDEOS_DATA = [
     "category": "discourse",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_1",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -130,6 +143,7 @@ var VIDEOS_DATA = [
     "category": "bhajan",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_2",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -139,6 +153,7 @@ var VIDEOS_DATA = [
     "category": "documentary",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_3",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -148,6 +163,7 @@ var VIDEOS_DATA = [
     "category": "rare",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_4",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -157,6 +173,7 @@ var VIDEOS_DATA = [
     "category": "discourse",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_5",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -166,6 +183,7 @@ var VIDEOS_DATA = [
     "category": "bhajan",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_6",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -175,6 +193,7 @@ var VIDEOS_DATA = [
     "category": "discourse",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_1",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -184,6 +203,7 @@ var VIDEOS_DATA = [
     "category": "bhajan",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_2",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -193,6 +213,7 @@ var VIDEOS_DATA = [
     "category": "documentary",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_3",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -202,6 +223,7 @@ var VIDEOS_DATA = [
     "category": "rare",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_4",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -211,6 +233,7 @@ var VIDEOS_DATA = [
     "category": "discourse",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_5",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -220,6 +243,7 @@ var VIDEOS_DATA = [
     "category": "bhajan",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_6",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -229,6 +253,7 @@ var VIDEOS_DATA = [
     "category": "discourse",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_1",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -238,6 +263,7 @@ var VIDEOS_DATA = [
     "category": "bhajan",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_2",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -247,6 +273,7 @@ var VIDEOS_DATA = [
     "category": "documentary",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_3",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -256,6 +283,7 @@ var VIDEOS_DATA = [
     "category": "rare",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_4",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -265,6 +293,7 @@ var VIDEOS_DATA = [
     "category": "discourse",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_5",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -274,6 +303,7 @@ var VIDEOS_DATA = [
     "category": "bhajan",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_6",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -283,6 +313,7 @@ var VIDEOS_DATA = [
     "category": "discourse",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_1",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -292,6 +323,7 @@ var VIDEOS_DATA = [
     "category": "bhajan",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_2",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -301,6 +333,7 @@ var VIDEOS_DATA = [
     "category": "documentary",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_3",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -310,6 +343,7 @@ var VIDEOS_DATA = [
     "category": "rare",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_4",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -319,6 +353,7 @@ var VIDEOS_DATA = [
     "category": "discourse",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_5",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -328,6 +363,7 @@ var VIDEOS_DATA = [
     "category": "bhajan",
     "youtubeUrl": "https://www.youtube.com/embed/REPLACE_VIDEO_ID_6",
     "duration": "",
+    "embedAllowed": "yes",
     "isActive": "yes"
   }
 ];

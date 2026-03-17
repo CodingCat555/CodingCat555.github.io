@@ -93,13 +93,14 @@
       });
 
       this.videos = rows('Videos', {
-        serial      : 'Serial No',
-        name        : 'Name',
-        description : 'Description',
-        category    : 'Category',
-        youtubeUrl  : 'YouTube URL',
-        duration    : 'Duration',
-        isActive    : 'Is Active'
+        serial       : 'Serial No',
+        name         : 'Name',
+        description  : 'Description',
+        category     : 'Category',
+        youtubeUrl   : 'YouTube URL',
+        duration     : 'Duration',
+        embedAllowed : 'Embed Allowed',
+        isActive     : 'Is Active'
       });
 
       this.pdfs = rows('PDFs', {
