@@ -11,9 +11,9 @@ var VIDEOS_DATA = [
     "name": "The Importance Swami gave to Amla | நெல்லிக்காய்க்கு சுவாமி கொடுத்த முக்கியத்துவம்",
     "description": "A rare recording of Swamiji speaking about the supreme importance of repeating the Divine Name in daily life.",
     "category": "discourse",
-    "youtubeUrl": "https://www.youtube.com/embed/TQ5QSP47kYM?si=r6W9ywUEnqU_Bs0T",
+    "youtubeUrl": "https://youtu.be/3j7KJnuoxrs",
     "duration": "",
-    "embedAllowed": "no",
+    "embedAllowed": "yes",
     "isActive": "yes"
   },
   {
@@ -21,7 +21,7 @@ var VIDEOS_DATA = [
     "name": "Frog in Fangs of a Cobra | பாம்பின் வாயில் சிக்கிய தவளை",
     "description": "Devotional chanting of the sacred name mantra of Swamiji, performed at the Ashram by devoted followers.",
     "category": "bhajan",
-    "youtubeUrl": "https://www.youtube.com/embed/OSTIRLSmeug?si=ke7cVMvgrfrSAIZw",
+    "youtubeUrl": "https://youtu.be/3j7KJnuoxrs",
     "duration": "",
     "embedAllowed": "no",
     "isActive": "yes"

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Free Books — Yogi Ramsuratkumar</title>
+  <meta name="description" content="Download sacred books, talks, songs, and literature on Sri Yogi Ramsuratkumar — freely available for all seekers." />
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:site_name"   content="Yogi Ramsuratkumar" />
+  <meta property="og:url"         content="https://YOURDOMAIN.com/freebooks.html" />
+  <meta property="og:title"       content="Free Books &amp; Sacred Texts — Yogi Ramsuratkumar" />
+  <meta property="og:description" content="Download sacred books, transcribed talks, devotional songs, and scholarly works about Sri Yogi Ramsuratkumar — freely available for all seekers." />
+  <meta property="og:image"       content="https://YOURDOMAIN.com/images/swami-main.jpg" />
+  <meta property="og:locale"      content="en_IN" />
+  <meta name="twitter:card"       content="summary_large_image" />
+  <!-- SheetJS (reads Excel) + jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <!-- Static data files -->
+  <script src="data/photos.js"></script>
+  <script src="data/videos.js"></script>
+  <script src="data/pdfs.js"></script>
+  <script src="data/audios.js"></script>
+  <script src="data/version.js"></script>
+  <script src="js/footer.js"></script>
+  <!-- Central data loader (localStorage › falls back to data JS files) -->
+  <script src="data/data-loader.js"></script>
+  <style>
+    .no-data-msg {
+      text-align: center; padding: 48px 20px; grid-column: 1/-1;
+      color: var(--text-light);
+    }
+    .no-data-msg .nd-icon { font-size: 2.8rem; display: block; margin-bottom: 12px; }
+    .no-data-msg p { font-size: 0.95rem; }
+
+    .pdf-search {
+      max-width: 480px; margin: 0 auto 20px;
+      display: flex; border: 2px solid var(--border); border-radius: 50px;
+      overflow: hidden; background: white; box-shadow: var(--shadow);
+    }
+    .pdf-search input { flex:1; padding:11px 20px; border:none; outline:none; font-size:0.92rem; font-family:inherit; background:transparent; color:var(--text-dark); }
+    .pdf-search button { padding:11px 18px; background:var(--green); color:white; border:none; cursor:pointer; font-size:1rem; transition:var(--transition); }
+    .pdf-search button:hover { background:var(--green-dark); }
+    .gallery-counter { text-align:center; font-size:0.82rem; color:var(--text-light); margin-bottom:18px; }
+    .gallery-loading { text-align:center; color:var(--text-light); padding:40px; font-size:1rem; }
+    .pdf-btn-group { display:flex; gap:8px; flex-wrap:wrap; }
+    .pdf-view {
+      display:inline-flex; align-items:center; gap:5px;
+      padding:7px 16px; border-radius:50px; font-size:0.8rem; font-weight:700;
+      text-decoration:none; border:2px solid var(--green);
+      background:white; color:var(--green); transition:all 0.2s;
+    }
+    .pdf-view:hover { background:var(--green); color:white; }
+
+    /* ── PDF Page Preview ── */
+    .pdf-preview-wrap {
+      width: 100%; aspect-ratio: 3/4;
+      background: #f0f0f0; border-radius: 8px; overflow: hidden;
+      position: relative; margin-bottom: 14px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .pdf-preview-wrap canvas {
+      width: 100% !important; height: 100% !important;
+      object-fit: contain; display: block;
+    }
+    .pdf-preview-shimmer {
+      position: absolute; inset: 0;
+      background: linear-gradient(90deg, #e8e8e8 25%, #d0d0d0 50%, #e8e8e8 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+    .pdf-preview-fallback {
+      font-size: 3.5rem; position: relative; z-index: 1;
+    }
+    .pdf-preview-wrap.loaded .pdf-preview-shimmer { display: none; }
+    .pdf-preview-wrap.failed .pdf-preview-shimmer { display: none; }
+  </style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="header" id="header"></header>
+<div class="menu-overlay" id="menuOverlay"></div>
+
+<!-- ===== PAGE HEADER ===== -->
+<div class="page-header">
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="index.html">Home</a><span>›</span>
+      <a href="photos.html">Gallery</a><span>›</span>
+      <span>Free Books</span>
+    </nav>
+    <h1>📖 <span data-i18n="pdfs_page_title">Free Books</span></h1>
+  </div>
+</div>
+
+<!-- ===== FREE BOOKS ===== -->
+<section style="padding-top:32px; padding-bottom:60px;">
+  <div class="container">
+
+    <!-- Search -->
+    <div class="pdf-search" id="pdfSearchBox" style="display:none;">
+      <input type="text" id="pdfSearch" placeholder="Search by name or description…" data-i18n-ph="search_pdfs_ph" aria-label="Search Free Books" />
+      <button id="pdfSearchBtn">🔍</button>
+    </div>
+
+    <!-- ── Category Filters ── -->
+    <div class="gallery-filters" id="pdfFilters" style="display:none;">
+      <button class="filter-btn active" data-filter="all">All</button>
+    </div>
+
+    <p class="gallery-counter" id="pdfCounter"></p>
+
+    <!-- Books Grid -->
+    <div class="pdf-grid" id="pdfContainer">
+      <div class="gallery-loading" id="pdfPlaceholder">
+        📊 Load <strong>content-manager.xlsx</strong> using the bar above to display free books.
+      </div>
+    </div>
+    <!-- Infinite scroll sentinel -->
+    <div id="sentinel" style="height:2px;display:none;"></div>
+    <div id="loadingMore" data-i18n="loading_more_pdfs" style="display:none;text-align:center;padding:18px 0;color:var(--text-light);font-size:0.9rem;">⏳ Loading more publications…</div>
+
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer"></footer>
+
+<button class="scroll-top" id="scrollTop" aria-label="Scroll to top">↑</button>
+<script src="js/nav.js"></script>
+<script src="js/main.js"></script>
+<script>
+$(function () {
+
+  var BATCH           = 8;    /* 2 cols × 4 rows on desktop */
+  var allSorted       = [];
+  var currentFiltered = [];
+  var loadedCount     = 0;
+  var scrollObserver  = null;
+  var catIcons        = { book:'📕', talk:'📜', song:'🎵', magazine:'📰', photo:'🖼' };
+
+  /* ══════════════════════════════════════════════════════════
+     Free Books — Infinite Scroll
+  ══════════════════════════════════════════════════════════ */
+  function noDataMsg() {
+    return '<div class="no-data-msg"><span class="nd-icon">📖</span><p>' + t('no_pdfs') + '</p></div>';
+  }
+
+  function clearPdfs() {
+    if (scrollObserver) { scrollObserver.disconnect(); scrollObserver = null; }
+    $('#pdfSearchBox, #pdfFilters, #sentinel, #loadingMore').hide();
+    $('#pdfContainer').html(noDataMsg());
+    $('#pdfCounter').text('');
+    allSorted = []; currentFiltered = []; loadedCount = 0;
+  }
+
+  function buildAndRender() {
+    allSorted = SITE_DATA.active(SITE_DATA.pdfs);
+
+    var cats = [];
+    allSorted.forEach(function (p) {
+      if (p.category && $.inArray(p.category, cats) === -1) cats.push(p.category);
+    });
+    var $filters = $('#pdfFilters').show().empty()
+      .append('<button class="filter-btn active" data-filter="all">' + t('filter_all_pdfs') + '</button>');
+    cats.forEach(function (c) {
+      $filters.append('<button class="filter-btn" data-filter="' + c + '">' +
+        (catIcons[c] || '📄') + ' ' + c.charAt(0).toUpperCase() + c.slice(1) + '</button>');
+    });
+
+    $('#pdfSearchBox').show();
+    currentFiltered = allSorted;
+    loadedCount = 0;
+    $('#pdfContainer').empty();
+    appendBatch();
+  }
+
+  /* 'freebooks/images/book.jpg' → 'freebooks/images/thumbs/book.jpg' */
+  function pdfThumbPath(imagePath) {
+    if (!imagePath) return '';
+    var parts    = imagePath.replace(/\\/g, '/').split('/');
+    var filename = parts.pop();
+    return parts.join('/') + '/thumbs/' + filename;
+  }
+
+  function makeCard(p) {
+    var serial = String(p.serial).padStart(2, '0');
+    var icon   = catIcons[p.category] || '📄';
+    var thumb  = pdfThumbPath(p.image);
+
+    var $img = p.image
+      ? $('<img>', { 'data-src': thumb, alt: p.name, style: 'width:100%;height:100%;object-fit:cover;display:block;' })
+          .on('error', function () {
+            var $i = $(this);
+            if (!$i.data('triedFull')) {
+              $i.data('triedFull', true);
+              $i.attr('src', p.image); /* fallback to full image */
+              return;
+            }
+            $i.replaceWith('<div class="pdf-preview-fallback">' + icon + '</div>');
+          })
+      : $('<div>', { 'class': 'pdf-preview-fallback' }).text(icon);
+
+    var $preview = $('<div>', { 'class': 'pdf-preview-wrap' }).append(
+      '<div class="pdf-preview-shimmer"></div>', $img
+    );
+    /* hide shimmer once image loads */
+    $img.on('load', function () { $preview.addClass('loaded'); });
+
+    return $('<div>', { 'class': 'pdf-card fade-in', 'data-category': p.category,
+                        'style': 'flex-direction:column;' }).append(
+      $preview,
+      $('<div class="pdf-info">').append(
+        '<h3 class="pdf-title"><span class="pdf-serial-inline">#' + serial + '</span> ' + p.name + '</h3>',
+        '<p class="pdf-meta">📂 ' + (p.category || '') +
+          (p.pages ? ' &nbsp;|&nbsp; 📄 ' + p.pages + ' pages' : '') +
+          (p.fileSize ? ' &nbsp;|&nbsp; 💾 ' + p.fileSize : '') + '</p>',
+        (p.author ? '<p style="font-size:0.84rem;color:var(--text-body);line-height:1.6;margin-bottom:12px;">✍ ' + p.author + '</p>' : ''),
+        $('<div class="pdf-btn-group">').append(
+          $('<a>', { href: p.file, 'class': 'pdf-view', target: '_blank', text: t('btn_view') }),
+          $('<a>', { href: p.file, 'class': 'pdf-download', download: '', text: t('btn_download') })
+        )
+      )
+    );
+  }
+
+  function appendBatch() {
+    var batch = currentFiltered.slice(loadedCount, loadedCount + BATCH);
+    if (!batch.length && loadedCount === 0) {
+      $('#pdfContainer').html('<p style="color:var(--text-light);text-align:center;grid-column:1/-1;padding:40px;">' + t('no_pdfs') + '</p>');
+      $('#pdfCounter').text(''); $('#sentinel').hide(); return;
+    }
+    var $container = $('#pdfContainer');
+    $.each(batch, function (i, p) { $container.append(makeCard(p)); });
+    loadedCount += batch.length;
+    updateCounter();
+
+    if (loadedCount < currentFiltered.length) {
+      $('#sentinel').show(); setupObserver();
+    } else {
+      $('#sentinel').hide();
+      if (scrollObserver) { scrollObserver.disconnect(); scrollObserver = null; }
+    }
+    if (typeof window.initFade === 'function') window.initFade();
+  }
+
+  function updateCounter() {
+    var total = currentFiltered.length;
+    $('#pdfCounter').text(t('showing') + ' ' + Math.min(loadedCount, total) + ' ' + t('of') + ' ' + total + ' ' + t('label_publications'));
+  }
+
+  function setupObserver() {
+    if (scrollObserver) scrollObserver.disconnect();
+    scrollObserver = new IntersectionObserver(function (entries) {
+      if (!entries[0].isIntersecting) return;
+      $('#loadingMore').show();
+      setTimeout(function () { appendBatch(); $('#loadingMore').hide(); }, 250);
+    }, { rootMargin: '300px' });
+    scrollObserver.observe(document.getElementById('sentinel'));
+  }
+
+  /* ── Combined filter + search ── */
+  function applyFilter() {
+    var f = $('.filter-btn.active').data('filter') || 'all';
+    var q = $('#pdfSearch').val().toLowerCase().trim();
+    currentFiltered = allSorted.filter(function (p) {
+      return (f === 'all' || p.category === f) &&
+        (!q || (p.name || '').toLowerCase().indexOf(q) !== -1 ||
+               (p.description || '').toLowerCase().indexOf(q) !== -1);
+    });
+    loadedCount = 0;
+    $('#pdfContainer').empty();
+    if (scrollObserver) { scrollObserver.disconnect(); scrollObserver = null; }
+    appendBatch();
+  }
+
+  /* ── Category filter ── */
+  $(document).on('click', '.filter-btn', function () {
+    $('.filter-btn').removeClass('active'); $(this).addClass('active'); applyFilter();
+  });
+
+  /* ── Live search ── */
+  $(document).on('input keyup', '#pdfSearch', function (e) {
+    if (e.key === 'Escape') $(this).val(''); applyFilter();
+  });
+  $(document).on('click', '#pdfSearchBtn', function () { applyFilter(); });
+
+  /* ── Init ── */
+  if (SITE_DATA.loaded && SITE_DATA.pdfs.length) {
+    buildAndRender();
+    (function () {
+      var cat = new URLSearchParams(window.location.search).get('cat');
+      if (cat) { var $btn = $('.filter-btn[data-filter="' + cat + '"]'); if ($btn.length) $btn.trigger('click'); }
+    })();
+  } else {
+    $('#pdfContainer').html(noDataMsg());
+  }
+
+  /* ── Lazy load thumbnail images ── */
+  var pdfImgObserver = ('IntersectionObserver' in window)
+    ? new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          var img = entry.target;
+          var src = img.getAttribute('data-src');
+          if (src) { img.src = src; img.removeAttribute('data-src'); }
+          pdfImgObserver.unobserve(img);
+        });
+      }, { rootMargin: '400px' })
+    : null;
+
+  function observePdfImages() {
+    document.querySelectorAll('.pdf-preview-wrap img[data-src]').forEach(function (img) {
+      if (pdfImgObserver) pdfImgObserver.observe(img);
+      else { img.src = img.getAttribute('data-src'); img.removeAttribute('data-src'); }
+    });
+  }
+
+  var _origAppend = appendBatch;
+  appendBatch = function () { _origAppend(); observePdfImages(); };
+  observePdfImages();
+
+});
+</script>
+<script src="data/lang/en.js"></script>
+<script src="data/lang/ta.js"></script>
+<script src="data/lang-loader.js"></script>
+</body>
+</html>

@@ -64,11 +64,12 @@
               '</ul>' +
             '</li>' +
             '<li class="nav-has-sub">' +
-              '<a href="pdfs.html">📄 PDFs <span class="sub-arrow">▸</span></a>' +
+              '<a href="freebooks.html">📖 Free Books <span class="sub-arrow">▸</span></a>' +
               '<ul class="sub-dropdown" id="pdfCatDropdown">' +
-                '<li><a href="pdfs.html">All PDFs</a></li>' +
+                '<li><a href="freebooks.html">All Free Books</a></li>' +
               '</ul>' +
             '</li>' +
+            '<li><a href="paidbooks.html">📚 Paid Books</a></li>' +
             '<li><a href="quotes.html">✨ Quotes</a></li>' +
           '</ul>' +
         '</li>' +

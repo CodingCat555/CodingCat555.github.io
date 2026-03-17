@@ -11,10 +11,10 @@ var PDFS_DATA = [
     "name": "Amarakavyam",
     "author": "S. Parthasarathy",
     "category": "book",
-    "file": "pdfs/Amarakavyam.pdf",
+    "file": "freebooks/Amarakavyam.pdf",
     "pages": "~250",
     "fileSize": "2.44 MB",
-    "thumbImage": "pdfs/images/Amarakavyam.jpg",
+    "image": "freebooks/images/Amarakavyam.jpg",
     "isActive": "yes"
   },
   {
@@ -22,10 +22,10 @@ var PDFS_DATA = [
     "name": "Song of the Beggar",
     "author": "",
     "category": "book",
-    "file": "pdfs/song-of-the-beggar.pdf",
+    "file": "freebooks/song-of-the-beggar.pdf",
     "pages": "~180",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -33,10 +33,10 @@ var PDFS_DATA = [
     "name": "The Saint of the Twentieth Century",
     "author": "",
     "category": "book",
-    "file": "pdfs/saint-of-twentieth-century.pdf",
+    "file": "freebooks/saint-of-twentieth-century.pdf",
     "pages": "~200",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -44,10 +44,10 @@ var PDFS_DATA = [
     "name": "The Godman of Tiruvannamalai",
     "author": "",
     "category": "book",
-    "file": "pdfs/godman-of-tiruvannamalai.pdf",
+    "file": "freebooks/godman-of-tiruvannamalai.pdf",
     "pages": "~320",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -55,10 +55,10 @@ var PDFS_DATA = [
     "name": "Satsang Talks — Volume I",
     "author": "",
     "category": "talk",
-    "file": "pdfs/satsang-talks-vol-1.pdf",
+    "file": "freebooks/satsang-talks-vol-1.pdf",
     "pages": "~120",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -66,10 +66,10 @@ var PDFS_DATA = [
     "name": "Satsang Talks — Volume II",
     "author": "",
     "category": "talk",
-    "file": "pdfs/satsang-talks-vol-2.pdf",
+    "file": "freebooks/satsang-talks-vol-2.pdf",
     "pages": "~130",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -77,10 +77,10 @@ var PDFS_DATA = [
     "name": "His Words in Tamil",
     "author": "",
     "category": "talk",
-    "file": "pdfs/his-words-tamil.pdf",
+    "file": "freebooks/his-words-tamil.pdf",
     "pages": "~90",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -88,10 +88,10 @@ var PDFS_DATA = [
     "name": "Devotional Songs Collection",
     "author": "",
     "category": "song",
-    "file": "pdfs/devotional-songs.pdf",
+    "file": "freebooks/devotional-songs.pdf",
     "pages": "~60",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -99,10 +99,10 @@ var PDFS_DATA = [
     "name": "Ashtakam, Stotras and Namavali",
     "author": "",
     "category": "song",
-    "file": "pdfs/ashtakam-stotras.pdf",
+    "file": "freebooks/ashtakam-stotras.pdf",
     "pages": "~40",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -110,10 +110,10 @@ var PDFS_DATA = [
     "name": "Anandam Magazine",
     "author": "",
     "category": "magazine",
-    "file": "pdfs/anandam-magazine.pdf",
+    "file": "freebooks/anandam-magazine.pdf",
     "pages": "~80",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -121,10 +121,10 @@ var PDFS_DATA = [
     "name": "Jayanti Souvenir 2000",
     "author": "",
     "category": "magazine",
-    "file": "pdfs/jayanti-souvenir-2000.pdf",
+    "file": "freebooks/jayanti-souvenir-2000.pdf",
     "pages": "~100",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -132,10 +132,10 @@ var PDFS_DATA = [
     "name": "Divine Glimpses — Photo Book",
     "author": "",
     "category": "photo",
-    "file": "pdfs/divine-glimpses.pdf",
+    "file": "freebooks/divine-glimpses.pdf",
     "pages": "~60",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -143,10 +143,10 @@ var PDFS_DATA = [
     "name": "Beggar Prince",
     "author": "",
     "category": "book",
-    "file": "pdfs/beggar-prince.pdf",
+    "file": "freebooks/beggar-prince.pdf",
     "pages": "~250",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -154,10 +154,10 @@ var PDFS_DATA = [
     "name": "Song of the Beggar",
     "author": "",
     "category": "book",
-    "file": "pdfs/song-of-the-beggar.pdf",
+    "file": "freebooks/song-of-the-beggar.pdf",
     "pages": "~180",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -165,10 +165,10 @@ var PDFS_DATA = [
     "name": "The Saint of the Twentieth Century",
     "author": "",
     "category": "book",
-    "file": "pdfs/saint-of-twentieth-century.pdf",
+    "file": "freebooks/saint-of-twentieth-century.pdf",
     "pages": "~200",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -176,10 +176,10 @@ var PDFS_DATA = [
     "name": "The Godman of Tiruvannamalai",
     "author": "",
     "category": "book",
-    "file": "pdfs/godman-of-tiruvannamalai.pdf",
+    "file": "freebooks/godman-of-tiruvannamalai.pdf",
     "pages": "~320",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -187,10 +187,10 @@ var PDFS_DATA = [
     "name": "Satsang Talks — Volume I",
     "author": "",
     "category": "talk",
-    "file": "pdfs/satsang-talks-vol-1.pdf",
+    "file": "freebooks/satsang-talks-vol-1.pdf",
     "pages": "~120",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -198,10 +198,10 @@ var PDFS_DATA = [
     "name": "Satsang Talks — Volume II",
     "author": "",
     "category": "talk",
-    "file": "pdfs/satsang-talks-vol-2.pdf",
+    "file": "freebooks/satsang-talks-vol-2.pdf",
     "pages": "~130",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -209,10 +209,10 @@ var PDFS_DATA = [
     "name": "His Words in Tamil",
     "author": "",
     "category": "talk",
-    "file": "pdfs/his-words-tamil.pdf",
+    "file": "freebooks/his-words-tamil.pdf",
     "pages": "~90",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -220,10 +220,10 @@ var PDFS_DATA = [
     "name": "Devotional Songs Collection",
     "author": "",
     "category": "song",
-    "file": "pdfs/devotional-songs.pdf",
+    "file": "freebooks/devotional-songs.pdf",
     "pages": "~60",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -231,10 +231,10 @@ var PDFS_DATA = [
     "name": "Ashtakam, Stotras and Namavali",
     "author": "",
     "category": "song",
-    "file": "pdfs/ashtakam-stotras.pdf",
+    "file": "freebooks/ashtakam-stotras.pdf",
     "pages": "~40",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -242,10 +242,10 @@ var PDFS_DATA = [
     "name": "Anandam Magazine",
     "author": "",
     "category": "magazine",
-    "file": "pdfs/anandam-magazine.pdf",
+    "file": "freebooks/anandam-magazine.pdf",
     "pages": "~80",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -253,10 +253,10 @@ var PDFS_DATA = [
     "name": "Jayanti Souvenir 2000",
     "author": "",
     "category": "magazine",
-    "file": "pdfs/jayanti-souvenir-2000.pdf",
+    "file": "freebooks/jayanti-souvenir-2000.pdf",
     "pages": "~100",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -264,10 +264,10 @@ var PDFS_DATA = [
     "name": "Divine Glimpses — Photo Book",
     "author": "",
     "category": "photo",
-    "file": "pdfs/divine-glimpses.pdf",
+    "file": "freebooks/divine-glimpses.pdf",
     "pages": "~60",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -275,10 +275,10 @@ var PDFS_DATA = [
     "name": "Beggar Prince",
     "author": "",
     "category": "book",
-    "file": "pdfs/beggar-prince.pdf",
+    "file": "freebooks/beggar-prince.pdf",
     "pages": "~250",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -286,10 +286,10 @@ var PDFS_DATA = [
     "name": "Song of the Beggar",
     "author": "",
     "category": "book",
-    "file": "pdfs/song-of-the-beggar.pdf",
+    "file": "freebooks/song-of-the-beggar.pdf",
     "pages": "~180",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -297,10 +297,10 @@ var PDFS_DATA = [
     "name": "The Saint of the Twentieth Century",
     "author": "",
     "category": "book",
-    "file": "pdfs/saint-of-twentieth-century.pdf",
+    "file": "freebooks/saint-of-twentieth-century.pdf",
     "pages": "~200",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -308,10 +308,10 @@ var PDFS_DATA = [
     "name": "The Godman of Tiruvannamalai",
     "author": "",
     "category": "book",
-    "file": "pdfs/godman-of-tiruvannamalai.pdf",
+    "file": "freebooks/godman-of-tiruvannamalai.pdf",
     "pages": "~320",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -319,10 +319,10 @@ var PDFS_DATA = [
     "name": "Satsang Talks — Volume I",
     "author": "",
     "category": "talk",
-    "file": "pdfs/satsang-talks-vol-1.pdf",
+    "file": "freebooks/satsang-talks-vol-1.pdf",
     "pages": "~120",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -330,10 +330,10 @@ var PDFS_DATA = [
     "name": "Satsang Talks — Volume II",
     "author": "",
     "category": "talk",
-    "file": "pdfs/satsang-talks-vol-2.pdf",
+    "file": "freebooks/satsang-talks-vol-2.pdf",
     "pages": "~130",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -341,10 +341,10 @@ var PDFS_DATA = [
     "name": "His Words in Tamil",
     "author": "",
     "category": "talk",
-    "file": "pdfs/his-words-tamil.pdf",
+    "file": "freebooks/his-words-tamil.pdf",
     "pages": "~90",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -352,10 +352,10 @@ var PDFS_DATA = [
     "name": "Devotional Songs Collection",
     "author": "",
     "category": "song",
-    "file": "pdfs/devotional-songs.pdf",
+    "file": "freebooks/devotional-songs.pdf",
     "pages": "~60",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -363,10 +363,10 @@ var PDFS_DATA = [
     "name": "Ashtakam, Stotras and Namavali",
     "author": "",
     "category": "song",
-    "file": "pdfs/ashtakam-stotras.pdf",
+    "file": "freebooks/ashtakam-stotras.pdf",
     "pages": "~40",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -374,10 +374,10 @@ var PDFS_DATA = [
     "name": "Anandam Magazine",
     "author": "",
     "category": "magazine",
-    "file": "pdfs/anandam-magazine.pdf",
+    "file": "freebooks/anandam-magazine.pdf",
     "pages": "~80",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -385,10 +385,10 @@ var PDFS_DATA = [
     "name": "Jayanti Souvenir 2000",
     "author": "",
     "category": "magazine",
-    "file": "pdfs/jayanti-souvenir-2000.pdf",
+    "file": "freebooks/jayanti-souvenir-2000.pdf",
     "pages": "~100",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -396,10 +396,10 @@ var PDFS_DATA = [
     "name": "Divine Glimpses — Photo Book",
     "author": "",
     "category": "photo",
-    "file": "pdfs/divine-glimpses.pdf",
+    "file": "freebooks/divine-glimpses.pdf",
     "pages": "~60",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -407,10 +407,10 @@ var PDFS_DATA = [
     "name": "Beggar Prince",
     "author": "",
     "category": "book",
-    "file": "pdfs/beggar-prince.pdf",
+    "file": "freebooks/beggar-prince.pdf",
     "pages": "~250",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -418,10 +418,10 @@ var PDFS_DATA = [
     "name": "Song of the Beggar",
     "author": "",
     "category": "book",
-    "file": "pdfs/song-of-the-beggar.pdf",
+    "file": "freebooks/song-of-the-beggar.pdf",
     "pages": "~180",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -429,10 +429,10 @@ var PDFS_DATA = [
     "name": "The Saint of the Twentieth Century",
     "author": "",
     "category": "book",
-    "file": "pdfs/saint-of-twentieth-century.pdf",
+    "file": "freebooks/saint-of-twentieth-century.pdf",
     "pages": "~200",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -440,10 +440,10 @@ var PDFS_DATA = [
     "name": "The Godman of Tiruvannamalai",
     "author": "",
     "category": "book",
-    "file": "pdfs/godman-of-tiruvannamalai.pdf",
+    "file": "freebooks/godman-of-tiruvannamalai.pdf",
     "pages": "~320",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -451,10 +451,10 @@ var PDFS_DATA = [
     "name": "Satsang Talks — Volume I",
     "author": "",
     "category": "talk",
-    "file": "pdfs/satsang-talks-vol-1.pdf",
+    "file": "freebooks/satsang-talks-vol-1.pdf",
     "pages": "~120",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -462,10 +462,10 @@ var PDFS_DATA = [
     "name": "Satsang Talks — Volume II",
     "author": "",
     "category": "talk",
-    "file": "pdfs/satsang-talks-vol-2.pdf",
+    "file": "freebooks/satsang-talks-vol-2.pdf",
     "pages": "~130",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -473,10 +473,10 @@ var PDFS_DATA = [
     "name": "His Words in Tamil",
     "author": "",
     "category": "talk",
-    "file": "pdfs/his-words-tamil.pdf",
+    "file": "freebooks/his-words-tamil.pdf",
     "pages": "~90",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -484,10 +484,10 @@ var PDFS_DATA = [
     "name": "Devotional Songs Collection",
     "author": "",
     "category": "song",
-    "file": "pdfs/devotional-songs.pdf",
+    "file": "freebooks/devotional-songs.pdf",
     "pages": "~60",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -495,10 +495,10 @@ var PDFS_DATA = [
     "name": "Ashtakam, Stotras and Namavali",
     "author": "",
     "category": "song",
-    "file": "pdfs/ashtakam-stotras.pdf",
+    "file": "freebooks/ashtakam-stotras.pdf",
     "pages": "~40",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -506,10 +506,10 @@ var PDFS_DATA = [
     "name": "Anandam Magazine",
     "author": "",
     "category": "magazine",
-    "file": "pdfs/anandam-magazine.pdf",
+    "file": "freebooks/anandam-magazine.pdf",
     "pages": "~80",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -517,10 +517,10 @@ var PDFS_DATA = [
     "name": "Jayanti Souvenir 2000",
     "author": "",
     "category": "magazine",
-    "file": "pdfs/jayanti-souvenir-2000.pdf",
+    "file": "freebooks/jayanti-souvenir-2000.pdf",
     "pages": "~100",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   },
   {
@@ -528,10 +528,10 @@ var PDFS_DATA = [
     "name": "Divine Glimpses — Photo Book",
     "author": "",
     "category": "photo",
-    "file": "pdfs/divine-glimpses.pdf",
+    "file": "freebooks/divine-glimpses.pdf",
     "pages": "~60",
     "fileSize": "",
-    "thumbImage": "",
+    "image": "",
     "isActive": "yes"
   }
 ];

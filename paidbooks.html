@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Books — Yogi Ramsuratkumar</title>
+  <meta name="description" content="Books about Sri Yogi Ramsuratkumar — biographies, teachings, and devotional works available for purchase." />
+  <link rel="stylesheet" href="css/style.css" />
+  <meta property="og:type"        content="website" />
+  <meta property="og:site_name"   content="Yogi Ramsuratkumar" />
+  <meta property="og:title"       content="Books — Yogi Ramsuratkumar" />
+  <meta property="og:description" content="Books about Sri Yogi Ramsuratkumar — biographies, teachings, and devotional works." />
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="data/photos.js"></script>
+  <script src="data/videos.js"></script>
+  <script src="data/pdfs.js"></script>
+  <script src="data/audios.js"></script>
+  <script src="data/version.js"></script>
+  <script src="js/footer.js"></script>
+  <script src="data/data-loader.js"></script>
+  <style>
+    /* ── Book Grid ── */
+    .book-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 24px;
+    }
+
+    /* ── Book Card (Option A + language tag + store name) ── */
+    .book-card {
+      background: var(--card-bg);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .book-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    /* Cover */
+    .book-cover {
+      width: 100%;
+      aspect-ratio: 3/4;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(160deg, #c8ecd2 0%, #7ab89a 100%);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .book-cover img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .book-cover-placeholder {
+      font-size: 3.8rem;
+      font-family: 'Cinzel', Georgia, serif;
+      font-weight: 700;
+      color: rgba(15,69,32,0.5);
+      user-select: none;
+      line-height: 1;
+    }
+    /* Body */
+    .book-body {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .book-title {
+      font-family: 'Cinzel', Georgia, serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 4px;
+      line-height: 1.4;
+    }
+    .book-author {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      margin-bottom: 8px;
+    }
+    .book-desc {
+      font-size: 0.74rem;
+      color: var(--text-body);
+      line-height: 1.55;
+      flex: 1;
+      margin-bottom: 14px;
+      opacity: 0.88;
+    }
+    .book-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: auto;
+    }
+    .book-buy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 7px 14px;
+      background: linear-gradient(135deg, var(--green), var(--green-light));
+      color: #fff;
+      border-radius: 50px;
+      text-decoration: none;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .book-buy-btn:hover { opacity: 0.88; transform: scale(1.03); }
+
+    /* No-data / loading */
+    .no-data-msg {
+      text-align: center; padding: 48px 20px; grid-column: 1/-1;
+      color: var(--text-light);
+    }
+    .no-data-msg .nd-icon { font-size: 2.8rem; display: block; margin-bottom: 12px; }
+    .no-data-msg p { font-size: 0.95rem; }
+    .gallery-loading { text-align:center; color:var(--text-light); padding:40px; font-size:1rem; }
+    .gallery-counter { text-align:center; font-size:0.82rem; color:var(--text-light); margin-bottom:18px; }
+
+    /* Search */
+    .book-search {
+      max-width: 480px; margin: 0 auto 20px;
+      display: flex; border: 2px solid var(--border); border-radius: 50px;
+      overflow: hidden; background: white; box-shadow: var(--shadow);
+    }
+    .book-search input {
+      flex:1; padding:11px 20px; border:none; outline:none;
+      font-size:0.92rem; font-family:inherit; background:transparent; color:var(--text-dark);
+    }
+    .book-search button {
+      padding:11px 18px; background:var(--green); color:white;
+      border:none; cursor:pointer; font-size:1rem; transition:var(--transition);
+    }
+    .book-search button:hover { background:var(--green-dark); }
+
+    @media (max-width: 480px) {
+      .book-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+      .book-body { padding: 10px; }
+      .book-title { font-size: 0.75rem; }
+      .book-desc { display: none; }
+      .book-footer { flex-direction: column; align-items: flex-start; gap: 6px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="header" id="header"></header>
+<div class="menu-overlay" id="menuOverlay"></div>
+
+<!-- ===== PAGE HEADER ===== -->
+<div class="page-header">
+  <div class="container">
+    <nav class="breadcrumb">
+      <a href="index.html">Home</a><span>›</span>
+      <span>Books</span>
+    </nav>
+    <h1>📚 Books</h1>
+  </div>
+</div>
+
+<!-- ===== BOOKS ===== -->
+<section style="padding-top:32px; padding-bottom:60px;">
+  <div class="container">
+
+    <!-- Search -->
+    <div class="book-search" id="bookSearchBox" style="display:none;">
+      <input type="text" id="bookSearch" placeholder="Search by title, author…" aria-label="Search books" />
+      <button id="bookSearchBtn">🔍</button>
+    </div>
+
+    <!-- Category Filters -->
+    <div class="gallery-filters" id="bookFilters" style="display:none;">
+      <button class="filter-btn active" data-filter="all">All</button>
+    </div>
+
+    <p class="gallery-counter" id="bookCounter"></p>
+
+    <!-- Book Grid -->
+    <div class="book-grid" id="bookContainer">
+      <div class="gallery-loading" id="bookPlaceholder">
+        📚 Load <strong>content-manager.xlsx</strong> using the bar above to display books.
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer"></footer>
+<button class="scroll-top" id="scrollTop" aria-label="Scroll to top">↑</button>
+
+<script src="js/nav.js"></script>
+<script src="js/main.js"></script>
+<script>
+$(function () {
+
+  var allSorted       = [];
+  var currentFiltered = [];
+
+  function noDataMsg() {
+    return '<div class="no-data-msg"><span class="nd-icon">📚</span><p>No books found.</p></div>';
+  }
+
+  /* Cover colour variants so placeholder cards look distinct */
+  var coverColors = [
+    'linear-gradient(160deg,#c8ecd2 0%,#7ab89a 100%)',
+    'linear-gradient(160deg,#d4e8f0 0%,#8aaed0 100%)',
+    'linear-gradient(160deg,#f0e8d4 0%,#d0a870 100%)',
+    'linear-gradient(160deg,#e8d4f0 0%,#a870c8 100%)',
+    'linear-gradient(160deg,#f0d4d4 0%,#c87070 100%)',
+    'linear-gradient(160deg,#d4f0e8 0%,#70c8a8 100%)'
+  ];
+
+  /* 'paidbooks/images/book.jpg' → 'paidbooks/images/thumbs/book.jpg' */
+  function paidThumbPath(imgPath) {
+    if (!imgPath) return '';
+    var parts = imgPath.replace(/\\/g, '/').split('/');
+    var filename = parts.pop();
+    return parts.join('/') + '/thumbs/' + filename;
+  }
+
+  function makeCard(b, idx) {
+    var $cover;
+    if (b.image) {
+      var thumb = paidThumbPath(b.image);
+      var $img = $('<img>', { 'data-src': thumb, alt: b.name, style: 'width:100%;height:100%;object-fit:cover;display:block;' })
+        .on('error', function () {
+          var $i = $(this);
+          if (!$i.data('triedFull')) { $i.data('triedFull', true); $i.attr('src', b.image); return; }
+          $i.replaceWith(makePlaceholder(b, idx));
+        });
+      $cover = $('<div class="book-cover">').append($img);
+      $img.on('load', function () { $cover.addClass('loaded'); });
+    } else {
+      $cover = $('<div class="book-cover">').css('background', coverColors[idx % coverColors.length]).append(
+        makePlaceholder(b, idx)
+      );
+    }
+
+    var $footer = $('<div class="book-footer">').append(
+      $('<a>', {
+        href: b.buyLink || '#',
+        'class': 'book-buy-btn',
+        target: '_blank',
+        rel: 'noopener noreferrer',
+        html: '🛒 Buy Now ↗'
+      })
+    );
+
+    return $('<div class="book-card fade-in">').append(
+      $cover,
+      $('<div class="book-body">').append(
+        '<div class="book-title">' + b.name + '</div>',
+        b.author ? '<div class="book-author">by ' + b.author + '</div>' : '',
+        b.description ? '<div class="book-desc">' + b.description + '</div>' : '',
+        $footer
+      )
+    );
+  }
+
+  function makePlaceholder(b, idx) {
+    var letter = (b.name || '?').charAt(0).toUpperCase();
+    return $('<div class="book-cover-placeholder">').text(letter);
+  }
+
+  function buildAndRender() {
+    allSorted = SITE_DATA.active(SITE_DATA.paidBooks);
+
+    if (!allSorted.length) {
+      $('#bookContainer').html(noDataMsg());
+      return;
+    }
+
+    /* Build category filters */
+    var cats = [];
+    allSorted.forEach(function (b) {
+      if (b.category && $.inArray(b.category, cats) === -1) cats.push(b.category);
+    });
+    var $filters = $('#bookFilters').show().empty()
+      .append('<button class="filter-btn active" data-filter="all">All</button>');
+    cats.forEach(function (c) {
+      $filters.append('<button class="filter-btn" data-filter="' + c + '">' +
+        c.charAt(0).toUpperCase() + c.slice(1) + '</button>');
+    });
+
+    $('#bookSearchBox').show();
+    currentFiltered = allSorted;
+    renderCards();
+  }
+
+  /* Lazy-load book cover images */
+  var bookImgObserver = ('IntersectionObserver' in window)
+    ? new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          var img = entry.target;
+          var src = img.getAttribute('data-src');
+          if (src) { img.src = src; img.removeAttribute('data-src'); }
+          bookImgObserver.unobserve(img);
+        });
+      }, { rootMargin: '400px' })
+    : null;
+
+  function observeBookImages() {
+    document.querySelectorAll('.book-cover img[data-src]').forEach(function (img) {
+      if (bookImgObserver) bookImgObserver.observe(img);
+      else { img.src = img.getAttribute('data-src'); img.removeAttribute('data-src'); }
+    });
+  }
+
+  function renderCards() {
+    var $container = $('#bookContainer').empty();
+    if (!currentFiltered.length) {
+      $container.html(noDataMsg());
+      $('#bookCounter').text('');
+      return;
+    }
+    $.each(currentFiltered, function (i, b) { $container.append(makeCard(b, i)); });
+    $('#bookCounter').text('Showing ' + currentFiltered.length + ' book' + (currentFiltered.length !== 1 ? 's' : ''));
+    if (typeof window.initFade === 'function') window.initFade();
+    observeBookImages();
+  }
+
+  function applyFilter() {
+    var f = $('.filter-btn.active').data('filter') || 'all';
+    var q = $('#bookSearch').val().toLowerCase().trim();
+    currentFiltered = allSorted.filter(function (b) {
+      return (f === 'all' || b.category === f) &&
+        (!q || (b.name   || '').toLowerCase().indexOf(q) !== -1 ||
+               (b.author || '').toLowerCase().indexOf(q) !== -1 ||
+               (b.description || '').toLowerCase().indexOf(q) !== -1);
+    });
+    renderCards();
+  }
+
+  $(document).on('click', '.filter-btn', function () {
+    $('.filter-btn').removeClass('active'); $(this).addClass('active'); applyFilter();
+  });
+  $(document).on('input keyup', '#bookSearch', function (e) {
+    if (e.key === 'Escape') $(this).val(''); applyFilter();
+  });
+  $(document).on('click', '#bookSearchBtn', applyFilter);
+
+  /* Init */
+  if (SITE_DATA.loaded && SITE_DATA.paidBooks && SITE_DATA.paidBooks.length) {
+    buildAndRender();
+  } else {
+    $('#bookContainer').html(noDataMsg());
+    document.addEventListener('siteDataReady', function () {
+      if (SITE_DATA.paidBooks && SITE_DATA.paidBooks.length) buildAndRender();
+    });
+  }
+
+});
+</script>
+<script src="data/lang/en.js"></script>
+<script src="data/lang/ta.js"></script>
+<script src="data/lang-loader.js"></script>
+</body>
+</html>

@@ -258,7 +258,7 @@
 <div class="mode-bar">
   <label for="modeSelect">Manager Mode:</label>
   <select id="modeSelect">
-    <option value="gallery">🖼 Gallery Manager — Photos · Videos · Audios · PDFs · Quotes</option>
+    <option value="gallery">🖼 Gallery Manager — 6 Sheets: Photos · Videos · Audios · Free Books · Paid Books · Quotes</option>
     <option value="lang">🌐 Language Manager — English &amp; Tamil Translations</option>
   </select>
   <span class="mode-desc" id="modeDesc">Upload Excel or edit rows → set Is Active → Save to Website</span>
@@ -295,27 +295,37 @@
     <label class="btn btn-gold" style="cursor:pointer;">
       📂 Upload Excel <input type="file" id="galleryUploadInput" accept=".xlsx,.xls" />
     </label>
-    <button class="btn btn-outline" id="btnGalleryDownloadExcel">📊 Download Excel</button>
-    <button class="btn btn-outline" id="btnGalleryTemplate">📋 Download Template</button>
     <div class="toolbar-sep"></div>
     <!-- Sheet selector multiselect -->
     <div class="sheet-select-wrap" id="sheetSelectWrap">
-      <button class="btn btn-outline" id="sheetSelectToggle" type="button">📋 Sheets <span id="sheetSelectCount">5</span> ▾</button>
+      <button class="btn btn-outline" id="sheetSelectToggle" type="button">📋 Sheets <span id="sheetSelectCount">6</span> ▾</button>
       <div class="sheet-dropdown" id="sheetDropdown">
-        <label><input type="checkbox" class="sheet-chk" value="photos"  checked> 🖼 Photos</label>
-        <label><input type="checkbox" class="sheet-chk" value="videos"  checked> 🎬 Videos</label>
-        <label><input type="checkbox" class="sheet-chk" value="audios"  checked> 🎵 Audios</label>
-        <label><input type="checkbox" class="sheet-chk" value="pdfs"    checked> 📄 PDFs</label>
-        <label><input type="checkbox" class="sheet-chk" value="quotes"  checked> ✨ Quotes</label>
+        <label><input type="checkbox" class="sheet-chk" value="photos"   checked> 🖼 Photos</label>
+        <label><input type="checkbox" class="sheet-chk" value="videos"   checked> 🎬 Videos</label>
+        <label><input type="checkbox" class="sheet-chk" value="audios"   checked> 🎵 Audios</label>
+        <label><input type="checkbox" class="sheet-chk" value="pdfs"     checked> 📖 Free Books</label>
+        <label><input type="checkbox" class="sheet-chk" value="paidbooks" checked> 📚 Paid Books</label>
+        <label><input type="checkbox" class="sheet-chk" value="quotes"   checked> ✨ Quotes</label>
       </div>
     </div>
     <button class="btn btn-green" id="btnGallerySave">💾 Save to Website</button>
+    <button class="btn btn-outline" id="btnGalleryDownloadExcel">📊 Download Excel</button>
+    <button class="btn btn-outline" id="btnGalleryTemplate">📋 Download Template</button>
     <button class="btn btn-red" id="btnGalleryClearCache">🗑 Clear Cache</button>
     <div style="width:100%; display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:6px;">
-      <button class="btn btn-outline" id="btnGenThumbs">🖼 Generate Photo Thumbnails</button>
-      <button class="btn btn-outline" id="btnGenPdfThumbs">📄 Generate PDF Thumbnails</button>
-      <button class="btn btn-outline" id="btnGenQuoteThumbs">✨ Generate Quote Thumbnails</button>
-      <button class="btn btn-outline" id="btnGenAudioThumbs">🎵 Generate Audio Thumbnails</button>
+      <button class="btn btn-outline" id="btnGenAllThumbs">🖼 Generate Thumbnails</button>
+      <div style="position:relative; display:inline-block;" id="thumbSelectWrap">
+        <button class="btn btn-outline" id="thumbSelectToggle" style="padding:6px 12px; font-size:0.82rem;">
+          ☑ All Types ▾
+        </button>
+        <div id="thumbSelectDropdown" style="display:none; position:absolute; top:110%; left:0; background:#fff; border:1px solid #ccc; border-radius:8px; padding:10px 14px; z-index:200; white-space:nowrap; box-shadow:0 4px 16px rgba(0,0,0,0.12); min-width:180px;">
+          <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;cursor:pointer;"><input type="checkbox" class="thumb-chk" value="photos"    checked> 🖼 Photos</label>
+          <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;cursor:pointer;"><input type="checkbox" class="thumb-chk" value="audio"     checked> 🎵 Audio</label>
+          <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;cursor:pointer;"><input type="checkbox" class="thumb-chk" value="freebooks" checked> 📖 Free Books</label>
+          <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;cursor:pointer;"><input type="checkbox" class="thumb-chk" value="quotes"    checked> ✨ Quotes</label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;"><input type="checkbox" class="thumb-chk" value="paidbooks" checked> 📚 Paid Books</label>
+        </div>
+      </div>
       <span class="pill no-data" id="galleryDataPill">⚠ No data cached</span>
     </div>
   </div>
@@ -341,7 +351,8 @@
   <button class="tab-btn active" data-tab="photos">🖼 Photos <span class="tab-count" id="photosCount">0</span></button>
   <button class="tab-btn" data-tab="videos">🎬 Videos <span class="tab-count" id="videosCount">0</span></button>
   <button class="tab-btn" data-tab="audios">🎵 Audios <span class="tab-count" id="audiosCount">0</span></button>
-  <button class="tab-btn" data-tab="pdfs">📚 PDFs <span class="tab-count" id="pdfsCount">0</span></button>
+  <button class="tab-btn" data-tab="pdfs">📖 Free Books <span class="tab-count" id="pdfsCount">0</span></button>
+  <button class="tab-btn" data-tab="paidbooks">📚 Paid Books <span class="tab-count" id="paidbooksCount">0</span></button>
   <button class="tab-btn" data-tab="quotes">✨ Quotes <span class="tab-count" id="quotesCount">0</span></button>
 </div>
 
@@ -418,9 +429,9 @@
       </div>
     </div>
 
-    <!-- PDFs TAB -->
+    <!-- FREE BOOKS TAB -->
     <div class="tab-panel" id="tab-pdfs">
-      <div class="tip"><strong>PDFs:</strong> Place PDF files in <code>pdfs/</code> and thumbnail images in <code>pdfs/images/</code>. Set <strong>Is Active = No</strong> to hide without deleting.</div>
+      <div class="tip"><strong>Free Books:</strong> Place PDF files in <code>freebooks/</code> and cover images in <code>freebooks/images/</code>. Thumbnails are auto-generated to <code>freebooks/images/thumbs/</code>. Set <strong>Is Active = No</strong> to hide without deleting.</div>
       <div class="table-wrap">
         <table id="pdfsTable" style="min-width:1100px;">
           <thead><tr>
@@ -431,11 +442,32 @@
             <th style="min-width:200px">PDF File</th>
             <th style="min-width:80px">Pages</th>
             <th style="min-width:100px">File Size</th>
-            <th style="min-width:200px">Thumbnail Image</th>
+            <th style="min-width:200px">Image File</th>
             <th class="active-th">Is Active</th>
             <th style="width:40px"></th>
           </tr></thead>
           <tbody id="pdfsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAID BOOKS TAB -->
+    <div class="tab-panel" id="tab-paidbooks">
+      <div class="tip"><strong>Paid Books:</strong> Place cover images in <code>paidbooks/images/</code> (e.g. <code>paidbooks/images/book.jpg</code>). Thumbnails are auto-generated to <code>paidbooks/images/thumbs/</code>. Leave blank for a placeholder. Set <strong>Is Active = No</strong> to hide without deleting.</div>
+      <div class="table-wrap">
+        <table id="paidbooksTable" style="min-width:1000px;">
+          <thead><tr>
+            <th class="serial-th">S.No</th>
+            <th style="min-width:200px">Name</th>
+            <th style="min-width:140px">Author</th>
+            <th style="min-width:240px">Description</th>
+            <th style="min-width:200px">Image File</th>
+            <th style="min-width:200px">Buy Link</th>
+            <th style="min-width:110px">Category</th>
+            <th class="active-th">Is Active</th>
+            <th style="width:40px"></th>
+          </tr></thead>
+          <tbody id="paidbooksBody"></tbody>
         </table>
       </div>
     </div>
@@ -463,7 +495,7 @@
     <!-- Generated JS Files -->
     <div class="content" style="padding-top:18px; padding-bottom:4px;">
       <div class="section-title">Generated JS Files (active items only)</div>
-      <div class="output-grid" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr;">
+      <div class="output-grid" style="grid-template-columns:repeat(6,1fr);">
         <div class="output-card">
           <h3>📸 data/photos.js</h3>
           <pre id="photosOutput"></pre>
@@ -489,11 +521,19 @@
           </div>
         </div>
         <div class="output-card">
-          <h3>📚 data/pdfs.js</h3>
+          <h3>📖 data/pdfs.js</h3>
           <pre id="pdfsOutput"></pre>
           <div class="output-actions">
             <button class="btn btn-green" id="btnDownloadPdfsJs">⬇ Download pdfs.js</button>
             <button class="btn btn-outline" id="btnCopyPdfsJs">📋 Copy</button>
+          </div>
+        </div>
+        <div class="output-card">
+          <h3>📚 data/paidbooks.js</h3>
+          <pre id="paidbooksOutput"></pre>
+          <div class="output-actions">
+            <button class="btn btn-green" id="btnDownloadPaidbooksJs">⬇ Download paidbooks.js</button>
+            <button class="btn btn-outline" id="btnCopyPaidbooksJs">📋 Copy</button>
           </div>
         </div>
         <div class="output-card">
@@ -712,7 +752,7 @@ $('#modeSelect').on('change', function () {
     $('#galleryTabs').show();
     $('#galleryPanel').addClass('active'); $('#langPanel').removeClass('active');
     $('#headerTitle').text('🪔 Gallery Manager — Yogi Ramsuratkumar Website');
-    $('#headerSub').text('Edit Photos · Videos · Audios · PDFs · Quotes → Set Is Active → Save to Website');
+    $('#headerSub').text('Edit 6 Sheets: Photos · Videos · Audios · Free Books · Paid Books · Quotes → Set Is Active → Save to Website');
   } else {
     $('#workflowGallery').hide(); $('#workflowLang').show();
     $('#galleryToolbar').hide(); $('#langToolbar').css('display', 'flex');
@@ -739,10 +779,17 @@ $(function () {
   function updateGalleryPill() {
     var $p = $('#galleryDataPill');
     if (SITE_DATA.loaded) {
-      $p.removeClass('no-data').addClass('loaded')
-        .text('✅ Cached: ' + SITE_DATA.photos.length + ' photos · ' +
-              SITE_DATA.videos.length + ' videos · ' + SITE_DATA.pdfs.length + ' PDFs · ' +
-              (SITE_DATA.audios ? SITE_DATA.audios.length : 0) + ' audios');
+      var ver = (typeof SITE_VERSION !== 'undefined' && SITE_VERSION.data) ? SITE_VERSION.data : '—';
+      var at  = SITE_DATA.loadedAt ? ' · Saved: ' + SITE_DATA.loadedAt : '';
+      $p.removeClass('no-data').addClass('loaded').html(
+        '✅ Cache v' + ver + ' &nbsp;|&nbsp; ' +
+        SITE_DATA.photos.length + ' photos · ' +
+        SITE_DATA.videos.length + ' videos · ' +
+        (SITE_DATA.audios   ? SITE_DATA.audios.length   : 0) + ' audios · ' +
+        SITE_DATA.pdfs.length + ' free books · ' +
+        (SITE_DATA.paidBooks ? SITE_DATA.paidBooks.length : 0) + ' paid books · ' +
+        (SITE_DATA.quotes   ? SITE_DATA.quotes.length   : 0) + ' quotes' + at
+      );
     } else {
       $p.removeClass('loaded').addClass('no-data').text('⚠ No data cached');
     }
@@ -859,7 +906,7 @@ $(function () {
         $('<td>').html(cell(r.file)),
         $('<td>').html(cell(r.pages)),
         $('<td>').html(cell(r.fileSize)),
-        $('<td>').html(cell(r.thumbImage)),
+        $('<td>').html(cell(r.image)),
         $('<td class="active-td">').html(activeSelect(r.isActive)),
         $('<td>').html(delBtn())
       );
@@ -899,7 +946,7 @@ $(function () {
   function readPdfs() {
     return $('#pdfsBody tr').map(function (i) {
       var $t = $(this).find('td');
-      return { serial: i+1, name: $t.eq(1).find('.editable').val().trim(), author: $t.eq(2).find('.editable').val().trim(), category: $t.eq(3).find('.editable').val(), file: $t.eq(4).find('.editable').val().trim(), pages: $t.eq(5).find('.editable').val().trim(), fileSize: $t.eq(6).find('.editable').val().trim(), thumbImage: $t.eq(7).find('.editable').val().trim(), isActive: $t.eq(8).find('.editable').val() };
+      return { serial: i+1, name: $t.eq(1).find('.editable').val().trim(), author: $t.eq(2).find('.editable').val().trim(), category: $t.eq(3).find('.editable').val(), file: $t.eq(4).find('.editable').val().trim(), pages: $t.eq(5).find('.editable').val().trim(), fileSize: $t.eq(6).find('.editable').val().trim(), image: $t.eq(7).find('.editable').val().trim(), isActive: $t.eq(8).find('.editable').val() };
     }).get();
   }
   function readAudios() {
@@ -919,14 +966,25 @@ $(function () {
       'var ' + varName + ' = ' + JSON.stringify(data, null, 2) + ';\n';
   }
 
+  function buildPaidBooksJS(data) {
+    return '/* ============================================================\n' +
+      '   data/paidbooks.js — Paid Books Data\n' +
+      '   Edit using tools/manager.html → Gallery Manager\n' +
+      '   Fields: serial, name, author, image, description, language, store, buyLink, category, isActive\n' +
+      '   isActive: "yes" = show | "no" = hide without deleting\n' +
+      '   ============================================================ */\n\n' +
+      'var PAID_BOOKS_DATA = ' + JSON.stringify(data, null, 2) + ';\n';
+  }
+
   /* Gallery JS Output preview */
   function refreshGalleryOutputs() {
-    var photos = readPhotos(), videos = readVideos(), pdfs = readPdfs(), audios = readAudios();
+    var photos = readPhotos(), videos = readVideos(), pdfs = readPdfs(), audios = readAudios(), paidBooks = readPaidBooks();
     var map = [
-      { pre: 'photosOutput', dl: 'btnDownloadPhotosJs', cp: 'btnCopyPhotosJs', fn: 'photos.js', js: buildDataJS('PHOTOS_DATA', 'data/photos.js — Photo Gallery Data', 'serial, name, name_ta, name_en, description, category, image, isActive', photos) },
-      { pre: 'videosOutput', dl: 'btnDownloadVideosJs', cp: 'btnCopyVideosJs', fn: 'videos.js', js: buildDataJS('VIDEOS_DATA', 'data/videos.js — Video Gallery Data', 'serial, name, description, category, youtubeUrl, duration, isActive', videos) },
-      { pre: 'audiosOutput', dl: 'btnDownloadAudiosJs', cp: 'btnCopyAudiosJs', fn: 'audios.js', js: buildDataJS('AUDIOS_DATA', 'data/audios.js — Audio Gallery Data', 'serial, name, description, category, audioFile, image, duration, isActive', audios) },
-      { pre: 'pdfsOutput',   dl: 'btnDownloadPdfsJs',   cp: 'btnCopyPdfsJs',   fn: 'pdfs.js',   js: buildDataJS('PDFS_DATA',   'data/pdfs.js — PDF Downloads Data',   'serial, name, author, category, file, pages, fileSize, thumbImage, isActive', pdfs) }
+      { pre: 'photosOutput',    dl: 'btnDownloadPhotosJs',    cp: 'btnCopyPhotosJs',    fn: 'photos.js',    js: buildDataJS('PHOTOS_DATA',    'data/photos.js — Photo Gallery Data',    'serial, name, name_ta, name_en, description, category, image, isActive', photos) },
+      { pre: 'videosOutput',    dl: 'btnDownloadVideosJs',    cp: 'btnCopyVideosJs',    fn: 'videos.js',    js: buildDataJS('VIDEOS_DATA',    'data/videos.js — Video Gallery Data',    'serial, name, description, category, youtubeUrl, duration, isActive', videos) },
+      { pre: 'audiosOutput',    dl: 'btnDownloadAudiosJs',    cp: 'btnCopyAudiosJs',    fn: 'audios.js',    js: buildDataJS('AUDIOS_DATA',    'data/audios.js — Audio Gallery Data',    'serial, name, description, category, audioFile, image, duration, isActive', audios) },
+      { pre: 'pdfsOutput',      dl: 'btnDownloadPdfsJs',      cp: 'btnCopyPdfsJs',      fn: 'pdfs.js',      js: buildDataJS('PDFS_DATA',      'data/pdfs.js — Free Books Data',         'serial, name, author, category, file, pages, fileSize, image, isActive', pdfs) },
+      { pre: 'paidbooksOutput', dl: 'btnDownloadPaidbooksJs', cp: 'btnCopyPaidbooksJs', fn: 'paidbooks.js', js: buildPaidBooksJS(paidBooks) }
     ];
     map.forEach(function (m) {
       $('#' + m.pre).text(m.js);
@@ -963,22 +1021,23 @@ $(function () {
     var sel = getSelectedSheets();
     if (!sel.length) { showStatus('Please select at least one sheet to save.', 'error'); return; }
 
-    var photos = readPhotos(), videos = readVideos(), pdfs = readPdfs(), audios = readAudios(), quotes = readQuotes();
-    if (!photos.length && !videos.length && !pdfs.length && !audios.length && !quotes.length) {
+    var photos = readPhotos(), videos = readVideos(), pdfs = readPdfs(), audios = readAudios(), quotes = readQuotes(), paidBooks = readPaidBooks();
+    if (!photos.length && !videos.length && !pdfs.length && !audios.length && !quotes.length && !paidBooks.length) {
       showStatus('No data to save. Upload an Excel file or add rows first.', 'error'); return;
     }
     var langVer    = (typeof SITE_VERSION !== 'undefined' && SITE_VERSION.lang) ? SITE_VERSION.lang : '1.0';
     var curDataVer = (typeof SITE_VERSION !== 'undefined' && SITE_VERSION.data) ? SITE_VERSION.data : '1.0';
-    SITE_DATA.photos = photos; SITE_DATA.videos = videos; SITE_DATA.pdfs = pdfs; SITE_DATA.audios = audios; SITE_DATA.quotes = quotes;
+    SITE_DATA.photos = photos; SITE_DATA.videos = videos; SITE_DATA.pdfs = pdfs; SITE_DATA.audios = audios; SITE_DATA.quotes = quotes; SITE_DATA.paidBooks = paidBooks;
     SITE_DATA.saveToStorage(); /* save with CURRENT version — stays consistent with disk */
     updateGalleryPill();
 
     var summaryParts = [];
-    if (sel.indexOf('photos') > -1) summaryParts.push(photos.filter(function(r){ return r.isActive !== 'no'; }).length + '/' + photos.length + ' photos');
-    if (sel.indexOf('videos') > -1) summaryParts.push(videos.filter(function(r){ return r.isActive !== 'no'; }).length + '/' + videos.length + ' videos');
-    if (sel.indexOf('pdfs')   > -1) summaryParts.push(pdfs.filter(function(r){ return r.isActive !== 'no'; }).length   + '/' + pdfs.length   + ' PDFs');
-    if (sel.indexOf('audios') > -1) summaryParts.push(audios.filter(function(r){ return r.isActive !== 'no'; }).length + '/' + audios.length + ' audios');
-    if (sel.indexOf('quotes') > -1) summaryParts.push(quotes.filter(function(r){ return r.isActive !== 'no'; }).length + '/' + quotes.length + ' quotes');
+    if (sel.indexOf('photos')    > -1) summaryParts.push(photos.filter(function(r){ return r.isActive !== 'no'; }).length + '/' + photos.length + ' photos');
+    if (sel.indexOf('videos')    > -1) summaryParts.push(videos.filter(function(r){ return r.isActive !== 'no'; }).length + '/' + videos.length + ' videos');
+    if (sel.indexOf('pdfs')      > -1) summaryParts.push(pdfs.filter(function(r){ return r.isActive !== 'no'; }).length   + '/' + pdfs.length   + ' PDFs');
+    if (sel.indexOf('audios')    > -1) summaryParts.push(audios.filter(function(r){ return r.isActive !== 'no'; }).length + '/' + audios.length + ' audios');
+    if (sel.indexOf('quotes')    > -1) summaryParts.push(quotes.filter(function(r){ return r.isActive !== 'no'; }).length + '/' + quotes.length + ' quotes');
+    if (sel.indexOf('paidbooks') > -1) summaryParts.push(paidBooks.filter(function(r){ return r.isActive !== 'no'; }).length + '/' + paidBooks.length + ' books');
     var summary = 'Active: ' + summaryParts.join(', ') + '.';
 
     if (window.showDirectoryPicker) {
@@ -995,7 +1054,8 @@ $(function () {
             if (sel.indexOf('videos') > -1) writes.push(writeFileToDir(dir, 'videos.js', buildDataJS('VIDEOS_DATA', 'data/videos.js — Video Gallery Data', 'serial, name, description, category, youtubeUrl, duration, isActive', videos)));
             if (sel.indexOf('pdfs')   > -1) writes.push(writeFileToDir(dir, 'pdfs.js',   buildDataJS('PDFS_DATA',   'data/pdfs.js — PDF Downloads Data',   'serial, name, author, category, file, pages, fileSize, thumbImage, isActive', pdfs)));
             if (sel.indexOf('audios') > -1) writes.push(writeFileToDir(dir, 'audios.js', buildDataJS('AUDIOS_DATA', 'data/audios.js — Audio Gallery Data', 'serial, name, description, category, audioFile, image, duration, isActive', audios)));
-            if (sel.indexOf('quotes') > -1) writes.push(writeFileToDir(dir, 'quotes.js', buildQuotesJS(quotes.filter(function(r){ return r.isActive !== 'no'; }))));
+            if (sel.indexOf('paidbooks') > -1) writes.push(writeFileToDir(dir, 'paidbooks.js', buildPaidBooksJS(paidBooks)));
+            if (sel.indexOf('quotes')    > -1) writes.push(writeFileToDir(dir, 'quotes.js',    buildQuotesJS(quotes.filter(function(r){ return r.isActive !== 'no'; }))));
             return Promise.all(writes).then(function () {
               showStatus('Saved! ' + summary + ' Version: <strong>' + newDataVer + '</strong> — old cache auto-clears on next page visit.', 'success', true);
             });
@@ -1035,15 +1095,20 @@ $(function () {
             return { serial: Number(r['Serial No'])||(i+1), name: String(r['Name']||''), description: String(r['Description']||''), category: String(r['Category']||'discourse'), audioFile: String(r['Audio File']||''), image: String(r['Image File']||''), duration: String(r['Duration']||''), size: String(r['Size']||''), isActive: parseActive(r['Is Active']) };
           }).sort(sortBySerial));
         }
-        if (wb.Sheets['PDFs']) {
-          renderPdfs(XLSX.utils.sheet_to_json(wb.Sheets['PDFs'], {defval:''}).map(function(r,i){
-            return { serial: Number(r['Serial No'])||(i+1), name: String(r['Name']||''), author: String(r['Author']||''), category: String(r['Category']||'book'), file: String(r['PDF File']||''), pages: String(r['Pages']||''), fileSize: String(r['File Size']||''), thumbImage: String(r['Thumbnail Image']||''), isActive: parseActive(r['Is Active']) };
+        if (wb.Sheets['Free Books']) {
+          renderPdfs(XLSX.utils.sheet_to_json(wb.Sheets['Free Books'], {defval:''}).map(function(r,i){
+            return { serial: Number(r['Serial No'])||(i+1), name: String(r['Name']||''), author: String(r['Author']||''), category: String(r['Category']||'book'), file: String(r['PDF File']||''), pages: String(r['Pages']||''), fileSize: String(r['File Size']||''), image: String(r['Image File']||''), isActive: parseActive(r['Is Active']) };
           }).sort(sortBySerial));
         }
         if (wb.Sheets['Quotes']) {
           renderQuotes(XLSX.utils.sheet_to_json(wb.Sheets['Quotes'], {defval:''}).map(function(r,i){
             /* Support both column name styles: "English"/"Tamil"/"Image" (template) and "Quote (English)"/"Quote (Tamil)"/"Image File" (data-loader) */
             return { serial: Number(r['Serial No'])||(i+1), en: String(r['Quote (English)']||r['English']||''), ta: String(r['Quote (Tamil)']||r['Tamil']||''), source: String(r['Source']||''), category: String(r['Category']||'general').toLowerCase(), image: String(r['Image File']||r['Image']||''), isActive: parseActive(r['Is Active']) };
+          }).sort(sortBySerial));
+        }
+        if (wb.Sheets['Paid Books']) {
+          renderPaidBooks(XLSX.utils.sheet_to_json(wb.Sheets['Paid Books'], {defval:''}).map(function(r,i){
+            return { serial: Number(r['Serial No'])||(i+1), name: String(r['Name']||''), author: String(r['Author']||''), image: String(r['Image File']||''), description: String(r['Description']||''), buyLink: String(r['Buy Link']||''), category: String(r['Category']||'book'), isActive: parseActive(r['Is Active']) };
           }).sort(sortBySerial));
         }
         refreshGalleryOutputs();
@@ -1054,18 +1119,19 @@ $(function () {
                when it writes the JS files to disk. ── */
         SITE_DATA.photos = readPhotos();
         SITE_DATA.videos = readVideos();
-        SITE_DATA.pdfs   = readPdfs();
-        SITE_DATA.audios = readAudios();
-        SITE_DATA.quotes = readQuotes();
-        SITE_DATA.loaded = true;
+        SITE_DATA.pdfs      = readPdfs();
+        SITE_DATA.audios    = readAudios();
+        SITE_DATA.quotes    = readQuotes();
+        SITE_DATA.paidBooks = readPaidBooks();
+        SITE_DATA.loaded    = true;
         try { SITE_DATA.saveToStorage(); } catch(e) {}
         updateGalleryPill();
 
         showStatus('✅ Excel uploaded &amp; saved! Data is now live on all pages. Click 💾 Save to Website to also update the permanent JS files.', 'success');
       } catch (err) { showStatus('Error reading Excel: ' + err.message, 'error'); }
-      $(this).val('');
     };
     reader.readAsBinaryString(file);
+    this.value = '';
   });
 
   /* Download Excel — Gallery */
@@ -1081,15 +1147,20 @@ $(function () {
     var vWs = XLSX.utils.aoa_to_sheet(vD); vWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:46},{wch:12},{wch:13},{wch:10}];
     XLSX.utils.book_append_sheet(wb, vWs, 'Videos');
 
-    var dD = [['Serial No','Name','Author','Category','PDF File','Pages','File Size','Thumbnail Image','Is Active']];
-    readPdfs().forEach(function(r){ dD.push([r.serial,r.name,r.author||'',r.category,r.file,r.pages,r.fileSize||'',r.thumbImage||'',r.isActive||'yes']); });
-    var dWs = XLSX.utils.aoa_to_sheet(dD); dWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:32},{wch:12},{wch:10}];
-    XLSX.utils.book_append_sheet(wb, dWs, 'PDFs');
-
     var aD = [['Serial No','Name','Description','Category','Audio File','Image File','Duration','Size','Is Active']];
     readAudios().forEach(function(r){ aD.push([r.serial,r.name,r.description,r.category,r.audioFile,r.image||'',r.duration,r.size||'',r.isActive||'yes']); });
     var aWs = XLSX.utils.aoa_to_sheet(aD); aWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:40},{wch:32},{wch:12},{wch:10},{wch:10}];
     XLSX.utils.book_append_sheet(wb, aWs, 'Audios');
+
+    var dD = [['Serial No','Name','Author','Category','PDF File','Pages','File Size','Image File','Is Active']];
+    readPdfs().forEach(function(r){ dD.push([r.serial,r.name,r.author||'',r.category,r.file,r.pages,r.fileSize||'',r.image||'',r.isActive||'yes']); });
+    var dWs = XLSX.utils.aoa_to_sheet(dD); dWs['!cols'] = [{wch:9},{wch:32},{wch:22},{wch:14},{wch:36},{wch:8},{wch:10},{wch:32},{wch:10}];
+    XLSX.utils.book_append_sheet(wb, dWs, 'Free Books');
+
+    var pbD = [['Serial No','Name','Author','Image File','Description','Buy Link','Category','Is Active']];
+    readPaidBooks().forEach(function(r){ pbD.push([r.serial,r.name,r.author,r.image||'',r.description,r.buyLink,r.category,r.isActive||'yes']); });
+    var pbWs = XLSX.utils.aoa_to_sheet(pbD); pbWs['!cols'] = [{wch:9},{wch:32},{wch:22},{wch:32},{wch:52},{wch:40},{wch:14},{wch:10}];
+    XLSX.utils.book_append_sheet(wb, pbWs, 'Paid Books');
 
     var qD = [['Serial No','English','Tamil','Source','Category','Image','Is Active']];
     readQuotes().forEach(function(r){ qD.push([r.serial,r.en,r.ta,r.source,r.category,r.image,r.isActive||'yes']); });
@@ -1111,13 +1182,21 @@ $(function () {
     vWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:46},{wch:12},{wch:13},{wch:10}];
     XLSX.utils.book_append_sheet(wb, vWs, 'Videos');
 
-    var dWs = XLSX.utils.aoa_to_sheet([['Serial No','Name','Author','Category','PDF File','Pages','File Size','Thumbnail Image','Is Active']]);
-    dWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:32},{wch:12},{wch:10}];
-    XLSX.utils.book_append_sheet(wb, dWs, 'PDFs');
-
     var aWs = XLSX.utils.aoa_to_sheet([['Serial No','Name','Description','Category','Audio File','Image File','Duration','Size','Is Active']]);
     aWs['!cols'] = [{wch:9},{wch:32},{wch:52},{wch:14},{wch:40},{wch:32},{wch:12},{wch:10},{wch:10}];
     XLSX.utils.book_append_sheet(wb, aWs, 'Audios');
+
+    var dWs = XLSX.utils.aoa_to_sheet([['Serial No','Name','Author','Category','PDF File','Pages','File Size','Image File','Is Active']]);
+    dWs['!cols'] = [{wch:9},{wch:32},{wch:22},{wch:14},{wch:36},{wch:8},{wch:10},{wch:32},{wch:10}];
+    XLSX.utils.book_append_sheet(wb, dWs, 'Free Books');
+
+    var pbWs = XLSX.utils.aoa_to_sheet([
+      ['Serial No','Name','Author','Image File','Description','Buy Link','Category','Is Active'],
+      [1,'Tattva Bodha of Sri Yogi Ramsuratkumar','V. Ganesan','paidbooks/images/tattva-bodha.jpg','A profound spiritual exposition.','https://amazon.com/example','biography','yes'],
+      [2,'God\'s Grace in Human Form','Mathru Sri Sarada','','Personal experiences with the Beggar Saint.','https://flipkart.com/example','devotional','yes']
+    ]);
+    pbWs['!cols'] = [{wch:9},{wch:32},{wch:22},{wch:32},{wch:52},{wch:40},{wch:14},{wch:10}];
+    XLSX.utils.book_append_sheet(wb, pbWs, 'Paid Books');
 
     var qWs = XLSX.utils.aoa_to_sheet([
       ['Serial No','English','Tamil','Source','Category','Image','Is Active'],
@@ -1157,12 +1236,15 @@ $(function () {
       $('#audiosBody').append($('<tr>').append($('<td class="serial-td">').text(n), $('<td>').html(cell('')), $('<td class="desc-cell">').html(cell('','','textarea')), $('<td>').html(catSelect(CAT.audios,'discourse')), $('<td>').html(cell('audio/new.mp3')), $('<td>').html(cell('')), $('<td class="active-td">').html(activeSelect('yes')), $('<td>').html(delBtn())));
     } else if (tab === 'pdfs') {
       var n = $('#pdfsBody tr').length + 1;
-      $('#pdfsBody').append($('<tr>').append($('<td class="serial-td">').text(n), $('<td>').html(cell('')), $('<td>').html(cell('')), $('<td>').html(catSelect(CAT.pdfs,'book')), $('<td>').html(cell('pdfs/new.pdf')), $('<td>').html(cell('')), $('<td>').html(cell('')), $('<td>').html(cell('pdfs/images/new.jpg')), $('<td class="active-td">').html(activeSelect('yes')), $('<td>').html(delBtn())));
+      $('#pdfsBody').append($('<tr>').append($('<td class="serial-td">').text(n), $('<td>').html(cell('')), $('<td>').html(cell('')), $('<td>').html(catSelect(CAT.pdfs,'book')), $('<td>').html(cell('freebooks/new.pdf')), $('<td>').html(cell('')), $('<td>').html(cell('')), $('<td>').html(cell('freebooks/images/new.jpg')), $('<td class="active-td">').html(activeSelect('yes')), $('<td>').html(delBtn())));
     } else if (tab === 'quotes') {
       $('#quotesBody .empty-row').remove();
       var n = $('#quotesBody tr').length + 1;
       $('#quotesBody').append(makeQuoteRow({ serial: n, en: '', ta: '', source: 'Yogi Ramsuratkumar', category: 'general', image: '', isActive: 'yes' }));
       renderQuotesOutputs();
+    } else if (tab === 'paidbooks') {
+      var n = $('#paidbooksBody tr').length + 1;
+      $('#paidbooksBody').append(makePaidBookRow({ serial: n, name: '', author: '', description: '', image: '', buyLink: '', category: 'book', isActive: 'yes' }));
     }
     updateGalleryCounts();
   });
@@ -1173,6 +1255,7 @@ $(function () {
     $('#pdfsCount').text($('#pdfsBody tr').length);
     $('#audiosCount').text($('#audiosBody tr').length);
     $('#quotesCount').text($('#quotesBody tr:not(.empty-row)').length);
+    $('#paidbooksCount').text($('#paidbooksBody tr').length);
   }
 
   /* ── Shared File System helpers (used by both thumbnail generators) ── */
@@ -1246,228 +1329,90 @@ $(function () {
     });
   }
 
-  /* ── Generate Photo Thumbnails ───────────────────────────────
-     Reads each photo image, resizes via Canvas (400×300 max),
-     saves JPEG to photos/images/thumbs/ via File System Access API  */
-  $('#btnGenThumbs').on('click', function () {
-    var photos = readPhotos();
-    var imgPaths = photos.map(function (r) { return r.image; }).filter(Boolean);
-    if (!imgPaths.length) { showStatus('No photos found. Load or enter photo data first.', 'error'); return; }
-
-    if (!window.showDirectoryPicker) {
-      showStatus('File System Access API not supported. Use Chrome or Edge.', 'error'); return;
-    }
-
-    showStatus('⏳ Select your project root folder (where index.html lives)…', 'info');
-
-    window.showDirectoryPicker({ mode: 'readwrite' }).then(function (rootDir) {
-      showStatus('⏳ Generating thumbnails for ' + imgPaths.length + ' photo(s)…', 'info');
-
-      var done = 0, failed = 0;
-
-      /* Process photos one by one */
-      var chain = Promise.resolve();
-      imgPaths.forEach(function (imgPath) {
-        chain = chain.then(function () {
-          /* imgPath like 'images/photos/photo1.jpg' */
-          var parts        = imgPath.replace(/\\/g, '/').split('/');
-          var filename     = parts[parts.length - 1];
-          var folders      = parts.slice(0, -1);        /* ['images','photos'] */
-          var thumbFolders = folders.concat(['thumbs']); /* ['images','photos','thumbs'] */
-
-          /* Read source image directly via File System API (works on file://) */
-          return readFileFromDir(rootDir, parts)
-            .then(function (blob) { return resizeBlob(blob, 400, 300); })
-            .then(function (thumbBlob) {
-              return getDir(rootDir, thumbFolders).then(function (thumbDir) {
-                return writeBlob(thumbDir, filename, thumbBlob);
-              });
-            })
-            .then(function () {
-              done++;
-              showStatus('⏳ Generated ' + done + ' / ' + imgPaths.length + ' thumbnails…', 'info');
-            })
-            .catch(function (err) {
-              failed++;
-              console.warn('Thumb failed for ' + imgPath + ':', err.message);
-            });
-        });
-      });
-
-      return chain.then(function () {
-        showStatus(
-          'Thumbnails done! ' + done + ' generated' +
-          (failed  ? ', ' + failed  + ' failed (check console)' : '') +
-          '. Saved to images/photos/thumbs/', 'success', true
-        );
-      });
-
-    }).catch(function (e) {
-      if (e.name !== 'AbortError') showStatus('Error: ' + e.message, 'error');
-    });
+  /* ── Thumb multiselect dropdown toggle ── */
+  $('#thumbSelectToggle').on('click', function (e) {
+    e.stopPropagation();
+    var $dd = $('#thumbSelectDropdown');
+    $dd.toggle();
+  });
+  $(document).on('click', function (e) {
+    if (!$(e.target).closest('#thumbSelectWrap').length) $('#thumbSelectDropdown').hide();
+  });
+  /* Update toggle label */
+  $(document).on('change', '.thumb-chk', function () {
+    var total = $('.thumb-chk').length;
+    var checked = $('.thumb-chk:checked').length;
+    $('#thumbSelectToggle').text(checked === total ? '☑ All Types ▾' : '☑ ' + checked + ' of ' + total + ' ▾');
   });
 
-  /* ── Generate PDF Thumbnails ─────────────────────────────────
-     Reads each PDF's Thumbnail Image (from pdfs/images/), resizes to
-     360×480 JPEG and saves to pdfs/images/thumbs/ — same approach as photos */
-
-  $('#btnGenPdfThumbs').on('click', function () {
-    var pdfs       = readPdfs();
-    var imgEntries = pdfs.map(function (r) { return r.thumbImage; }).filter(Boolean);
-    if (!imgEntries.length) { showStatus('No Thumbnail Images found. Fill the "Thumbnail Image" column first.', 'error'); return; }
-
-    if (!window.showDirectoryPicker) {
-      showStatus('File System Access API not supported. Use Chrome or Edge.', 'error'); return;
-    }
-
-    showStatus('⏳ Select your project root folder (where index.html lives)…', 'info');
-
-    window.showDirectoryPicker({ mode: 'readwrite' }).then(function (rootDir) {
-      showStatus('⏳ Generating PDF thumbnails for ' + imgEntries.length + ' image(s)…', 'info');
-
-      var done = 0, failed = 0;
-      var chain = Promise.resolve();
-
-      imgEntries.forEach(function (imgPath) {
-        chain = chain.then(function () {
-          var parts        = imgPath.replace(/\\/g, '/').split('/');
-          var filename     = parts[parts.length - 1];
-          var thumbFolders = parts.slice(0, -1).concat(['thumbs']); /* pdfs/images → pdfs/images/thumbs */
-
-          return readFileFromDir(rootDir, parts)
-            .then(function (blob) { return resizeBlob(blob, 360, 480); })
-            .then(function (thumbBlob) {
-              return getDir(rootDir, thumbFolders).then(function (thumbDir) {
-                return writeBlob(thumbDir, filename, thumbBlob);
-              });
-            })
-            .then(function () {
-              done++;
-              showStatus('⏳ Generated ' + done + ' / ' + imgEntries.length + ' PDF thumbnails…', 'info');
-            })
-            .catch(function (err) {
-              failed++;
-              console.warn('PDF thumb failed for ' + imgPath + ':', err.message);
-            });
-        });
-      });
-
-      return chain.then(function () {
-        showStatus(
-          'PDF thumbnails done! ' + done + ' generated' +
-          (failed ? ', ' + failed + ' failed (check console)' : '') +
-          '. Saved to pdfs/images/thumbs/', 'success', true
-        );
-      });
-
-    }).catch(function (e) {
-      if (e.name !== 'AbortError') showStatus('Error: ' + e.message, 'error');
-    });
-  });
-
-  /* ── Generate Quote Thumbnails ──────────────────────────────
-     Reads each quote's Image path, resizes to 360×360 square JPEG and saves
-     to [same-folder]/thumbs/ via File System Access API */
-  $('#btnGenQuoteThumbs').on('click', function () {
-    var quotes   = readQuotes();
-    var imgPaths = quotes.map(function (r) { return r.image; }).filter(Boolean);
-    if (!imgPaths.length) { showStatus('No quote images found. Fill the "Image" column first.', 'error'); return; }
-
-    if (!window.showDirectoryPicker) {
-      showStatus('File System Access API not supported. Use Chrome or Edge.', 'error'); return;
-    }
-
-    showStatus('⏳ Select your project root folder (where index.html lives)…', 'info');
-
-    window.showDirectoryPicker({ mode: 'readwrite' }).then(function (rootDir) {
-      showStatus('⏳ Generating quote thumbnails for ' + imgPaths.length + ' image(s)…', 'info');
-
-      var done = 0, failed = 0;
-      var chain = Promise.resolve();
-
-      imgPaths.forEach(function (imgPath) {
-        chain = chain.then(function () {
-          var parts        = imgPath.replace(/\\/g, '/').split('/');
-          var filename     = parts[parts.length - 1];
-          var thumbFolders = parts.slice(0, -1).concat(['thumbs']); /* quotes/images → quotes/images/thumbs */
-
-          return readFileFromDir(rootDir, parts)
-            .then(function (blob) { return resizeBlobSquare(blob, 360); })
-            .then(function (thumbBlob) {
-              return getDir(rootDir, thumbFolders).then(function (thumbDir) {
-                return writeBlob(thumbDir, filename, thumbBlob);
-              });
-            })
-            .then(function () {
-              done++;
-              showStatus('⏳ Generated ' + done + ' / ' + imgPaths.length + ' quote thumbnails…', 'info');
-            })
-            .catch(function (err) {
-              failed++;
-              console.warn('Quote thumb failed for ' + imgPath + ':', err.message);
-            });
-        });
-      });
-
-      return chain.then(function () {
-        showStatus(
-          'Quote thumbnails done! ' + done + ' generated' +
-          (failed ? ', ' + failed + ' failed (check console)' : '') +
-          '. Saved to quotes/images/thumbs/', 'success', true
-        );
-      });
-
-    }).catch(function (e) {
-      if (e.name !== 'AbortError') showStatus('Error: ' + e.message, 'error');
-    });
-  });
-
-  /* ── Generate Audio Thumbnails ──────────────────────────────
-     Reads each audio's Image File path, resizes to 400×200 landscape JPEG
-     and saves to [same-folder]/thumbs/ via File System Access API */
-  $('#btnGenAudioThumbs').on('click', function () {
-    var audios    = readAudios();
-    var imgPaths  = audios.map(function (r) { return r.image; }).filter(Boolean);
-    if (!imgPaths.length) { showStatus('No Image Files found in Audios. Fill the "Image File" column first.', 'error'); return; }
-
+  /* ── Shared thumb runner ── */
+  function runThumbGenerator(label, imgPaths, resizeFn, rootDir) {
     var unique = imgPaths.filter(function (p, i) { return imgPaths.indexOf(p) === i; });
+    if (!unique.length) return Promise.resolve({ label: label, done: 0, failed: 0, skipped: true });
+    var done = 0, failed = 0;
+    var chain = Promise.resolve();
+    unique.forEach(function (imgPath) {
+      chain = chain.then(function () {
+        var parts        = imgPath.replace(/\\/g, '/').split('/');
+        var filename     = parts[parts.length - 1];
+        var thumbFolders = parts.slice(0, -1).concat(['thumbs']);
+        return readFileFromDir(rootDir, parts)
+          .then(resizeFn)
+          .then(function (thumbBlob) {
+            return getDir(rootDir, thumbFolders).then(function (thumbDir) {
+              return writeBlob(thumbDir, filename, thumbBlob);
+            });
+          })
+          .then(function () { done++; })
+          .catch(function (err) { failed++; console.warn(label + ' thumb failed for ' + imgPath + ':', err.message); });
+      });
+    });
+    return chain.then(function () { return { label: label, done: done, failed: failed }; });
+  }
+
+  /* ── Generate Thumbnails (unified) ── */
+  $('#btnGenAllThumbs').on('click', function () {
+    if (!window.showDirectoryPicker) {
+      showStatus('File System Access API not supported. Use Chrome or Edge.', 'error'); return;
+    }
+    var sel = [];
+    $('.thumb-chk:checked').each(function () { sel.push($(this).val()); });
+    if (!sel.length) { showStatus('Select at least one type from the dropdown.', 'error'); return; }
+
+    showStatus('⏳ Select your project root folder (where index.html lives)…', 'info');
 
     window.showDirectoryPicker({ mode: 'readwrite' }).then(function (rootDir) {
-      showStatus('⏳ Generating audio thumbnails for ' + unique.length + ' image(s)…', 'info');
+      showStatus('⏳ Generating thumbnails for selected types…', 'info');
 
-      var done = 0, failed = 0;
-      var chain = Promise.resolve();
+      var tasks = [];
 
-      unique.forEach(function (imgPath) {
-        chain = chain.then(function () {
-          var parts        = imgPath.replace(/\\/g, '/').split('/');
-          var filename     = parts[parts.length - 1];
-          var thumbFolders = parts.slice(0, -1).concat(['thumbs']); /* audio/images → audio/images/thumbs */
+      if (sel.indexOf('photos') > -1) {
+        var paths = readPhotos().map(function (r) { return r.image; }).filter(Boolean);
+        tasks.push(runThumbGenerator('Photos', paths, function (b) { return resizeBlob(b, 400, 300); }, rootDir));
+      }
+      if (sel.indexOf('audio') > -1) {
+        var paths = readAudios().map(function (r) { return r.image; }).filter(Boolean);
+        tasks.push(runThumbGenerator('Audio', paths, function (b) { return resizeBlob(b, 400, 200); }, rootDir));
+      }
+      if (sel.indexOf('freebooks') > -1) {
+        var paths = readPdfs().map(function (r) { return r.image; }).filter(Boolean);
+        tasks.push(runThumbGenerator('Free Books', paths, function (b) { return resizeBlob(b, 360, 480); }, rootDir));
+      }
+      if (sel.indexOf('quotes') > -1) {
+        var paths = readQuotes().map(function (r) { return r.image; }).filter(Boolean);
+        tasks.push(runThumbGenerator('Quotes', paths, function (b) { return resizeBlobSquare(b, 360); }, rootDir));
+      }
+      if (sel.indexOf('paidbooks') > -1) {
+        var paths = readPaidBooks().map(function (r) { return r.image; }).filter(Boolean);
+        tasks.push(runThumbGenerator('Paid Books', paths, function (b) { return resizeBlob(b, 360, 480); }, rootDir));
+      }
 
-          return readFileFromDir(rootDir, parts)
-            .then(function (blob) { return resizeBlob(blob, 400, 200); })
-            .then(function (thumbBlob) {
-              return getDir(rootDir, thumbFolders).then(function (thumbDir) {
-                return writeBlob(thumbDir, filename, thumbBlob);
-              });
-            })
-            .then(function () {
-              done++;
-              showStatus('⏳ Generated ' + done + ' / ' + unique.length + ' audio thumbnails…', 'info');
-            })
-            .catch(function (err) {
-              failed++;
-              console.warn('Audio thumb failed for ' + imgPath + ':', err.message);
-            });
+      return Promise.all(tasks).then(function (results) {
+        var lines = results.map(function (r) {
+          if (r.skipped) return r.label + ': no images';
+          return r.label + ': ' + r.done + ' done' + (r.failed ? ', ' + r.failed + ' failed' : '');
         });
-      });
-
-      return chain.then(function () {
-        showStatus(
-          'Audio thumbnails done! ' + done + ' generated' +
-          (failed ? ', ' + failed + ' failed (check console)' : '') +
-          '. Saved to audio/images/thumbs/', 'success', true
-        );
+        showStatus('✅ Thumbnails complete! ' + lines.join(' | '), 'success', true);
       });
 
     }).catch(function (e) {
@@ -1555,6 +1500,50 @@ $(function () {
   (function () {
     var initQ = (SITE_DATA.active ? SITE_DATA.active(SITE_DATA.quotes) : SITE_DATA.quotes) || [];
     renderQuotes(initQ);
+  })();
+
+  /* ── Paid Books render / read ── */
+  function readPaidBooks() {
+    return $('#paidbooksBody tr').map(function (i) {
+      var $t = $(this).find('td');
+      return {
+        serial:      i + 1,
+        name:        $t.eq(1).find('input').val().trim(),
+        author:      $t.eq(2).find('input').val().trim(),
+        description: $t.eq(3).find('input').val().trim(),
+        image:       $t.eq(4).find('input').val().trim(),
+        buyLink:     $t.eq(5).find('input').val().trim(),
+        category:    $t.eq(6).find('input').val().trim(),
+        isActive:    $t.eq(7).find('select').val()
+      };
+    }).get();
+  }
+
+  function makePaidBookRow(b) {
+    return $('<tr>').append(
+      $('<td class="serial-td">').text(b.serial),
+      $('<td>').html(cell(b.name || '')),
+      $('<td>').html(cell(b.author || '')),
+      $('<td>').html(cell(b.description || '')),
+      $('<td>').html(cell(b.image || '')),
+      $('<td>').html(cell(b.buyLink || '')),
+      $('<td>').html(cell(b.category || 'book')),
+      $('<td class="active-td">').html(activeSelect(b.isActive || 'yes')),
+      $('<td>').html(delBtn())
+    );
+  }
+
+  function renderPaidBooks(data) {
+    var $body = $('#paidbooksBody').empty();
+    if (!data || !data.length) { updateGalleryCounts(); return; }
+    data.forEach(function (b) { $body.append(makePaidBookRow(b)); });
+    updateGalleryCounts();
+  }
+
+  /* Init paid books from SITE_DATA */
+  (function () {
+    var initPB = (SITE_DATA.active ? SITE_DATA.active(SITE_DATA.paidBooks) : SITE_DATA.paidBooks) || [];
+    renderPaidBooks(initPB);
   })();
 
 });

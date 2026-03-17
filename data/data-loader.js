@@ -12,11 +12,12 @@
 
   /* ── Public API exposed on window.SITE_DATA ─────────────── */
   window.SITE_DATA = {
-    photos : [],
-    videos : [],
-    pdfs   : [],
-    audios : [],
-    quotes : [],
+    photos     : [],
+    videos     : [],
+    pdfs       : [],
+    audios     : [],
+    quotes     : [],
+    paidBooks  : [],
     loaded : false,
     loadedAt: null,
 
@@ -36,11 +37,12 @@
           return false;
         }
 
-        this.photos   = d.photos  || [];
-        this.videos   = d.videos  || [];
-        this.pdfs     = d.pdfs    || [];
-        this.audios   = d.audios  || [];
-        this.quotes   = d.quotes  || [];
+        this.photos     = d.photos     || [];
+        this.videos     = d.videos     || [];
+        this.pdfs       = d.pdfs       || [];
+        this.audios     = d.audios     || [];
+        this.quotes     = d.quotes     || [];
+        this.paidBooks  = d.paidBooks  || [];
         this.loaded   = true;
         this.loadedAt = d.loadedAt || null;
         return true;
@@ -50,13 +52,14 @@
     /* Save current data to localStorage (includes current version) */
     saveToStorage: function () {
       var payload = {
-        version  : (typeof SITE_VERSION !== 'undefined') ? SITE_VERSION.data : '1.0',
-        photos   : this.photos,
-        videos   : this.videos,
-        pdfs     : this.pdfs,
-        audios   : this.audios,
-        quotes   : this.quotes,
-        loadedAt : new Date().toLocaleString()
+        version   : (typeof SITE_VERSION !== 'undefined') ? SITE_VERSION.data : '1.0',
+        photos    : this.photos,
+        videos    : this.videos,
+        pdfs      : this.pdfs,
+        audios    : this.audios,
+        quotes    : this.quotes,
+        paidBooks : this.paidBooks,
+        loadedAt  : new Date().toLocaleString()
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
       this.loadedAt = payload.loadedAt;
@@ -103,13 +106,16 @@
         isActive     : 'Is Active'
       });
 
-      this.pdfs = rows('PDFs', {
+      this.pdfs = rows('Free Books', {
         serial      : 'Serial No',
         name        : 'Name',
+        author      : 'Author',
         description : 'Description',
         category    : 'Category',
         file        : 'PDF File',
         pages       : 'Pages',
+        fileSize    : 'File Size',
+        image       : 'Image File',
         isActive    : 'Is Active'
       });
 
@@ -135,6 +141,17 @@
         isActive : 'Is Active'
       });
 
+      this.paidBooks = rows('Paid Books', {
+        serial      : 'Serial No',
+        name        : 'Name',
+        author      : 'Author',
+        image       : 'Image File',
+        description : 'Description',
+        buyLink     : 'Buy Link',
+        category    : 'Category',
+        isActive    : 'Is Active'
+      });
+
       this.loaded = true;
       this.saveToStorage();
     },
@@ -158,7 +175,7 @@
     /* Clear all cached data */
     clear: function () {
       localStorage.removeItem(STORAGE_KEY);
-      this.photos = []; this.videos = []; this.pdfs = []; this.audios = []; this.quotes = [];
+      this.photos = []; this.videos = []; this.pdfs = []; this.audios = []; this.quotes = []; this.paidBooks = [];
       this.loaded = false; this.loadedAt = null;
     },
 
@@ -193,6 +210,9 @@
     }
     if (typeof QUOTES_DATA !== 'undefined' && QUOTES_DATA.length) {
       window.SITE_DATA.quotes = QUOTES_DATA;
+    }
+    if (typeof PAID_BOOKS_DATA !== 'undefined' && PAID_BOOKS_DATA.length) {
+      window.SITE_DATA.paidBooks = PAID_BOOKS_DATA;
     }
     if (window.SITE_DATA.photos.length || window.SITE_DATA.videos.length ||
         window.SITE_DATA.pdfs.length   || window.SITE_DATA.audios.length ||

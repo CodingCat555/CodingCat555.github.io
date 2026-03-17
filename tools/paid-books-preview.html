@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Paid Books Card Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;600;700&display=swap" rel="stylesheet" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #eaf5ee; font-family: 'Lato', sans-serif; padding: 40px 20px; color: #1B4332; }
+h1 { font-family: 'Cinzel', serif; color: #0F4520; text-align: center; margin-bottom: 8px; font-size: 1.5rem; }
+.subtitle { text-align: center; color: #3D7A57; margin-bottom: 48px; font-size: 0.9rem; }
+.section-label { font-family: 'Cinzel', serif; font-size: 1rem; color: #1A6B2E; font-weight: 700; margin-bottom: 20px; padding-bottom: 6px; border-bottom: 2px solid #D8F3DC; letter-spacing: 0.06em; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 24px; margin-bottom: 60px; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-bottom: 60px; }
+
+/* ── OPTION A: Classic Book Card ── */
+.card-a {
+  background: #F5FFFA;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(15,69,32,0.10);
+  border: 1px solid rgba(26,107,46,0.12);
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+.card-a:hover { transform: translateY(-4px); box-shadow: 0 10px 32px rgba(15,69,32,0.18); }
+.card-a .cover {
+  width: 100%; aspect-ratio: 3/4; object-fit: cover;
+  background: linear-gradient(160deg, #c8ecd2 0%, #8dc9a2 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3rem;
+}
+.card-a .body { padding: 14px; }
+.card-a .title { font-family: 'Cinzel', serif; font-size: 0.85rem; font-weight: 700; color: #071A0E; margin-bottom: 4px; line-height: 1.35; }
+.card-a .author { font-size: 0.75rem; color: #3D7A57; margin-bottom: 10px; }
+.card-a .desc { font-size: 0.72rem; color: #1B4332; line-height: 1.5; margin-bottom: 12px; opacity: 0.85; }
+.card-a .buy-btn {
+  display: block; width: 100%; text-align: center; padding: 8px;
+  background: linear-gradient(135deg, #1A6B2E, #2D9148);
+  color: #fff; border-radius: 8px; text-decoration: none;
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 0.04em;
+  transition: opacity 0.2s;
+}
+.card-a .buy-btn:hover { opacity: 0.88; }
+
+/* ── OPTION B: Horizontal Layout ── */
+.card-b {
+  background: #F5FFFA;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(15,69,32,0.10);
+  border: 1px solid rgba(26,107,46,0.12);
+  display: flex;
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+.card-b:hover { transform: translateY(-4px); box-shadow: 0 10px 32px rgba(15,69,32,0.18); }
+.card-b .cover {
+  width: 90px; flex-shrink: 0;
+  background: linear-gradient(160deg, #c8ecd2 0%, #8dc9a2 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.2rem;
+}
+.card-b .body { padding: 14px 14px 12px; flex: 1; display: flex; flex-direction: column; }
+.card-b .title { font-family: 'Cinzel', serif; font-size: 0.82rem; font-weight: 700; color: #071A0E; margin-bottom: 3px; line-height: 1.35; }
+.card-b .author { font-size: 0.72rem; color: #3D7A57; margin-bottom: 8px; }
+.card-b .desc { font-size: 0.71rem; color: #1B4332; line-height: 1.5; flex: 1; opacity: 0.85; margin-bottom: 10px; }
+.card-b .buy-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 14px;
+  background: linear-gradient(135deg, #1A6B2E, #2D9148);
+  color: #fff; border-radius: 20px; text-decoration: none;
+  font-size: 0.74rem; font-weight: 700; letter-spacing: 0.03em;
+  transition: opacity 0.2s; align-self: flex-start;
+}
+.card-b .buy-btn:hover { opacity: 0.88; }
+
+/* ── OPTION C: Premium Dark Card ── */
+.card-c {
+  background: linear-gradient(160deg, #0a2e14 0%, #123b1e 100%);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 6px 28px rgba(0,0,0,0.35);
+  border: 1px solid rgba(116,198,157,0.18);
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+.card-c:hover { transform: translateY(-5px); box-shadow: 0 14px 40px rgba(0,0,0,0.45), 0 0 0 1px rgba(116,198,157,0.3); }
+.card-c .cover {
+  width: 100%; aspect-ratio: 3/4; object-fit: cover;
+  background: linear-gradient(160deg, #1a5c30 0%, #0a2e14 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3.5rem; position: relative;
+}
+.card-c .cover::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(10,46,20,0.9) 0%, transparent 50%);
+}
+.card-c .body { padding: 14px; }
+.card-c .title { font-family: 'Cinzel', serif; font-size: 0.85rem; font-weight: 700; color: #e8f5ec; margin-bottom: 4px; line-height: 1.35; }
+.card-c .author { font-size: 0.74rem; color: #74C69D; margin-bottom: 8px; }
+.card-c .desc { font-size: 0.71rem; color: rgba(232,245,236,0.7); line-height: 1.5; margin-bottom: 12px; }
+.card-c .buy-btn {
+  display: block; width: 100%; text-align: center; padding: 8px;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #071A0E; border-radius: 8px; text-decoration: none;
+  font-size: 0.78rem; font-weight: 800; letter-spacing: 0.05em;
+  transition: opacity 0.2s;
+}
+.card-c .buy-btn:hover { opacity: 0.88; }
+
+/* ── OPTION D: Gold Accent Card ── */
+.card-d {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(15,69,32,0.10);
+  border: 1px solid rgba(204,168,0,0.25);
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+.card-d:hover { transform: translateY(-4px); box-shadow: 0 10px 32px rgba(204,168,0,0.2); }
+.card-d .cover-wrap { position: relative; }
+.card-d .cover {
+  width: 100%; aspect-ratio: 3/4; object-fit: cover;
+  background: linear-gradient(160deg, #f5f0d8 0%, #e8d98a 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3rem;
+}
+.card-d .badge {
+  position: absolute; top: 10px; right: 10px;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #071A0E; font-size: 0.62rem; font-weight: 800;
+  padding: 3px 8px; border-radius: 20px; letter-spacing: 0.05em;
+}
+.card-d .body { padding: 14px; }
+.card-d .title { font-family: 'Cinzel', serif; font-size: 0.85rem; font-weight: 700; color: #071A0E; margin-bottom: 4px; line-height: 1.35; }
+.card-d .author { font-size: 0.74rem; color: #3D7A57; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+.card-d .author::before { content: '✍️'; font-size: 0.7rem; }
+.card-d .desc { font-size: 0.72rem; color: #1B4332; line-height: 1.5; margin-bottom: 12px; opacity: 0.85; }
+.card-d .buy-btn {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  width: 100%; padding: 9px;
+  background: #fff;
+  color: #1A6B2E; border-radius: 8px; text-decoration: none;
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 0.04em;
+  border: 2px solid #1A6B2E;
+  transition: background 0.2s, color 0.2s;
+}
+.card-d .buy-btn:hover { background: #1A6B2E; color: #fff; }
+
+/* ── OPTION E: Minimal Clean Card ── */
+.card-e {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(15,69,32,0.08);
+  border: 1px solid #D8F3DC;
+  display: flex; flex-direction: column;
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+.card-e:hover { transform: translateY(-4px); box-shadow: 0 8px 28px rgba(15,69,32,0.15); }
+.card-e .cover {
+  width: 100%; aspect-ratio: 3/4;
+  background: linear-gradient(160deg, #d4edd9 0%, #a8d8b4 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3rem; position: relative;
+}
+.card-e .lang-tag {
+  position: absolute; bottom: 8px; left: 8px;
+  background: rgba(255,255,255,0.9); color: #1A6B2E;
+  font-size: 0.6rem; font-weight: 700; padding: 2px 7px; border-radius: 10px;
+  letter-spacing: 0.05em;
+}
+.card-e .body { padding: 12px 14px 14px; flex: 1; display: flex; flex-direction: column; }
+.card-e .title { font-family: 'Cinzel', serif; font-size: 0.83rem; font-weight: 700; color: #071A0E; margin-bottom: 3px; line-height: 1.35; }
+.card-e .author { font-size: 0.72rem; color: #3D7A57; margin-bottom: 10px; }
+.card-e .desc { font-size: 0.71rem; color: #1B4332; line-height: 1.55; flex: 1; margin-bottom: 12px; opacity: 0.85; }
+.card-e .buy-row { display: flex; align-items: center; justify-content: space-between; }
+.card-e .store { font-size: 0.66rem; color: #3D7A57; opacity: 0.7; }
+.card-e .buy-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 6px 14px;
+  background: linear-gradient(135deg, #1A6B2E, #2D9148);
+  color: #fff; border-radius: 20px; text-decoration: none;
+  font-size: 0.73rem; font-weight: 700;
+  transition: opacity 0.2s;
+}
+.card-e .buy-btn:hover { opacity: 0.85; }
+
+/* ── OPTION F: Magazine / Wide Banner ── */
+.card-f {
+  background: #F5FFFA;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(15,69,32,0.10);
+  border: 1px solid rgba(26,107,46,0.12);
+  display: flex; gap: 0;
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+.card-f:hover { transform: translateY(-4px); box-shadow: 0 10px 32px rgba(15,69,32,0.18); }
+.card-f .cover {
+  width: 120px; flex-shrink: 0;
+  background: linear-gradient(160deg, #1a5c30 0%, #3da664 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3rem;
+}
+.card-f .body { padding: 18px 16px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+.card-f .top .title { font-family: 'Cinzel', serif; font-size: 0.95rem; font-weight: 700; color: #071A0E; margin-bottom: 4px; }
+.card-f .top .author { font-size: 0.75rem; color: #3D7A57; margin-bottom: 8px; }
+.card-f .top .desc { font-size: 0.73rem; color: #1B4332; line-height: 1.55; opacity: 0.85; }
+.card-f .bottom { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; }
+.card-f .meta { font-size: 0.66rem; color: #3D7A57; opacity: 0.7; line-height: 1.5; }
+.card-f .buy-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 18px;
+  background: linear-gradient(135deg, #1A6B2E, #2D9148);
+  color: #fff; border-radius: 8px; text-decoration: none;
+  font-size: 0.78rem; font-weight: 700;
+  transition: opacity 0.2s; white-space: nowrap;
+}
+.card-f .buy-btn:hover { opacity: 0.88; }
+</style>
+</head>
+<body>
+
+<h1>Paid Books — Card Design Options</h1>
+<p class="subtitle">Choose a style that fits the site. All use the existing green theme.</p>
+
+<!-- Option A -->
+<div class="section-label">Option A — Classic Vertical (Portrait Book Cover)</div>
+<div class="grid">
+  <div class="card-a">
+    <div class="cover">📖</div>
+    <div class="body">
+      <div class="title">Tattva Bodha of Sri Yogi Ramsuratkumar</div>
+      <div class="author">by V. Ganesan</div>
+      <div class="desc">A profound exposition of the spiritual teachings, revealing the essence of the Master's wisdom for sincere seekers.</div>
+      <a href="#" class="buy-btn">🛒 Buy Now ↗</a>
+    </div>
+  </div>
+  <div class="card-a">
+    <div class="cover" style="background: linear-gradient(160deg, #d4e8d8 0%, #7ab89a 100%);">🙏</div>
+    <div class="body">
+      <div class="title">God's Grace in Human Form</div>
+      <div class="author">by Mathru Sri Sarada</div>
+      <div class="desc">Personal experiences with the Beggar Saint of Tiruvannamalai — stories of grace, miracles, and divine love.</div>
+      <a href="#" class="buy-btn">🛒 Buy Now ↗</a>
+    </div>
+  </div>
+  <div class="card-a">
+    <div class="cover" style="background: linear-gradient(160deg, #e8e0c8 0%, #c8a85a 100%);">✨</div>
+    <div class="body">
+      <div class="title">The Intoxicated Saint</div>
+      <div class="author">by Truman Caylor Wadlington</div>
+      <div class="desc">A rare Western perspective on the life and teachings of this extraordinary mystic from South India.</div>
+      <a href="#" class="buy-btn">🛒 Buy Now ↗</a>
+    </div>
+  </div>
+  <div class="card-a">
+    <div class="cover" style="background: linear-gradient(160deg, #d8e4f0 0%, #8aaed0 100%);">🌿</div>
+    <div class="body">
+      <div class="title">Yogi Ramsuratkumar — The Godchild</div>
+      <div class="author">by Ma Devaki</div>
+      <div class="desc">A devotional biography filled with grace-filled encounters and direct conversations with the Divine Beggar.</div>
+      <a href="#" class="buy-btn">🛒 Buy Now ↗</a>
+    </div>
+  </div>
+</div>
+
+<!-- Option B -->
+<div class="section-label">Option B — Horizontal Compact (Good for long lists)</div>
+<div class="grid">
+  <div class="card-b">
+    <div class="cover">📖</div>
+    <div class="body">
+      <div class="title">Tattva Bodha of Sri Yogi Ramsuratkumar</div>
+      <div class="author">by V. Ganesan</div>
+      <div class="desc">A profound exposition of the spiritual teachings and the essence of the Master's wisdom.</div>
+      <a href="#" class="buy-btn">🛒 Buy Now ↗</a>
+    </div>
+  </div>
+  <div class="card-b">
+    <div class="cover" style="background: linear-gradient(160deg, #d4e8d8 0%, #7ab89a 100%);">🙏</div>
+    <div class="body">
+      <div class="title">God's Grace in Human Form</div>
+      <div class="author">by Mathru Sri Sarada</div>
+      <div class="desc">Personal experiences with the Beggar Saint — stories of grace and divine love.</div>
+      <a href="#" class="buy-btn">🛒 Buy Now ↗</a>
+    </div>
+  </div>
+  <div class="card-b">
+    <div class="cover" style="background: linear-gradient(160deg, #e8e0c8 0%, #c8a85a 100%);">✨</div>
+    <div class="body">
+      <div class="title">The Intoxicated Saint</div>
+      <div class="author">by Truman Caylor Wadlington</div>
+      <div class="desc">A rare Western perspective on this extraordinary mystic from South India.</div>
+      <a href="#" class="buy-btn">🛒 Buy Now ↗</a>
+    </div>
+  </div>
+  <div class="card-b">
+    <div class="cover" style="background: linear-gradient(160deg, #d8e4f0 0%, #8aaed0 100%);">🌿</div>
+    <div class="body">
+      <div class="title">Yogi Ramsuratkumar — The Godchild</div>
+      <div class="author">by Ma Devaki</div>
+      <div class="desc">A devotional biography of grace-filled encounters with the Divine Beggar.</div>
+      <a href="#" class="buy-btn">🛒 Buy Now ↗</a>
+    </div>
+  </div>
+</div>
+
+<!-- Option C -->
+<div class="section-label">Option C — Premium Dark (Rich / Elegant)</div>
+<div class="grid">
+  <div class="card-c">
+    <div class="cover">📖</div>
+    <div class="body">
+      <div class="title">Tattva Bodha of Sri Yogi Ramsuratkumar</div>
+      <div class="author">by V. Ganesan</div>
+      <div class="desc">A profound exposition of the spiritual teachings and the essence of the Master's wisdom.</div>
+      <a href="#" class="buy-btn">🛒 Buy Now ↗</a>
+    </div>
+  </div>
+  <div class="card-c">
+    <div class="cover" style="background: linear-gradient(160deg, #1a3a2a 0%, #0a1a10 100%);">🙏</div>
+    <div class="body">
+      <div class="title">God's Grace in Human Form</div>
+      <div class="author">by Mathru Sri Sarada</div>
+      <div class="desc">Personal experiences with the Beggar Saint — stories of grace and divine love.</div>
+      <a href="#" class="buy-btn">🛒 Buy Now ↗</a>
+    </div>
+  </div>
+  <div class="card-c">
+    <div class="cover" style="background: linear-gradient(160deg, #3a2a10 0%, #1a1005 100%);">✨</div>
+    <div class="body">
+      <div class="title">The Intoxicated Saint</div>
+      <div class="author">by Truman Caylor Wadlington</div>
+      <div class="desc">A rare Western perspective on this extraordinary mystic from South India.</div>
+      <a href="#" class="buy-btn">🛒 Buy Now ↗</a>
+    </div>
+  </div>
+  <div class="card-c">
+    <div class="cover" style="background: linear-gradient(160deg, #1a2a3a 0%, #0a1020 100%);">🌿</div>
+    <div class="body">
+      <div class="title">Yogi Ramsuratkumar — The Godchild</div>
+      <div class="author">by Ma Devaki</div>
+      <div class="desc">A devotional biography of grace-filled encounters with the Divine Beggar.</div>
+      <a href="#" class="buy-btn">🛒 Buy Now ↗</a>
+    </div>
+  </div>
+</div>
+
+<!-- Option D -->
+<div class="section-label">Option D — Gold Accent (Subtle Premium)</div>
+<div class="grid">
+  <div class="card-d">
+    <div class="cover-wrap">
+      <div class="cover">📖</div>
+      <div class="badge">BOOK</div>
+    </div>
+    <div class="body">
+      <div class="title">Tattva Bodha of Sri Yogi Ramsuratkumar</div>
+      <div class="author">V. Ganesan</div>
+      <div class="desc">A profound exposition of spiritual teachings, revealing the essence of the Master's wisdom.</div>
+      <a href="#" class="buy-btn">🛒 Buy Now ↗</a>
+    </div>
+  </div>
+  <div class="card-d">
+    <div class="cover-wrap">
+      <div class="cover" style="background: linear-gradient(160deg, #f5f0d8 0%, #e8c870 100%);">🙏</div>
+      <div class="badge">BOOK</div>
+    </div>
+    <div class="body">
+      <div class="title">God's Grace in Human Form</div>
+      <div class="author">Mathru Sri Sarada</div>
+      <div class="desc">Personal experiences with the Beggar Saint — stories of grace and divine love.</div>
+      <a href="#" class="buy-btn">🛒 Buy Now ↗</a>
+    </div>
+  </div>
+  <div class="card-d">
+    <div class="cover-wrap">
+      <div class="cover" style="background: linear-gradient(160deg, #eef5e8 0%, #a8d890 100%);">✨</div>
+      <div class="badge">BOOK</div>
+    </div>
+    <div class="body">
+      <div class="title">The Intoxicated Saint</div>
+      <div class="author">Truman Caylor Wadlington</div>
+      <div class="desc">A rare Western perspective on this extraordinary mystic from South India.</div>
+      <a href="#" class="buy-btn">🛒 Buy Now ↗</a>
+    </div>
+  </div>
+  <div class="card-d">
+    <div class="cover-wrap">
+      <div class="cover" style="background: linear-gradient(160deg, #f0e8f5 0%, #c8a0d8 100%);">🌿</div>
+      <div class="badge">BOOK</div>
+    </div>
+    <div class="body">
+      <div class="title">Yogi Ramsuratkumar — The Godchild</div>
+      <div class="author">Ma Devaki</div>
+      <div class="desc">A devotional biography of grace-filled encounters with the Divine Beggar.</div>
+      <a href="#" class="buy-btn">🛒 Buy Now ↗</a>
+    </div>
+  </div>
+</div>
+
+<!-- Option E -->
+<div class="section-label">Option E — Minimal Clean (with language tag + store label)</div>
+<div class="grid">
+  <div class="card-e">
+    <div class="cover">
+      📖
+      <div class="lang-tag">ENGLISH</div>
+    </div>
+    <div class="body">
+      <div class="title">Tattva Bodha of Sri Yogi Ramsuratkumar</div>
+      <div class="author">by V. Ganesan</div>
+      <div class="desc">A profound exposition of spiritual teachings, revealing the essence of the Master's wisdom for sincere seekers.</div>
+      <div class="buy-row">
+        <div class="store">Available on Amazon</div>
+        <a href="#" class="buy-btn">Buy ↗</a>
+      </div>
+    </div>
+  </div>
+  <div class="card-e">
+    <div class="cover" style="background: linear-gradient(160deg, #d4e0f0 0%, #8aaed0 100%);">
+      🙏
+      <div class="lang-tag">TAMIL</div>
+    </div>
+    <div class="body">
+      <div class="title">God's Grace in Human Form</div>
+      <div class="author">by Mathru Sri Sarada</div>
+      <div class="desc">Personal experiences with the Beggar Saint — stories of grace and divine love across many years.</div>
+      <div class="buy-row">
+        <div class="store">Available on Flipkart</div>
+        <a href="#" class="buy-btn">Buy ↗</a>
+      </div>
+    </div>
+  </div>
+  <div class="card-e">
+    <div class="cover" style="background: linear-gradient(160deg, #f0e8d4 0%, #d0a870 100%);">
+      ✨
+      <div class="lang-tag">ENGLISH</div>
+    </div>
+    <div class="body">
+      <div class="title">The Intoxicated Saint</div>
+      <div class="author">by Truman Caylor Wadlington</div>
+      <div class="desc">A rare Western perspective on this extraordinary mystic and saint from South India.</div>
+      <div class="buy-row">
+        <div class="store">Available on Amazon</div>
+        <a href="#" class="buy-btn">Buy ↗</a>
+      </div>
+    </div>
+  </div>
+  <div class="card-e">
+    <div class="cover" style="background: linear-gradient(160deg, #e8d4f0 0%, #a870c8 100%);">
+      🌿
+      <div class="lang-tag">ENGLISH</div>
+    </div>
+    <div class="body">
+      <div class="title">Yogi Ramsuratkumar — The Godchild</div>
+      <div class="author">by Ma Devaki</div>
+      <div class="desc">A devotional biography filled with grace-filled encounters with the Divine Beggar.</div>
+      <div class="buy-row">
+        <div class="store">Publisher's Site</div>
+        <a href="#" class="buy-btn">Buy ↗</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Option F -->
+<div class="section-label">Option F — Wide Banner (Best for few featured books)</div>
+<div class="grid-3">
+  <div class="card-f">
+    <div class="cover">📖</div>
+    <div class="body">
+      <div class="top">
+        <div class="title">Tattva Bodha of Sri Yogi Ramsuratkumar</div>
+        <div class="author">by V. Ganesan</div>
+        <div class="desc">A profound exposition of the spiritual teachings, revealing the essence of the Master's wisdom for sincere seekers on the path.</div>
+      </div>
+      <div class="bottom">
+        <div class="meta">English<br/>Available on Amazon</div>
+        <a href="#" class="buy-btn">🛒 Buy Now ↗</a>
+      </div>
+    </div>
+  </div>
+  <div class="card-f">
+    <div class="cover" style="background: linear-gradient(160deg, #3a2010 0%, #1a5c30 100%);">🙏</div>
+    <div class="body">
+      <div class="top">
+        <div class="title">God's Grace in Human Form</div>
+        <div class="author">by Mathru Sri Sarada</div>
+        <div class="desc">Personal experiences with the Beggar Saint of Tiruvannamalai — stories of grace, miracles, and divine love across many years.</div>
+      </div>
+      <div class="bottom">
+        <div class="meta">Tamil / English<br/>Available on Flipkart</div>
+        <a href="#" class="buy-btn">🛒 Buy Now ↗</a>
+      </div>
+    </div>
+  </div>
+  <div class="card-f">
+    <div class="cover" style="background: linear-gradient(160deg, #2a1a3a 0%, #1a3a5c 100%);">✨</div>
+    <div class="body">
+      <div class="top">
+        <div class="title">The Intoxicated Saint</div>
+        <div class="author">by Truman Caylor Wadlington</div>
+        <div class="desc">A rare Western perspective on the life and teachings of this extraordinary mystic from South India.</div>
+      </div>
+      <div class="bottom">
+        <div class="meta">English<br/>Publisher's Site</div>
+        <a href="#" class="buy-btn">🛒 Buy Now ↗</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
